@@ -1,0 +1,9 @@
+.DS_STORE
+.vs/
+*.user
+bin/
+obj/
+dist/
+node_modules
+npm-debug.log
+
