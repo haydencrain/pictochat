@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "lib": ["es2015", "es2017", "dom"],
+    "module": "es6",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "outDir": "./wwwroot/dist/",
+    "sourceMap": true,
+    "target": "es5"
+  },
+  "exclude": ["node_modules", "typings", "wwwroot"]
+}
