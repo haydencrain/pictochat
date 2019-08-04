@@ -13,5 +13,8 @@ module.exports = merge(common, {
     index: 'index.html',
     open: true,
     port: 3000
+  },
+  watchOptions: {
+    poll: true
   }
 });
