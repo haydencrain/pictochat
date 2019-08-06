@@ -1,0 +1,7 @@
+# Nodejs
+node_modules
+
+# Build/compiler output
+build
+tsc
+
