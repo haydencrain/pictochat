@@ -8,6 +8,10 @@ var usersRouter = require('./routes/users');
 var testAPIRouter = require('./routes/testAPI');
 var process = require('process');
 
+// CONSTANTS
+const PORT = process.env.PICTOCHAT_BACKEND_PORT || 3000;
+
+
 var app = express();
 
 app.use(function (req, res, next) {
@@ -15,7 +19,7 @@ app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type', 'Authorization');
 
-  if (req.method.toUpperCase() == "OPTIONS"){
+  if (req.method.toUpperCase() == "OPTIONS") {
     res.status(200).send();
     return;
   }
@@ -36,13 +40,13 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/testAPI', testAPIRouter);
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -52,5 +56,6 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.listen()
-//module.exports = app;
+// module.exports = app;
+
+app.listen(PICTOCHAT_BACKEND_PORT, () => console.log(`Pictochat server is listening on ${PORT}`));
