@@ -3,9 +3,9 @@ import {DiscussionPost} from '../../model/DiscussionPost';
 import discussionService from '../../services/DiscussionService';
 import './DiscussionView.less';
 
-function PostView(props: { post: DiscussionPost }): any {
+function PostView(props: {post: DiscussionPost, level: number}): any {
   const replies = props.post.replies.map((replyPost: DiscussionPost) => {
-    return <PostView post={replyPost} key={replyPost.postId} />;
+    return <PostView post={replyPost} key={replyPost.postId} level={props.level + 1}/>;
   });
   return (
     <div className="post-view-container">
@@ -15,7 +15,9 @@ function PostView(props: { post: DiscussionPost }): any {
       </div>
       <div className="post-view-content">
         <img className="post-view"
-            src={props.post.imageSrc}/>
+            src={props.post.imageSrc} 
+            //height={props.level*0.1 + />
+            />
       </div>
       <div className="post-view-replies">
         {replies}
@@ -48,7 +50,7 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
   }
 
   getDiscussion() {
-    return (this.useState) ? this.state.discussion : this.props.discussion;
+    return this.useState ? this.state.discussion : this.props.discussion;
   }
 
   render() {
@@ -57,7 +59,7 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
       return (
         <div className="discussion-view-container">
           <div className="root-post">
-            <PostView post={discussion}/>
+            <PostView post={discussion} level={0}/>
           </div>
         </div>
       );
