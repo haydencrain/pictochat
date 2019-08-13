@@ -9,7 +9,7 @@ module.exports = {
   entry: { main: './src/index.tsx' },
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, '../build/pictochat-fe')
   },
   plugins: [
     new CleanWebpackPlugin(),

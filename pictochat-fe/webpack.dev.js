@@ -8,7 +8,7 @@ module.exports = merge(common, {
   // devtool: false // use this if you want 30% faster builds but no sourcemap
   devServer: {
     compress: true,
-    contentBase: path.join(__dirname, 'dist'),
+    contentBase: path.join(__dirname, '../build/pictochat-fe'),
     historyApiFallback: true,
     index: 'index.html',
     open: true,
