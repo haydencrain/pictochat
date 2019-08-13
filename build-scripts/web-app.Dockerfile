@@ -10,15 +10,3 @@ RUN mkdir -p /pictochat/
 WORKDIR /pictochat
 COPY ./package.json ./package-lock.json ./
 RUN npm install
-
-# Install back-end deps.
-RUN mkdir -p /pictochat/pictochat-be
-WORKDIR /pictochat/pictochat-be
-COPY ./package.json ./package-lock.json ./
-RUN npm install
-
-# Install front-end deps.
-RUN mkdir -p /pictochat/pictochat-fe
-WORKDIR /pictochat/pictochat-fe
-COPY ./package.json ./package-lock.json ./
-RUN npm install
