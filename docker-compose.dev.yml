@@ -5,7 +5,7 @@ services:
     build: 
         dockerfile: ./build-scripts/web-app.Dockerfile
         context: .
-    command: sh -c "npm run start --prefix /pictochat-be && npm run run-dev-docker --prefix /pictochat-fe &"
+    command: sh -c "npm run start-dev-remote"
     environment:
       - NODE_ENV=development
     ports:
@@ -14,8 +14,6 @@ services:
     volumes:
       - .:/pictochat # mounting local dir to support live reloading
       - /pictochat/node_modules # effectively unmounts node_modules (solves some problems for Windows hosts)
-      - /pictochat/pictochat-fe/node_modules
-      - /pictochat/pictochat-be/node_modules
     depends_on:
       - pictochat-db
   pictochat-db:

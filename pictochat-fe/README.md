@@ -1,8 +1,8 @@
-# Pictochat front end Repository
+# Pictochat front end
 
 ## Starting locally
 ```
 npm install
-npm run build-dev
-npm start
+npm run build-frontend-dev
+npm start-frontend-dev
 ```
