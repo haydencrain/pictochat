@@ -5,13 +5,15 @@
   "main": "",
   "scripts": {
     "start": "npm run start-dev-remote",
+    "build": "npm run build-backend-prod && npm run build-frontend-prod",
+    "build-backend-prod": "echo \"ERROR: pictochat backend build script not implemented\" && exit 1",
+    "build-frontend-prod": "webpack --config ./pictochat-fe/webpack.prod.js",
     "start-dev": "concurrently \"npm run start-frontend-dev\" \"npm run start-backend-dev\"",
     "start-dev-remote": "concurrently \"npm run start-frontend-dev-remote\" \"npm run start-backend-dev\"",
     "start-backend-dev": "nodemon ./pictochat-be/app.js",
     "start-frontend-dev": "webpack-dev-server --config ./pictochat-fe/webpack.dev.js",
     "start-frontend-dev-remote": "webpack-dev-server --config ./pictochat-fe/webpack.dev.js --host 0.0.0.0",
     "build-frontend-dev": "webpack --config ./pictochat-fe/webpack.dev.js",
-    "build-frontend-prod": "webpack --config ./pictochat-fe/webpack.prod.js",
     "tsc": "tsc"
   },
   "repository": {
