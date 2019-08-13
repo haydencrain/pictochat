@@ -56,6 +56,4 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
-// module.exports = app;
-
-app.listen(PICTOCHAT_BACKEND_PORT, () => console.log(`Pictochat server is listening on ${PORT}`));
+app.listen(PORT, () => console.log(`Pictochat server is listening on ${PORT}`));
