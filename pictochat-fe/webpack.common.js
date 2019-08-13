@@ -15,7 +15,8 @@ module.exports = {
     new CleanWebpackPlugin(),
     new CopyWebpackPlugin([
       {
-        from: 'public'
+        from: path.join(__dirname, 'public'),
+        to: path.join(__dirname, '../build/pictochat-fe') // This feels unnessary
       }
     ]),
     new HtmlWebpackPlugin({

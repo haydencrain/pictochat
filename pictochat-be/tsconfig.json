@@ -1,8 +1,8 @@
 {
     "extends": "../tsconfig.json",
     "compilerOptions": {
-        "outDir": "../build/server",
-        "rootDir": "../server",
+        "outDir": "../build/pictochat-be",
+        "rootDir": "../pictochat-be",
         "types": []
     }
 }

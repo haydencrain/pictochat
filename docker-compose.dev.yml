@@ -8,8 +8,10 @@ services:
     command: sh -c "npm run start-dev-remote"
     environment:
       - NODE_ENV=development
+      - PICTOCHAT_BACKEND_PORT=9000
     ports:
       - '3000:3000'
+      - '9000:9000'
     working_dir: /pictochat
     volumes:
       - .:/pictochat # mounting local dir to support live reloading

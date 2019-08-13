@@ -1,6 +1,7 @@
 const merge = require('webpack-merge');
 const common = require('./webpack.common.js');
 const path = require('path');
+const DotenvPlugin = require('dotenv-webpack');
 
 module.exports = merge(common, {
   mode: 'development',
@@ -16,5 +17,12 @@ module.exports = merge(common, {
   },
   watchOptions: {
     poll: true
-  }
+  },
+  plugins: [
+    // injects any variables set in .env.dev into process.env.<varname>
+    new DotenvPlugin({
+      path: path.join(__dirname, '../.env.dev'),
+      systemvars: true // any existing environment variables already set take precedence
+    })
+  ]
 });

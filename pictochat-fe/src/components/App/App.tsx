@@ -11,7 +11,7 @@ interface IState {
   apiResponse: string;
 }
 
-interface IProps {}
+interface IProps { }
 
 const Test = (props: TestProps) => (
   <div className="test">
@@ -21,15 +21,17 @@ const Test = (props: TestProps) => (
 );
 
 class App extends React.Component<IProps, IState> {
+  static readonly API_ROOT: string = process.env.PICTOCHAT_API_ROOT;
+
   constructor(props: IProps) {
     super(props as any);
-    this.state = {apiResponse: ""};
+    this.state = { apiResponse: "" };
   }
 
-  callApi(){
-    fetch("http://192.168.99.100:9000/testAPI")
+  private callApi() {
+    fetch(App.API_ROOT + '/test')
       .then(res => res.text())
-      .then(res => this.setState({apiResponse: res}))
+      .then(res => this.setState({ apiResponse: res }))
       .catch(err => err);
   }
 
@@ -40,9 +42,9 @@ class App extends React.Component<IProps, IState> {
   render() {
     return (
       <div className="app">
-        <Test header="Hello World!"/>
+        <Test header="Hello World!" />
         <SignUp />
-        <br/>
+        <br />
         <p>{this.state.apiResponse}</p>
       </div>
     );
