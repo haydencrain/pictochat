@@ -4,6 +4,7 @@
   "description": "This repository contains the Project for Assessment 3 of 31242 Advanced Internet",
   "main": "",
   "scripts": {
+    "start-dev": "concurrently \"npm run start-dev --prefix ./pictochat-be\" \"npm run start-dev --prefix ./pictochat-fe\"",
     "build-server": "tsc",
     "start-server": "node build/server/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.0",
+    "concurrently": "^4.1.1",
     "nodemon": "^1.19.1",
     "typescript": "^3.5.3"
   }

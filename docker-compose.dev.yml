@@ -2,31 +2,22 @@
 version: '3'
 services:
   web-app:
-    build: ./pictochat-fe
-    command: sh -c "npm run build && npm run run-dev-docker"
+    build: 
+        dockerfile: ./build-scripts/web-app.Dockerfile
+        context: .
+    command: sh -c "npm run start --prefix /pictochat-be && npm run run-dev-docker --prefix /pictochat-fe &"
     environment:
       - NODE_ENV=development
     ports:
-      - '3000:3000' # port configured for webpack dev server
-    working_dir: /root/web-app
+      - '3000:3000'
+    working_dir: /pictochat
     volumes:
-      - ./pictochat-fe:/root/web-app # mounting local dir to support live reloading
-      - /root/web-app/node_modules # effectively unmounts node_modules (solves some problems for Windows hosts)
+      - .:/pictochat # mounting local dir to support live reloading
+      - /pictochat/node_modules # effectively unmounts node_modules (solves some problems for Windows hosts)
+      - /pictochat/pictochat-fe/node_modules
+      - /pictochat/pictochat-be/node_modules
     depends_on:
       - pictochat-db
-  web-app-be:
-      build: ./pictochat-be
-      command: sh -c "npm start"
-      environment:
-        - NODE_ENV=development
-      ports:
-        - '9000:9000' # port configured for webpack dev server
-      working_dir: /root/web-app-be
-      volumes:
-        - ./pictochat-be:/root/web-app-be # mounting local dir to support live reloading
-        - /root/web-app-be/node_modules # effectively unmounts node_modules (solves some problems for Windows hosts)
-      depends_on:
-        - pictochat-db
   pictochat-db:
     image: mongo:4.0.11
     restart: always

@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run run-dev",
     "build": "npm run build-dev",
-    "run-dev": "webpack-dev-server --config webpack.dev.js",
-    "run-dev-docker": "webpack-dev-server --config webpack.dev.js --host 0.0.0.0",
+    "run-dev": "webpack-dev-server --config webpack.dev.js --host 0.0.0.0",
+    "start-dev": "npm run run-dev",
     "build-dev": "webpack --config webpack.dev.js",
     "build-prod": "webpack --config webpack.prod.js"
   },
