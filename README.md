@@ -15,10 +15,12 @@ This repository contains the Project for Assessment 3 of 31242 Advanced Internet
 
     `$ docker-compose -f docker-compose.dev.yml up --build`
 
-    On sub-sequent runs, the containers can be spun up without being rebuilt by removing the --build option, i.e.
+    On subsequent runs, the containers can be spun up without being rebuilt by removing the --build option, i.e.
 
     `$ docker-compose -f docker-compose.dev.yml up`
 
-Web services exposed by each container will be available at \<docker-machine ip\>:\<port\>
+Web services exposed by each container will be available at:
+* \<docker-machine ip\>:\<port\> , on Window hosts
+* localhost:\<port\>, on Mac and Linux hosts
 
-Note that containers will need to be rebuild after any change which alters the output of the setup steps performed in the build-scripts/* docker files (e.g. adding a new npm dependency).
+Note that containers will need to be rebuilt after any change which alters the output of the setup steps performed in the build-scripts/* docker files (e.g. adding a new npm dependency).
