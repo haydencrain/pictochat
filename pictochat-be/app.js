@@ -52,3 +52,4 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+const port  = app.listen(process.env.port || '3434');
