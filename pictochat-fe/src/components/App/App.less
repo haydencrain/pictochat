@@ -16,6 +16,8 @@ body {
 }
 
 #main-content {
-  height: 100%;
-  padding: calc(@navHeight + 30px) 30px 30px;
+  position: relative;
+  top: @navHeight;
+  height: calc(100% - @navHeight);
+  padding: 30px;
 }
