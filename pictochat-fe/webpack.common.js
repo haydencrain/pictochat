@@ -5,16 +5,18 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+  context: path.resolve(__dirname),
   entry: { main: './src/index.tsx' },
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, '../build/pictochat-fe')
   },
   plugins: [
     new CleanWebpackPlugin(),
     new CopyWebpackPlugin([
       {
-        from: 'public'
+        from: path.join(__dirname, 'public'),
+        to: path.join(__dirname, '../build/pictochat-fe') // This feels unnessary
       }
     ]),
     new HtmlWebpackPlugin({
