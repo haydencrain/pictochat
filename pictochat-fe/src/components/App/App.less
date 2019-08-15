@@ -1,5 +1,23 @@
-.app {
-  img {
-    height: 300px;
+@import '../../styles/_constants.less';
+
+body {
+  background-color: @appBackground;
+}
+
+#app {
+  height: 100%;
+
+  a {
+    text-decoration: underline;
+    &:hover {
+      text-decoration: underline;
+    }
   }
+}
+
+#main-content {
+  position: relative;
+  top: @navHeight;
+  height: calc(100% - @navHeight);
+  padding: 30px;
 }
