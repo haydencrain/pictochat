@@ -1,8 +1,21 @@
 @import '../../styles/_constants.less';
 
-.app {
+body {
   background-color: @appBackground;
-  img {
-    height: 300px;
+}
+
+#app {
+  height: 100%;
+
+  a {
+    text-decoration: underline;
+    &:hover {
+      text-decoration: underline;
+    }
   }
+}
+
+#main-content {
+  height: 100%;
+  padding: calc(@navHeight + 30px) 30px 30px;
 }
