@@ -23,4 +23,4 @@ Web services exposed by each container will be available at:
 * \<docker-machine ip\>:\<port\> , on Window hosts
 * localhost:\<port\>, on Mac and Linux hosts
 
-Note that containers will need to be rebuilt after any change which alters the output of the setup steps performed in the build-scripts/* docker files (e.g. adding a new npm dependency).
+_Note that containers will need to be rebuilt after any change which alters the output of the setup steps performed in the build-scripts/* docker files (e.g. adding a new npm dependency). You may find it helpful to rebuild the containers after merging code from other developers._
