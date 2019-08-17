@@ -1,56 +1,24 @@
 import * as React from 'react';
-import duck from '../../images/duck.jpg';
-import SignUp from '../SignUp/SignUp';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import Navbar from '../common/Navbar';
+import HomePage from '../pages/Home';
+import NotFoundPage from '../pages/NotFound';
+import DiscussionPage from '../pages/Discussion';
+import LeaderboardPage from '../pages/Leaderboard';
+import RegisterPage from '../pages/Register';
 import './App.less';
 
-interface TestProps {
-  header: string;
-}
-
-interface IState {
-  apiResponse: string;
-}
-
-interface IProps { }
-
-const Test = (props: TestProps) => (
-  <div className="test">
-    <h1>{props.header}</h1>
-    <img src={duck} />
-  </div>
+export default () => (
+  <BrowserRouter>
+    <Navbar />
+    <main id="main-content">
+      <Switch>
+        <Route exact path="/" component={HomePage} />
+        <Route exact path="/discussion" component={DiscussionPage} />
+        <Route exact path="/leaderboard" component={LeaderboardPage} />
+        <Route exact path="/register" component={RegisterPage} />
+        <Route component={NotFoundPage} />
+      </Switch>
+    </main>
+  </BrowserRouter>
 );
-
-class App extends React.Component<IProps, IState> {
-  static readonly API_ROOT: string = process.env.PICTOCHAT_API_ROOT;
-
-  constructor(props: IProps) {
-    super(props as any);
-    this.state = { apiResponse: "" };
-  }
-
-  private callApi() {
-    fetch(App.API_ROOT + '/test')
-      .then(res => res.text())
-      .then(res => this.setState({ apiResponse: res }))
-      .catch(err => err);
-  }
-
-  componentDidMount() {
-    this.callApi();
-  }
-
-  render() {
-    return (
-      <div className="app">
-        <Test header="Hello World!" />
-        <SignUp />
-        <br />
-        <p>{this.state.apiResponse}</p>
-      </div>
-    );
-  }
-}
-
-
-
-export default App;

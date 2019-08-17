@@ -5,8 +5,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  context: path.resolve(__dirname),
-  entry: { main: './src/index.tsx' },
+  entry: { main: path.resolve(__dirname, './src/index.tsx') },
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, '../build/pictochat-fe')
@@ -20,7 +19,7 @@ module.exports = {
       }
     ]),
     new HtmlWebpackPlugin({
-      template: 'public/index.html',
+      template: path.join(__dirname, 'public/index.html'),
       title: 'index.html',
       minify: true
     }),
