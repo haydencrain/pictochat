@@ -7,6 +7,16 @@ import './DiscussionPage.less';
 
 // HELPER COMPONENTS
 
+function PostActionsGroup(props: {}) {
+  return (
+    <div>
+      <Button>Edit</Button>
+      <Button>Reply</Button>
+      <Button>React</Button>
+    </div>
+  );
+}
+
 function PostHeader(props: { post: DiscussionPost }) {
   return (
     <div className="post-header">
@@ -17,23 +27,14 @@ function PostHeader(props: { post: DiscussionPost }) {
   );
 }
 
-function PostRepliesSection(props: { replies: DiscussionPost[], level: number }) {
+function PostRepliesSection(props: { replies: DiscussionPost[] }) {
   if (props.replies.length > 0) {
     const replies = props.replies.map((replyPost: DiscussionPost, i) => {
-      return (
-        <div key={replyPost.postId}>
-          {/*i > 0 ? <Divider /> : null*/}
-          <PostView post={replyPost} level={props.level + 1} />
-        </div>
-      );
+      return <PostView post={replyPost} key={replyPost.postId} />;
     });
-
     return (
-      <div>
-        {/*<Divider />*/}
-        <div className="post-replies-container">
-          {replies}
-        </div>
+      <div className="post-replies-container">
+        {replies}
       </div>
     );
   } else {
@@ -42,7 +43,7 @@ function PostRepliesSection(props: { replies: DiscussionPost[], level: number })
   }
 }
 
-function PostView(props: { post: DiscussionPost, level: number }): any {
+function PostView(props: { post: DiscussionPost }): any {
   let postClasses = "post-container";
   if (props.post.replies.length === 0) {
     postClasses += " no-replies";
@@ -51,18 +52,14 @@ function PostView(props: { post: DiscussionPost, level: number }): any {
     <div className={postClasses}>
       <div className="post-header-content-container">
         <PostHeader post={props.post} />
-        {/*<div className="post-header">
-        <span className="post-view-username">{props.post.author.userName}</span>
-        <span className="post-view-posted-date">{props.post.postedDate}</span>
-      </div>*/}
         <div className="post-content">
           <Image
             className="post-content"
             src={props.post.imageSrc} />
-          {/*height={props.level*0.1 + />*/}
         </div>
+        <PostActionsGroup />
       </div>
-      <PostRepliesSection replies={props.post.replies} level={props.level} />
+      <PostRepliesSection replies={props.post.replies} />
     </div>
   );
 }
@@ -96,7 +93,7 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
     const rootPost = this.getDiscussion();
     if (rootPost !== null) {
       const rootReplies = rootPost.replies.map((post: DiscussionPost) => {
-        return <PostView post={post} level={1} key={post.postId} />
+        return <PostView post={post} key={post.postId} />
       });
       return (
         <section id="discussion-page" className="discussion-view-container">
@@ -123,11 +120,7 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
         <a>&#8617; View all threads</a>
         <PostHeader post={rootPost} />
         <Image className="post-content" src={rootPost.imageSrc} />
-        <div>
-          <Button>Edit</Button>
-          <Button>Reply</Button>
-          <Button>React</Button>
-        </div>
+        <PostActionsGroup />
       </div>
     );
   }
