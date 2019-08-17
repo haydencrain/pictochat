@@ -1,15 +1,84 @@
 #discussion-page {
-    
-    .post-view-user-details {
-        span {
-            padding: 0 10px 0 0;
-        }
+
+  .root-post-container {
+
+    margin: 0 auto;
+    max-width: 1070px;
+    margin: 0 20px;
+
+    img {
+      max-height: 435px;
+      max-width: 1069px;
+      margin: 0 auto;
     }
-    
-    .post-view-content { 
-        img {
-            max-width: 500px;
-            max-height: 500px;
-        }
+
+  }
+
+  .post-replies-container {
+    padding-left: 26px;
+    border-left: 1px solid rgba(34,36,38,0.15)
+    // border-left: 1px solid black;
+    // border-top: 1px solid black;
+  }
+
+  // .post-container.no-replies {
+  //   border-bottom: 1px solid rgba(34,36,38,.15);
+  // }
+
+  .post-header-content-container {
+    border: 1px solid rgba(34,36,38,.15);
+    // border: 1px solid #707070;
+    box-shadow: 0px 3px 6px rgba(112, 112, 112, 0.15);
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    opacity: 1;
+    padding: 10px;
+  }
+
+  .post-container {
+    margin: 1rem 0;
+    // border-top: 1px solid rgba(34,36,38,.15);
+    // border-left: 1px solid rgba(34,36,38,.15);
+    // border-right: 1px solid rgba(34,36,38,.15);
+    // border-top: 1px solid rgba(34,36,38,.15);
+    .post-header {
+      margin: 10px 0;
     }
+
+    .divider {
+      // margin: 1px 0;
+    }
+  }
+
+  .post-header {
+
+    span {
+      margin-left: 10px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+    }
+
+    .post-author-name {
+      font-size: 14;
+      font-weight: bold;
+      color: black;
+    }
+
+    .post-posted-date {
+      font-size: 12;
+      color: rgba(0, 0, 0, 0.43);
+    }
+
+  }
+
+  .post-content {
+    padding-bottom: 10px;
+    margin-left: 10px;
+    img {
+      max-width: 400px;
+      max-height: 250px;
+    }
+  }
 }
