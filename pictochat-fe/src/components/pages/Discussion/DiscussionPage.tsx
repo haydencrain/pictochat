@@ -12,9 +12,9 @@ import './DiscussionPage.less';
 function PostActionsGroup(props: {}) {
   return (
     <div>
-      <Button>Edit</Button>
-      <Button>Reply</Button>
-      <Button>React</Button>
+      <Button className="link">Edit</Button>
+      <Button className="link">Reply</Button>
+      <Button className="link">React</Button>
     </div>
   );
 }

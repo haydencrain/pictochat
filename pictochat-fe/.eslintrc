@@ -1,13 +1,6 @@
 {
-  "plugins": [
-    "@typescript-eslint"
-  ],
-  "extends": [
-    "airbnb-typescript",
-    "airbnb-typescript",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
+  "plugins": ["@typescript-eslint"],
+  "extends": ["airbnb-typescript", "airbnb-typescript", "plugin:@typescript-eslint/recommended", "prettier"],
   "env": {
     "browser": true,
     "es6": true
@@ -24,10 +17,7 @@
     "sourceType": "module"
   },
   "rules": {
-    "indent": [
-      "warn",
-      2
-    ],
+    "indent": ["warn", 2],
     "comma-dangle": "off",
     "no-var-requires": false
   }
