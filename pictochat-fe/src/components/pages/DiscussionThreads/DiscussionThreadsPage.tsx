@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Image, Button, Header } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
 import PostHeader from '../../common/PostHeader';
 import { DiscussionPost } from '../../../model/DiscussionPost';
 import discussionService from '../../../services/DiscussionService';
@@ -15,10 +16,11 @@ function ThreadSummaryComponent(props: { discussionRootPost: DiscussionPost }) {
         <Image src={rootPost.imageSrc} />
       </div>
       <div className="thread-summary-links-container">
-        <Button className="link">Comments ({numReplies})</Button>
+        <Link className="link" to="/discussion">Comments ({numReplies})</Link>
+        {/*<Button className="link">Comments ({numReplies})</Button>*/}
         <Button className="link">Share</Button>
       </div>
-    </div>
+    </div >
   );
 }
 

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Image, Button, Header, Label, Dropdown } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
 import PostHeader from '../../common/PostHeader';
 import { DiscussionPost } from '../../../model/DiscussionPost';
 import discussionService from '../../../services/DiscussionService';
@@ -119,7 +120,7 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
   private renderRootPost(rootPost: DiscussionPost): any {
     return (
       <div className="root-post-container">
-        <a>&#8617; View all threads</a>
+        <Link to="/threads">&#8617; View all threads</Link>
         <PostHeader post={rootPost} />
         <Image className="root-post-content" src={rootPost.imageSrc} />
         <PostActionsGroup />
