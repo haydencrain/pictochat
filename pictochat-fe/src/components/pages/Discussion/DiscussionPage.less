@@ -1,7 +1,35 @@
 #discussion-page {
 
-  .root-post-container {
+  /*.right-aligning-block-container {
+    display: flex;
+    justify-content: flex-end;
+  }*/
 
+  // ROOT AND NON-ROOT POSTS
+  // .post-header {
+  //   span {
+  //     margin-left: 10px;
+  //   }
+
+  //   .avatar {
+  //     width: 40px;
+  //     height: 40px;
+  //   }
+
+  //   .post-author-name {
+  //     font-size: 14;
+  //     font-weight: bold;
+  //     color: black;
+  //   }
+
+  //   .post-posted-date {
+  //     font-size: 12;
+  //     color: rgba(0, 0, 0, 0.43);
+  //   }
+  // }
+
+  // ROOT POST
+  .root-post-container {
     margin: 0 auto;
     max-width: 1070px;
     margin: 0 20px;
@@ -11,64 +39,52 @@
       max-width: 1069px;
       margin: 0 auto;
     }
-
   }
 
-  .post-replies-container {
-    padding-left: 26px;
-    border-left: 1px solid rgba(34, 36, 38, 0.15);
+  .root-replies-header-container {
+    // height:
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    .replies-sort-by-container {
+      display: flex;
+      justify-content: flex-end;
+      flex-grow: 1;
+    }
+    .header {
+      flex-grow: 1;
+      margin: auto 0;
+    }
   }
 
-  .post-header-content-container {
-    border: 1px solid rgba(34, 36, 38, 0.15);
-    box-shadow: 0px 3px 6px rgba(112, 112, 112, 0.15);
-    opacity: 1;
-    padding: 10px;
-  }
-
+  // NON-ROOT POSTS
   .post-container {
-
     margin: 1rem 0;
 
     .post-header {
       margin: 10px 0;
     }
 
-  }
-
-  .post-header {
-
-    span {
+    .post-content {
+      padding-bottom: 10px;
       margin-left: 10px;
+
+      img {
+        max-width: 400px;
+        max-height: 250px;
+      }
     }
 
-    .avatar {
-      width: 40px;
-      height: 40px;
+    .post-replies-container {
+      padding-left: 26px;
+      border-left: 1px solid rgba(34, 36, 38, 0.15);
     }
 
-    .post-author-name {
-      font-size: 14;
-      font-weight: bold;
-      color: black;
+    .post-header-and-content-container {
+      border: 1px solid rgba(34, 36, 38, 0.15);
+      box-shadow: 0px 3px 6px rgba(112, 112, 112, 0.15);
+      opacity: 1;
+      padding: 10px;
     }
-
-    .post-posted-date {
-      font-size: 12;
-      color: rgba(0, 0, 0, 0.43);
-    }
-
-  }
-
-  .post-content {
-
-    padding-bottom: 10px;
-    margin-left: 10px;
-
-    img {
-      max-width: 400px;
-      max-height: 250px;
-    }
-
   }
 }

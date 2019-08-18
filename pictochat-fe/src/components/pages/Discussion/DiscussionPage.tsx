@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Image, Button, Header, Divider } from 'semantic-ui-react';
+import { Image, Button, Header, Label, Dropdown } from 'semantic-ui-react';
+import PostHeader from '../../common/PostHeader';
 import { DiscussionPost } from '../../../model/DiscussionPost';
 import discussionService from '../../../services/DiscussionService';
 import './DiscussionPage.less';
@@ -13,16 +14,6 @@ function PostActionsGroup(props: {}) {
       <Button>Edit</Button>
       <Button>Reply</Button>
       <Button>React</Button>
-    </div>
-  );
-}
-
-function PostHeader(props: { post: DiscussionPost }) {
-  return (
-    <div className="post-header">
-      <Image src={props.post.author.userAvatarURI} avatar />
-      <span className="post-author-name">{props.post.author.userName}</span>
-      <span className="post-posted-date">{props.post.postedDate}</span>
     </div>
   );
 }
@@ -50,7 +41,7 @@ function PostView(props: { post: DiscussionPost }): any {
   }
   return (
     <div className={postClasses}>
-      <div className="post-header-content-container">
+      <div className="post-header-and-content-container">
         <PostHeader post={props.post} />
         <div className="post-content">
           <Image
@@ -70,6 +61,10 @@ interface DiscussionViewProps {
   discussion?: DiscussionPost;
 }
 export class DiscussionView extends React.Component<DiscussionViewProps, DiscussionViewProps> {
+  static readonly REPLIES_SORT_OPTIONS = [
+    { key: 'MOST_RECENT', value: 'MOST_RECENT', text: 'Most Recent' }
+  ];
+
   private useState: boolean;
 
   constructor(props: DiscussionViewProps) {
@@ -78,9 +73,7 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
     //      This should be pulled out into a discussion store
     this.useState = !props.hasOwnProperty('discussion');
     if (this.useState) {
-      this.state = {
-        discussion: null
-      };
+      this.state = { discussion: null };
       discussionService.getDiscussion("1")
         .then((discussion: DiscussionPost) => {
           this.setState({ discussion: discussion });
@@ -98,10 +91,19 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
       return (
         <section id="discussion-page" className="discussion-view-container">
           {this.renderRootPost(rootPost)}
-          <Header as="h2">Replies ({rootPost.replies.length})</Header>
+          <div className="root-replies-header-container">
+            <Header as="span">Replies</Header>
+            <span className="replies-sort-by-container right-aligning-block-container">
+              <Label htmlFor="replies-sort-by-input">Sort By: </Label>
+              <Dropdown
+                id="replies-sort-by-input"
+                options={DiscussionView.REPLIES_SORT_OPTIONS}
+                selection
+                defaultValue={DiscussionView.REPLIES_SORT_OPTIONS[0].value} />
+            </span>
+          </div>
           <div className="root-replies-container">
             {rootReplies}
-            {/*<PostView post={rootPost} level={0} />*/}
           </div>
         </section>
       );
@@ -119,7 +121,7 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
       <div className="root-post-container">
         <a>&#8617; View all threads</a>
         <PostHeader post={rootPost} />
-        <Image className="post-content" src={rootPost.imageSrc} />
+        <Image className="root-post-content" src={rootPost.imageSrc} />
         <PostActionsGroup />
       </div>
     );

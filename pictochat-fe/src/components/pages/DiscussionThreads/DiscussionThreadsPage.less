@@ -1,0 +1,42 @@
+@import '../../../styles/_constants.less';
+
+#discussion-threads-page {
+
+  .main-content {
+    max-width: 700px;
+    padding: 0 20px;
+  }
+
+  .threads-list {
+    box-shadow: 3px 3px 10px #000000;
+  }
+
+  .thread-summary {
+    padding: 10px;
+    border-top: 1px solid @gray;
+
+    .post-header {
+      .avatar {
+        width: 2em;
+        height: 2em;
+      }
+    }
+
+    .thread-summary-content {
+      img {
+        max-height: 150px;
+        max-width: 300px;
+      }
+    }
+
+    .thread-summary-content, .thread-summary-links-container {
+      margin-left: 3em;
+    }
+  }
+
+  .link {
+    background-color: transparent;
+    color: @buttonPrimary;
+    text-decoration: underline;
+  }
+}

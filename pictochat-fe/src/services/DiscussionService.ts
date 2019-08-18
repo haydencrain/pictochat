@@ -63,12 +63,19 @@ const DISCUSSION = {
 
 /**
  * Responsible for retreiving Discussion data from the API
+ * NOTE: This currently just a stub that returns static data
  */
 export class DiscussionService {
+
   getDiscussion(discussionId: string): Promise<DiscussionPost> {
     let discussion = DISCUSSION as DiscussionPost;
     console.log(discussion);
     return Promise.resolve(discussion);
+  }
+
+  getRootDiscussionPosts(): Promise<DiscussionPost[]> {
+    let discussion = DISCUSSION as DiscussionPost;
+    return Promise.resolve([discussion, discussion]);
   }
 }
 
