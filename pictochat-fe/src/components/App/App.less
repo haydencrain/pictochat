@@ -13,17 +13,10 @@ body {
       text-decoration: underline;
     }
   }
-
-  img.ui.image {
-    /* Prevents visible overlap with fixed position header when scrolling */
-    position: static;
-  }
 }
 
 #main-content {
-  /* position: relative; */
+  position: relative;
   top: @navHeight;
-  height: calc(100% - @navHeight);
   padding: 30px;
-  margin-top: @navHeight;
 }
