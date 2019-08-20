@@ -14,13 +14,13 @@ export default (props: Props) => {
         <Segment className="header-info">
           <div className="user-name">Dosss</div>
           <div className="user-rating">
-            <label>Thread Score</label>
+            <label>Rating</label>
             <span className="value">4.05</span>
             <Rating className="rating-stars" icon="star" defaultRating={4.05} maxRating={5} disabled />
           </div>
         </Segment>
       </Segment.Group>
-      <Segment className="proflie-card-body">
+      <Segment className="profile-card-body">
         <div className="user-statistic">
           <label>Thread Score</label>
           <span className="value">295</span>
@@ -30,16 +30,16 @@ export default (props: Props) => {
           <span className="value">35</span>
         </div>
       </Segment>
-      <Segment className="proflie-card-footer">
+      <Segment className="profile-card-footer">
         <ul>
           <li>
-            <a>View Settings</a>
+            <a>View Profile</a>
           </li>
           <li>
-            <a>View Settings</a>
+            <a>Settings</a>
           </li>
           <li>
-            <a>View Settings</a>
+            <a>Logout</a>
           </li>
         </ul>
       </Segment>
