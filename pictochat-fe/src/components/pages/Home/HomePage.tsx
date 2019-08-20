@@ -7,7 +7,13 @@ interface HomePage {}
 export default (props: HomePage) => {
   return (
     <section id="home-page">
-      <ProfileCard />
+      <div className="main">
+        <h1>Threads</h1>
+      </div>
+      <div className="sidebar">
+        <h1>My Profile</h1>
+        <ProfileCard />
+      </div>
     </section>
   );
 };
