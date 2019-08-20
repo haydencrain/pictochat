@@ -54,8 +54,8 @@ export class DiscussionThreadsPage extends React.Component<DiscussionThreadsPage
     const rootPosts = this.getRootPosts();
     console.log(rootPosts);
     if (rootPosts !== null) {
-      const discussionElems = rootPosts.map((rootPost: DiscussionPost) => {
-        return <ThreadSummaryComponent discussionRootPost={rootPost} key={rootPost.postId} />;
+      const discussionElems = rootPosts.map((rootPost: DiscussionPost, i) => {
+        return <ThreadSummaryComponent discussionRootPost={rootPost} key={i} />;
       });
       return (
         <section id="discussion-threads-page">
