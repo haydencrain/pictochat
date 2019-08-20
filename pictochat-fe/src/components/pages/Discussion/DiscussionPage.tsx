@@ -6,7 +6,6 @@ import { DiscussionPost } from '../../../model/DiscussionPost';
 import discussionService from '../../../services/DiscussionService';
 import './DiscussionPage.less';
 
-
 // HELPER COMPONENTS
 
 function PostActionsGroup(props: {}) {
@@ -24,11 +23,7 @@ function PostRepliesSection(props: { replies: DiscussionPost[] }) {
     const replies = props.replies.map((replyPost: DiscussionPost, i) => {
       return <PostView post={replyPost} key={replyPost.postId} />;
     });
-    return (
-      <div className="post-replies-container">
-        {replies}
-      </div>
-    );
+    return <div className="post-replies-container">{replies}</div>;
   } else {
     // Render nothing
     return null;
@@ -36,18 +31,16 @@ function PostRepliesSection(props: { replies: DiscussionPost[] }) {
 }
 
 function PostView(props: { post: DiscussionPost }): any {
-  let postClasses = "post-container";
+  let postClasses = 'post-container';
   if (props.post.replies.length === 0) {
-    postClasses += " no-replies";
+    postClasses += ' no-replies';
   }
   return (
     <div className={postClasses}>
       <div className="post-header-and-content-container">
         <PostHeader post={props.post} />
         <div className="post-content">
-          <Image
-            className="post-content"
-            src={props.post.imageSrc} />
+          <Image className="post-content" src={props.post.imageSrc} />
         </div>
         <PostActionsGroup />
       </div>
@@ -62,9 +55,7 @@ interface DiscussionViewProps {
   discussion?: DiscussionPost;
 }
 export class DiscussionView extends React.Component<DiscussionViewProps, DiscussionViewProps> {
-  static readonly REPLIES_SORT_OPTIONS = [
-    { key: 'MOST_RECENT', value: 'MOST_RECENT', text: 'Most Recent' }
-  ];
+  static readonly REPLIES_SORT_OPTIONS = [{ key: 'MOST_RECENT', value: 'MOST_RECENT', text: 'Most Recent' }];
 
   private useState: boolean;
 
@@ -75,7 +66,8 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
     this.useState = !props.hasOwnProperty('discussion');
     if (this.useState) {
       this.state = { discussion: null };
-      discussionService.getDiscussion("1")
+      discussionService
+        .getDiscussion('1')
         .then((discussion: DiscussionPost) => {
           this.setState({ discussion: discussion });
         })
@@ -87,7 +79,7 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
     const rootPost = this.getDiscussion();
     if (rootPost !== null) {
       const rootReplies = rootPost.replies.map((post: DiscussionPost) => {
-        return <PostView post={post} key={post.postId} />
+        return <PostView post={post} key={post.postId} />;
       });
       return (
         <section id="discussion-page" className="discussion-view-container">
@@ -100,12 +92,11 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
                 id="replies-sort-by-input"
                 options={DiscussionView.REPLIES_SORT_OPTIONS}
                 selection
-                defaultValue={DiscussionView.REPLIES_SORT_OPTIONS[0].value} />
+                defaultValue={DiscussionView.REPLIES_SORT_OPTIONS[0].value}
+              />
             </span>
           </div>
-          <div className="root-replies-container">
-            {rootReplies}
-          </div>
+          <div className="root-replies-container">{rootReplies}</div>
         </section>
       );
     } else {
@@ -120,7 +111,7 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
   private renderRootPost(rootPost: DiscussionPost): any {
     return (
       <div className="root-post-container">
-        <Link to="/threads">&#8617; View all threads</Link>
+        <Link to="/">&#8617; Back to home</Link>
         <PostHeader post={rootPost} />
         <Image className="root-post-content" src={rootPost.imageSrc} />
         <PostActionsGroup />

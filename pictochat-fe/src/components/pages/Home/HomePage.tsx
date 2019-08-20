@@ -1,6 +1,7 @@
 import * as React from 'react';
-import './HomePage.less';
 import ProfileCard from '../../common/ProfileCard';
+import { DiscussionThreads } from '../../common/DiscussionThreads/DiscussionThreads';
+import './HomePage.less';
 
 interface HomePage {}
 
@@ -9,6 +10,7 @@ export default (props: HomePage) => {
     <section id="home-page">
       <div className="main">
         <h1>Threads</h1>
+        <DiscussionThreads />
       </div>
       <div className="sidebar">
         <h1>My Profile</h1>
