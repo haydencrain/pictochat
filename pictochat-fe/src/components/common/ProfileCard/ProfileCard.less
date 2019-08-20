@@ -1,0 +1,26 @@
+.profile-card {
+  .profile-card-header {
+    height: 125px;
+    .header-image img {
+      height: 100%;
+      object-fit: cover;
+    }
+    .header-info {
+      &.ui.segment {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .rating-stars {
+        display: block;
+      }
+    }
+  }
+
+  .image-segment {
+    &.ui.segment {
+      padding: 0;
+    }
+    max-width: 120px;
+  }
+}
