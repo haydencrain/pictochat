@@ -7,7 +7,7 @@ export default (props: {}) => (
     <div className="title">
       Pictochat
       <span className="nav-links-container">
-        <Link to="/threads">Threads</Link>
+        <Link to="/">Home</Link>
         <Link to="/leaderboard">Leaderboard</Link>
       </span>
     </div>
