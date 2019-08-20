@@ -32,7 +32,7 @@ const DISCUSSION = {
           "replies": [
             {
               "discussionId": "1",
-              "postId": "5",
+              "postId": "10",
               "author": { "userName": "user1", "userAvatarURI": "https://picsum.photos/id/523/200/300" },
               "postedDate": "2019-01-01T02:02:00",
               "imageSrc": "https://upload.wikimedia.org/wikipedia/commons/f/ff/An_Iron_Age_Unit_Iceni_Celtic_Coin_Index_reference%2C_4.066_%28FindID_293350%29.jpg",
@@ -42,7 +42,7 @@ const DISCUSSION = {
         },
         {
           "discussionId": "1",
-          "postId": "5",
+          "postId": "11",
           "author": { "userName": "user1", "userAvatarURI": "https://picsum.photos/id/523/200/300" },
           "postedDate": "2019-01-01T02:02:00",
           "imageSrc": "https://upload.wikimedia.org/wikipedia/commons/f/ff/An_Iron_Age_Unit_Iceni_Celtic_Coin_Index_reference%2C_4.066_%28FindID_293350%29.jpg",
