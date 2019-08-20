@@ -1,0 +1,63 @@
+.profile-card {
+  width: 280px;
+  label {
+    font-weight: bold;
+    &:after {
+      content: ':';
+      margin-right: 5px;
+    }
+  }
+
+  .profile-card-header {
+    height: 125px;
+    .header-image {
+      max-width: 120px;
+      &.ui.segment {
+        padding: 0;
+      }
+
+      img {
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .header-info {
+      font-weight: bold;
+      &.ui.segment {
+        display: flex;
+        justify-content: flex-end;
+        flex-direction: column;
+      }
+
+      > div {
+        margin-top: 8px;
+      }
+
+      .user-name {
+        font-size: 20px;
+      }
+
+      .rating-stars {
+        display: block;
+      }
+    }
+  }
+
+  .profile-card-body {
+    .user-statistic {
+      margin-top: 8px;
+    }
+  }
+
+  .profile-card-footer {
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      li {
+        margin: 5px 0;
+      }
+    }
+  }
+}
