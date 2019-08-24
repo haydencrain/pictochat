@@ -5,6 +5,7 @@ import HomePage from '../pages/Home';
 import NotFoundPage from '../pages/NotFound';
 import DiscussionPage from '../pages/Discussion';
 import LeaderboardPage from '../pages/Leaderboard';
+import LoginPage from '../pages/Login';
 import RegisterPage from '../pages/Register';
 import './App.less';
 
@@ -17,6 +18,7 @@ export default () => (
         <Route exact path="/discussion" component={DiscussionPage} />
         <Route exact path="/leaderboard" component={LeaderboardPage} />
         <Route exact path="/register" component={RegisterPage} />
+        <Route exact path="/login" component={LoginPage} />
         <Route component={NotFoundPage} />
       </Switch>
     </main>
