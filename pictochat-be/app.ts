@@ -31,17 +31,32 @@ app.use(cookieParser());
 
 /// ROUTES ///
 
-app.use('/', makeFrontEndRouter(WEB_CONTENT_DIR));
+// Frontend
+const frontEndRouter = makeFrontEndRouter(WEB_CONTENT_DIR);
+app.use('/', frontEndRouter);
+
+// API
 app.use('/api', apiRouter);
 
-// Support client-side routing
-app.use('*', (req, res) => res.redirect('/'));
-
-/// ERROR HANDLERS ///
+// Enable client-side routing
+app.use('*', (req, res) => res.sendFile(path.join(WEB_CONTENT_DIR, 'index.html')));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
+
+
+/// ERROR HANDLERS ///
+
+// app.use(function (err, req, res, next) {
+//   // set locals, only providing error in development
+//   res.locals.message = err.message;
+//   res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+//   // render the error page
+//   res.status(err.status || 500);
+//   res.render('error');
+// });
 
 app.listen(PORT, () => console.log(`Pictochat server is listening on ${PORT}`));
