@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Image, Button, Header, Label, Dropdown } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
-import PostHeader from '../../common/PostHeader';
 import { DiscussionPost } from '../../../model/DiscussionPost';
 import discussionService from '../../../services/DiscussionService';
 import './DiscussionPage.less';
@@ -38,7 +37,6 @@ function PostView(props: { post: DiscussionPost }): any {
   return (
     <div className={postClasses}>
       <div className="post-header-and-content-container">
-        <PostHeader post={props.post} />
         <div className="post-content">
           <Image className="post-content" src={props.post.imageSrc} />
         </div>
@@ -112,7 +110,6 @@ export class DiscussionView extends React.Component<DiscussionViewProps, Discuss
     return (
       <div className="root-post-container">
         <Link to="/">&#8617; Back to home</Link>
-        <PostHeader post={rootPost} />
         <Image className="root-post-content" src={rootPost.imageSrc} />
         <PostActionsGroup />
       </div>

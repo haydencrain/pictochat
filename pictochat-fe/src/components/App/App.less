@@ -1,6 +1,8 @@
 @import '../../styles/_constants.less';
 @import '../../styles/global.less';
 
+@sidebarWidth: 280px;
+
 #app {
   height: 100%;
 
@@ -25,8 +27,19 @@
   }
 }
 
-#main-content {
+#app-body {
   position: relative;
   top: @navHeight;
   padding: 30px;
+}
+
+#app-main {
+  width: calc(100% - @sidebarWidth - 30px);
+}
+
+#app-sidebar {
+  position: fixed;
+  height: 100%;
+  right: 30px;
+  top: 90px;
 }
