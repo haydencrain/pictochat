@@ -2,6 +2,7 @@
 @import '../../styles/global.less';
 
 @sidebarWidth: 280px;
+@appPadding: 30px;
 
 #app {
   height: 100%;
@@ -28,18 +29,21 @@
 }
 
 #app-body {
+  display: flex;
   position: relative;
   top: @navHeight;
-  padding: 30px;
+  padding: @appPadding;
+  max-width: 1280px;
+  margin: auto;
 }
 
 #app-main {
-  width: calc(100% - @sidebarWidth - 30px);
+  flex: 1 1 auto;
 }
 
 #app-sidebar {
-  position: fixed;
+  position: sticky;
   height: 100%;
-  right: 30px;
-  top: 90px;
+  top: calc(@appPadding + @navHeight);
+  margin-left: 30px;
 }

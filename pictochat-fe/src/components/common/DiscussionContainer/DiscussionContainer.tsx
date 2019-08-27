@@ -27,7 +27,6 @@ function useFetchPost(id: string): [DiscussionPost, boolean] {
   React.useEffect(() => {
     const fetchData = async () => {
       const post = await discussionService.getDiscussion(id);
-      console.log(post);
       setPost(post);
       setLoading(false);
     };
