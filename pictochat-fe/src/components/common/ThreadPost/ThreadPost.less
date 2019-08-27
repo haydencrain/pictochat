@@ -1,0 +1,39 @@
+@import '../../../styles/_constants.less';
+
+.thread-post {
+  display: flex;
+  .post-sidebar {
+    width: 36px;
+  }
+  .post-content {
+    flex: 1 1 auto;
+    margin-left: 15px;
+    > div:not(:last-child) {
+      margin-bottom: 6px;
+    }
+    .post-header {
+      > div {
+        &:not(:last-child) {
+          margin-right: 15px;
+        }
+        display: inline-block;
+      }
+      .post-author {
+        font-weight: bold;
+      }
+      .post-date {
+        font-size: 12px;
+        color: @gray;
+      }
+    }
+
+    img {
+      max-height: 150px;
+      max-width: 300px;
+    }
+  }
+
+  .post-links {
+    font-size: 12px;
+  }
+}

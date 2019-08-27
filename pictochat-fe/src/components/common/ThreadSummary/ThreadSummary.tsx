@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PostHeader from '../PostHeader';
 import { DiscussionPost } from '../../../model/DiscussionPost';
 import { Link } from 'react-router-dom';
 import { Button, Image } from 'semantic-ui-react';
@@ -10,7 +9,6 @@ export default (props: { discussionRootPost: DiscussionPost }) => {
   const numReplies = rootPost.hasOwnProperty('replies') ? rootPost.replies.length : 0;
   return (
     <div className="thread-summary">
-      <PostHeader post={rootPost} />
       <div className="thread-summary-content">
         <Image src={rootPost.imageSrc} />
       </div>
