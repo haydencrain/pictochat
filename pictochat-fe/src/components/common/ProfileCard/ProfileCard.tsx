@@ -7,7 +7,7 @@ interface Props {}
 export default (props: Props) => {
   return (
     <Segment.Group className="profile-card" raised>
-      <Segment className="profile-card-header" horizontal>
+      <Segment className="profile-card-header" horizontal="true">
         <div className="header-image">
           <Image src="https://semantic-ui.com/images/avatar2/large/elyse.png" />
         </div>

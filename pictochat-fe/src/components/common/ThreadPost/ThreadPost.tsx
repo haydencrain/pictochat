@@ -32,7 +32,7 @@ export default function ThreadPost(props: ThreadPostProps) {
             {commentCount} comments
           </Link>
         </div>
-        {showReplies && <ThreadReplies replies={replies} />}
+        {showReplies && <ThreadReplies replies={replies} showReplies={showReplies} />}
       </div>
     </div>
   );
@@ -40,9 +40,10 @@ export default function ThreadPost(props: ThreadPostProps) {
 
 interface ThreadRepliesProps {
   replies: DiscussionPost[];
+  showReplies?: boolean;
 }
 
 function ThreadReplies(props: ThreadRepliesProps) {
-  const { replies } = props;
-  return replies && replies.length > 0 && <ThreadPostsList posts={replies} raised={false} />;
+  const { replies, showReplies } = props;
+  return replies && replies.length > 0 && <ThreadPostsList posts={replies} raised={false} showReplies={showReplies} />;
 }

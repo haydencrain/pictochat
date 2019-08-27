@@ -1,13 +1,20 @@
 import * as React from 'react';
 import discussionService from '../../../services/DiscussionService';
 import ThreadPostsList from '../ThreadPostsList';
+import { DiscussionPost } from '../../../model/DiscussionPost';
 
 export default function ThreadPostsContainer(props: {}) {
   const [posts, isLoading] = useFetchPosts();
-  return !isLoading && <ThreadPostsList posts={posts} />;
+  if (isLoading) return null;
+  return (
+    <>
+      <h1>Threads</h1>
+      <ThreadPostsList posts={posts} />
+    </>
+  );
 }
 
-function useFetchPosts() {
+function useFetchPosts(): [DiscussionPost[], boolean] {
   const [posts, setPosts] = React.useState();
   const [loading, setLoading] = React.useState(true);
 

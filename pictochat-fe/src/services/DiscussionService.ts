@@ -81,6 +81,7 @@ const DATA: DiscussionPost[] = [
         postedDate: new Date().toUTCString(),
         author: { userName: 'Dosss', userAvatarURI: 'https://semantic-ui.com/images/avatar2/large/elyse.png' },
         imageSrc: getRandDogUrl(),
+        commentCount: 3,
         replies: [
           {
             discussionId: '11',
@@ -220,9 +221,11 @@ const DATA: DiscussionPost[] = [
  * NOTE: This currently just a stub that returns static data
  */
 export class DiscussionService {
-  getDiscussion(discussionId: string): Promise<DiscussionPost> {
+  getDiscussion(postId: string): Promise<DiscussionPost> {
     let discussions = DATA;
-    return Promise.resolve(discussions.find(d => d.discussionId === discussionId));
+    const discussion = discussions.find(d => d.postId === postId);
+    console.log(discussion);
+    return Promise.resolve(discussion);
   }
 
   getRootDiscussionPosts(): Promise<DiscussionPost[]> {
