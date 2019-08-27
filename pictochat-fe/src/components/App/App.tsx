@@ -5,22 +5,25 @@ import HomePage from '../pages/Home';
 import NotFoundPage from '../pages/NotFound';
 import DiscussionPage from '../pages/Discussion';
 import LeaderboardPage from '../pages/Leaderboard';
-import LoginPage from '../pages/Login';
 import RegisterPage from '../pages/Register';
 import './App.less';
 
-export default () => (
-  <BrowserRouter>
-    <Navbar />
-    <main id="main-content">
-      <Switch>
-        <Route exact path="/" component={HomePage} />
-        <Route exact path="/discussion" component={DiscussionPage} />
-        <Route exact path="/leaderboard" component={LeaderboardPage} />
-        <Route exact path="/register" component={RegisterPage} />
-        <Route exact path="/login" component={LoginPage} />
-        <Route component={NotFoundPage} />
-      </Switch>
-    </main>
-  </BrowserRouter>
-);
+function App() {
+  const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
+  return (
+    <BrowserRouter>
+      <Navbar />
+      <main id="main-content">
+        <Switch>
+          <Route exact path={FRONTEND_URL_ROOT} component={HomePage} />
+          <Route exact path={FRONTEND_URL_ROOT + "/discussion"} component={DiscussionPage} />
+          <Route exact path={FRONTEND_URL_ROOT + "/leaderboard"} component={LeaderboardPage} />
+          <Route exact path={FRONTEND_URL_ROOT + "/register"} component={RegisterPage} />
+          <Route component={NotFoundPage} />
+        </Switch>
+      </main>
+    </BrowserRouter>
+  );
+}
+
+export default App;

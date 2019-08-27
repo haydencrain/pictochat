@@ -8,8 +8,8 @@ export function makeFrontEndRouter(webContentDir: string) {
   const router = express.Router();
   router.use('/', express.static(webContentDir));
   // Enable client-side routing
-  // router.get('*', (req, res) => {
-  //     res.sendFile(path.join(webContentDir, 'index.html'));
+  // router.get('/*', (req, res) => {
+  //   res.sendFile(path.join(webContentDir, 'index.html'));
   // });
   return router;
 }
