@@ -12,7 +12,7 @@
     "start-dev-remote": "concurrently \"npm run start-frontend-dev-remote\" \"npm run start-backend-dev\"",
     "start-backend-dev": "concurrently \"tsc --watch\" \"nodemon -L ./build/pictochat-be/app.js\"",
     "start-frontend-dev": "webpack-dev-server --config ./pictochat-fe/webpack.dev.js",
-    "start-frontend-dev-remote": "webpack --config ./pictochat-fe/webpack.dev.js --host 0.0.0.0 --watch",
+    "start-frontend-dev-remote": "webpack --config ./pictochat-fe/webpack.dev.js --watch",
     "build-frontend-dev": "webpack --config ./pictochat-fe/webpack.dev.js",
     "tsc": "tsc"
   },
