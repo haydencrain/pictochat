@@ -19,10 +19,10 @@ export default function App() {
         <main id="app-main">
           <Switch>
             <Route exact path={FRONTEND_URL_ROOT} component={HomePage} />
-            <Route exact path={`${FRONTEND_URL_ROOT}/discussionOld`} component={DiscussionPageOld} />
-            <Route exact path={`${FRONTEND_URL_ROOT}/discussion`} component={DiscussionPage} />
-            <Route exact path={`${FRONTEND_URL_ROOT}/leaderboard`} component={LeaderboardPage} />
-            <Route exact path={`${FRONTEND_URL_ROOT}/register`} component={RegisterPage} />
+            <Route exact path={`${FRONTEND_URL_ROOT}discussionOld`} component={DiscussionPageOld} />
+            <Route exact path={`${FRONTEND_URL_ROOT}discussion`} component={DiscussionPage} />
+            <Route exact path={`${FRONTEND_URL_ROOT}leaderboard`} component={LeaderboardPage} />
+            <Route exact path={`${FRONTEND_URL_ROOT}register`} component={RegisterPage} />
             <Route component={NotFoundPage} />
           </Switch>
         </main>
