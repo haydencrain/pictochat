@@ -33,6 +33,7 @@
     "express": "^4.17.1",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
+    "query-string": "^6.8.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-helmet": "^5.2.1",
