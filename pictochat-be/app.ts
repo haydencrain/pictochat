@@ -34,6 +34,9 @@ app.use(cookieParser());
 app.use('/', makeFrontEndRouter(WEB_CONTENT_DIR));
 app.use('/api', apiRouter);
 
+// Support client-side routing
+app.use('*', (req, res) => res.redirect('/'));
+
 /// ERROR HANDLERS ///
 
 // catch 404 and forward to error handler
