@@ -12,10 +12,10 @@ export default (props: HomePage) => {
         <h1>Threads</h1>
         <DiscussionThreads />
       </div>
-      <div className="sidebar">
+      <aside className="sidebar">
         <h1>My Profile</h1>
         <ProfileCard />
-      </div>
+      </aside>
     </section>
   );
 };

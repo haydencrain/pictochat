@@ -7,19 +7,19 @@ interface Props {}
 export default (props: Props) => {
   return (
     <Segment.Group className="profile-card" raised>
-      <Segment.Group className="profile-card-header" horizontal>
-        <Segment className="header-image">
+      <Segment className="profile-card-header" horizontal>
+        <div className="header-image">
           <Image src="https://semantic-ui.com/images/avatar2/large/elyse.png" />
-        </Segment>
-        <Segment className="header-info">
+        </div>
+        <div className="header-info">
           <div className="user-name">Dosss</div>
           <div className="user-rating">
             <label>Rating</label>
             <span className="value">4.05</span>
             <Rating className="rating-stars" icon="star" defaultRating={4.05} maxRating={5} disabled />
           </div>
-        </Segment>
-      </Segment.Group>
+        </div>
+      </Segment>
       <Segment className="profile-card-body">
         <div className="user-statistic">
           <label>Thread Score</label>
