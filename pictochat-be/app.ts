@@ -36,7 +36,7 @@ app.use('/', frontEndRouter);
 app.use('/api', apiRouter);
 
 // Enable client-side routing
-// app.use('*', (req, res) => res.sendFile(path.join(WEB_CONTENT_DIR, 'index.html')));
+app.use('*', (req, res) => res.sendFile(path.join(WEB_CONTENT_DIR, 'index.html')));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
