@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const discussionPostSchema = new mongoose.Schema({
   discussionId: String,
@@ -9,4 +9,7 @@ const discussionPostSchema = new mongoose.Schema({
   createdDatetime: Date // really a data-time object
 });
 
-export const DiscussionPost = mongoose.model('DiscussionPost', discussionPostSchema);
+export const DiscussionPost = mongoose.model(
+  "DiscussionPost",
+  discussionPostSchema
+);
