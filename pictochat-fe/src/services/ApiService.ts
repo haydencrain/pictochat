@@ -1,5 +1,5 @@
 import { stringify } from 'query-string';
-import ApiException from '../model/ApiException';
+import ApiException from '../models/ApiException';
 
 const BACKEND_ENDPOINT = 'http://localhost:443/api';
 

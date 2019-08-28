@@ -1,4 +1,4 @@
-import { DiscussionPost } from '../model/DiscussionPost';
+import { DiscussionPost } from '../models/DiscussionPost';
 import ApiService from './ApiService';
 
 export class DiscussionService {

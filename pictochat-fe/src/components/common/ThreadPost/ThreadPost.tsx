@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Image } from 'semantic-ui-react';
-import { DiscussionPost } from '../../../model/DiscussionPost';
+import { DiscussionPost } from '../../../models/DiscussionPost';
 import { Link } from 'react-router-dom';
 import ThreadPostsList from '../ThreadPostsList';
 import './ThreadPost.less';

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Segment } from 'semantic-ui-react';
-import { DiscussionPost } from '../../../model/DiscussionPost';
+import { DiscussionPost } from '../../../models/DiscussionPost';
 import ThreadPost from '../ThreadPost';
 
 interface Props {

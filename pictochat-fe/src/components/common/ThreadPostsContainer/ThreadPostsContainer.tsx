@@ -1,7 +1,7 @@
 import * as React from 'react';
 import discussionService from '../../../services/DiscussionService';
 import ThreadPostsList from '../ThreadPostsList';
-import { DiscussionPost } from '../../../model/DiscussionPost';
+import { DiscussionPost } from '../../../models/DiscussionPost';
 
 export default function ThreadPostsContainer(props: {}) {
   const [posts, isLoading] = useFetchPosts();

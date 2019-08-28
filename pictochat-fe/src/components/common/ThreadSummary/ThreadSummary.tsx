@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DiscussionPost } from '../../../model/DiscussionPost';
+import { DiscussionPost } from '../../../models/DiscussionPost';
 import { Link } from 'react-router-dom';
 import { Button, Image } from 'semantic-ui-react';
 import './ThreadSummary.less';
