@@ -23,5 +23,7 @@ services:
   pictochat-db:
     image: postgres:11.5
     restart: always
+    environment:
+      - POSTGRES_DB=pictochat
     ports:
       - "5432:5432"
