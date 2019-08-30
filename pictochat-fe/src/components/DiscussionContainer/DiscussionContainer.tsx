@@ -1,6 +1,6 @@
 import * as React from 'react';
-import discussionService from '../../../services/DiscussionService';
-import { DiscussionPost } from '../../../models/DiscussionPost';
+import discussionService from '../../services/DiscussionService';
+import { DiscussionPost } from '../../models/DiscussionPost';
 import { Segment } from 'semantic-ui-react';
 import ThreadPost from '../ThreadPost';
 import ThreadPostsList from '../ThreadPostsList';

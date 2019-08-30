@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { parse } from 'query-string';
-import DiscussionContainer from '../../common/DiscussionContainer';
+import DiscussionContainer from '../../components/DiscussionContainer';
 import './DiscussionPage.less';
 
 interface Props extends RouteComponentProps<any> {}

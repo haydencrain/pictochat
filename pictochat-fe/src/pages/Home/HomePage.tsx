@@ -1,5 +1,5 @@
 import * as React from 'react';
-import ThreadPostsContainer from '../../common/ThreadPostsContainer';
+import ThreadPostsContainer from '../../components/ThreadPostsContainer';
 import './HomePage.less';
 
 interface HomePage {}
