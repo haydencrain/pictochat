@@ -6,7 +6,7 @@ import './DiscussionPage.less';
 
 interface Props extends RouteComponentProps<any> {}
 
-function DiscussionPage(props: Props) {
+export default function DiscussionPage(props: Props) {
   const { id } = parse(props.location.search);
   return (
     <section id="discussion-page">
@@ -14,5 +14,3 @@ function DiscussionPage(props: Props) {
     </section>
   );
 }
-
-export default withRouter(DiscussionPage);
