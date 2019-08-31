@@ -1,4 +1,4 @@
-import { DiscussionThread } from '../models/discussion-thread';
+import { DiscussionThread } from './discussion-thread';
 
 /**
  * Wrapper for DiscussionThread that adds aggregate thread metrics

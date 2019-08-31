@@ -1,31 +1,30 @@
 import express from 'express';
-import { DiscussionThreadService } from '../services/discussion-threads-service';
+import { DiscussionService } from '../services/discussion-service';
 import { ImageService } from '../services/image-service';
+import { DiscussionTreeNode } from '../models/discussion-tree-node';
 
 export const discussionPostRouter = express.Router();
 
 discussionPostRouter.get('/', async (req, res, next) => {
   try {
-    let threadSummaries = await DiscussionThreadService.getThreadSummaries();
-
-    // FIXME: Temporarily setting the author data to be a single test user for every discussion
-    threadSummaries.forEach((threadSummary) => {
-      threadSummary['author']  = {
-        userName: 'Dosss',
-        userAvatarURI: ImageService.getUserAvatarURI('4')
-      }
-    });
-
-    res.json(threadSummaries);
+    let threadSummaries = await DiscussionService.getThreadSummaries();
+    let threadSummariesFlat = threadSummaries.map((threadSummary) => threadSummary.toFlatJSON());
+    res.json(threadSummariesFlat);
   } catch (error) {
     next(error);
   }
   //res.send(DISCUSSIONS);
 });
 
-discussionPostRouter.get('/:discussionId', (req, res) => {
-  const discussion = DISCUSSIONS.find(d => d.discussionId === req.params.discussionId);
-  res.send(discussion);
+discussionPostRouter.get('/:discussionId', async (req, res, next) => {
+  try {
+    let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeForThread(req.params.discussionId);
+    res.json(replyTree.toJSON());
+  } catch (error) {
+    next(error);
+  }
+  // const discussion = DISCUSSIONS.find(d => d.discussionId === req.params.discussionId);
+  // res.send(discussion);
 });
 
 const getRandDogUrl = () => `https://placedog.net/600?random&id=${Math.floor(Math.random() * 20) + 1}`;

@@ -1,9 +1,8 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
-import { DiscussionThreadSummary } from './discussion-thread-summary';
 import { DiscussionPost } from './discussion-post';
 
-const sequelize = SequelizeConnectionService.getInstance();
+const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
 
 // HELPERS
@@ -25,7 +24,7 @@ export class DiscussionThread extends Model {
 
   // attributes for all of the 'has' associations
   rootPost?: DiscussionPost;
-  allReplies?: {postId: number}[]; // list of postIds for all replies, incl. replies to replies, etc.
+  allReplies?: { postId: number }[]; // list of postIds for all replies, incl. replies to replies, etc.
 
   /**
    * @returns Promise for a list for DiscussionThreads with rootPost and allReplies populated

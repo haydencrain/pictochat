@@ -2,7 +2,7 @@ import { DiscussionPost } from '../models/discussion-post';
 import { DiscussionThread } from '../models/discussion-thread';
 import { syncModels } from './sync-models';
 
-import { DiscussionThreadService } from '../services/discussion-threads-service';
+import { DiscussionService } from '../services/discussion-service';
 
 /**
  * FIXME: Not sure if this is the best way to load test data.
@@ -16,22 +16,22 @@ export async function loadTestData() {
 
   console.log('Creating test instances for DiscussionPosts');
   let samplePosts = [
-    { postId: 1, discussionId: 1, isRootPost: true, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 11, discussionId: 1, parentPostId: 1, isRootPost: false, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 111, discussionId: 1, parentPostId: 11, isRootPost: false, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 1111, discussionId: 1, parentPostId: 111, isRootPost: false, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 1112, discussionId: 1, parentPostId: 111, isRootPost: false, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 1113, discussionId: 1, parentPostId: 111, isRootPost: false, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 112, discussionId: 11, parentPostId: 111, isRootPost: false, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 113, discussionId: 11, parentPostId: 111, isRootPost: false, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 12, discussionId: 11, parentPostId: 1, isRootPost: false, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 13, discussionId: 11, parentPostId: 1, isRootPost: false, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 14, discussionId: 11, parentPostId: 1, isRootPost: false, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 15, discussionId: 11, parentPostId: 1, isRootPost: false, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 2, discussionId: 2, isRootPost: true, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 3, discussionId: 3, isRootPost: true, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 4, discussionId: 4, isRootPost: true, imageId: 1, authorId: 1, postedDate: new Date() },
-    { postId: 5, discussionId: 5, isRootPost: true, imageId: 1, authorId: 1, postedDate: new Date() }
+    { postId: 1, discussionId: 1, isRootPost: true, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '1' },
+    { postId: 11, discussionId: 1, parentPostId: 1, isRootPost: false, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '1/11' },
+    { postId: 111, discussionId: 1, parentPostId: 11, isRootPost: false, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '1/11/111'  },
+    { postId: 1111, discussionId: 1, parentPostId: 111, isRootPost: false, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '1/11/111/1111' },
+    { postId: 1112, discussionId: 1, parentPostId: 111, isRootPost: false, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '1/11/111/1112' },
+    { postId: 1113, discussionId: 1, parentPostId: 111, isRootPost: false, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '1/11/111/1113' },
+    { postId: 112, discussionId: 1, parentPostId: 11, isRootPost: false, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '1/11/112' },
+    { postId: 113, discussionId: 1, parentPostId: 11, isRootPost: false, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '1/11/113' },
+    { postId: 12, discussionId: 1, parentPostId: 1, isRootPost: false, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '1/12' },
+    { postId: 13, discussionId: 1, parentPostId: 1, isRootPost: false, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '1/13' },
+    { postId: 14, discussionId: 1, parentPostId: 1, isRootPost: false, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '1/14' },
+    { postId: 15, discussionId: 1, parentPostId: 1, isRootPost: false, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '1/15' },
+    { postId: 2, discussionId: 2, isRootPost: true, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '2' },
+    { postId: 3, discussionId: 3, isRootPost: true, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '3' },
+    { postId: 4, discussionId: 4, isRootPost: true, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '4' },
+    { postId: 5, discussionId: 5, isRootPost: true, imageId: '1', authorId: 1, postedDate: new Date(), commentTreePath: '5' }
   ];
   let sampleCreationPromises = samplePosts.map((postData) => DiscussionPost.create(postData));
   await Promise.all(sampleCreationPromises);
@@ -48,6 +48,6 @@ export async function loadTestData() {
   await Promise.all(threadCreationPromises);
 
   console.log('QUERY RESULT:',
-      (await DiscussionThreadService.getThreadSummaries())
+      (await DiscussionService.getThreadSummaries())
         .map((thread) => thread.toFlatJSON()));
 }
