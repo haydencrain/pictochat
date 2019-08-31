@@ -14,6 +14,7 @@ services:
     ports:
       - "3000:3000"
       - "9000:9000"
+      - "443:443"
     working_dir: /pictochat
     volumes:
       - .:/pictochat # mounting local dir to support live reloading
@@ -23,5 +24,7 @@ services:
   pictochat-db:
     image: postgres:11.5
     restart: always
+    environment:
+      - POSTGRES_DB=pictochat
     ports:
       - "5432:5432"
