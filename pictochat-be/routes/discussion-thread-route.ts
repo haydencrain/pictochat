@@ -1,9 +1,26 @@
 import express from 'express';
+import { DiscussionThreadService } from '../services/discussion-threads-service';
+import { ImageService } from '../services/image-service';
 
 export const discussionPostRouter = express.Router();
 
-discussionPostRouter.get('/', (req, res) => {
-  res.send(DISCUSSIONS);
+discussionPostRouter.get('/', async (req, res, next) => {
+  try {
+    let threadSummaries = await DiscussionThreadService.getThreadSummaries();
+
+    // FIXME: Temporarily setting the author data to be a single test user for every discussion
+    threadSummaries.forEach((threadSummary) => {
+      threadSummary['author']  = {
+        userName: 'Dosss',
+        userAvatarURI: ImageService.getUserAvatarURI('4')
+      }
+    });
+
+    res.json(threadSummaries);
+  } catch (error) {
+    next(error);
+  }
+  //res.send(DISCUSSIONS);
 });
 
 discussionPostRouter.get('/:discussionId', (req, res) => {
