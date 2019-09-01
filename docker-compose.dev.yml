@@ -1,17 +1,20 @@
 # Sets up a local development environment
-version: '3'
+version: "3"
 services:
   web-app:
-    build: 
-        dockerfile: ./build-scripts/web-app.Dockerfile
-        context: .
-    command: sh -c "npm run start-dev-remote"
-    environment:
-      - NODE_ENV=development
-      - PICTOCHAT_BACKEND_PORT=9000
+    build:
+      dockerfile: ./build-scripts/web-app.Dockerfile
+      context: .
+    command: npm run start-dev-remote
+    env_file:
+      - ./.env.dev
+    # environment:
+    #   - NODE_ENV=development
+    #   - PICTOCHAT_BACKEND_PORT=9000
     ports:
-      - '3000:3000'
-      - '9000:9000'
+      - "3000:3000"
+      - "9000:9000"
+      - "443:443"
     working_dir: /pictochat
     volumes:
       - .:/pictochat # mounting local dir to support live reloading
@@ -19,7 +22,9 @@ services:
     depends_on:
       - pictochat-db
   pictochat-db:
-    image: mongo:4.0.11
+    image: postgres:11.5
     restart: always
+    environment:
+      - POSTGRES_DB=pictochat
     ports:
-      - '27017:27017'
+      - "5432:5432"

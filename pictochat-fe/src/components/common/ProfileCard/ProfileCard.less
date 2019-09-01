@@ -9,13 +9,15 @@
   }
 
   .profile-card-header {
+    display: flex;
+    overflow: hidden;
+    padding: 0;
     height: 125px;
+    &.ui.segment {
+      padding: 0;
+    }
     .header-image {
-      max-width: 120px;
-      &.ui.segment {
-        padding: 0;
-      }
-
+      flex: 0 1 120px;
       img {
         height: 100%;
         object-fit: cover;
@@ -23,12 +25,12 @@
     }
 
     .header-info {
+      flex: 1 1 auto;
+      padding: 1em;
       font-weight: bold;
-      &.ui.segment {
-        display: flex;
-        justify-content: flex-end;
-        flex-direction: column;
-      }
+      display: flex;
+      justify-content: flex-end;
+      flex-direction: column;
 
       > div {
         margin-top: 8px;

@@ -1,6 +1,9 @@
 @import '../../styles/_constants.less';
 @import '../../styles/global.less';
 
+@sidebarWidth: 280px;
+@appPadding: 30px;
+
 #app {
   height: 100%;
 
@@ -25,8 +28,22 @@
   }
 }
 
-#main-content {
+#app-body {
+  display: flex;
   position: relative;
   top: @navHeight;
-  padding: 30px;
+  padding: @appPadding;
+  max-width: 1280px;
+  margin: auto;
+}
+
+#app-main {
+  flex: 1 1 auto;
+}
+
+#app-sidebar {
+  position: sticky;
+  height: 100%;
+  top: calc(@appPadding + @navHeight);
+  margin-left: 30px;
 }
