@@ -2,12 +2,13 @@
 
 .thread-post {
   display: flex;
+  margin-bottom: 15px;
   .post-sidebar {
-    width: 36px;
+    width: @post-sidebar-width;
+    margin-right: @post-sidebar-margin-right;
   }
   .post-content {
     flex: 1 1 auto;
-    margin-left: 15px;
     > div:not(:last-child) {
       margin-bottom: 6px;
     }

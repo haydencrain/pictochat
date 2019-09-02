@@ -2,18 +2,15 @@ import * as React from 'react';
 import { Image } from 'semantic-ui-react';
 import { DiscussionPost } from '../../models/DiscussionPost';
 import { Link } from 'react-router-dom';
-import ThreadPostsList from '../ThreadPostsList';
-import './ThreadPost.less';
+import './Post.less';
 
-interface ThreadPostProps {
+interface PostProps {
   post: DiscussionPost;
-  showReplies?: boolean;
 }
 
-export default function ThreadPost(props: ThreadPostProps) {
-  const { author, postedDate, imageSrc, commentCount, postId, replies } = props.post;
+export default function Post(props: PostProps) {
+  const { author, postedDate, imageSrc, commentCount, postId } = props.post;
   const { userAvatarURI, userName } = author;
-  const showReplies = !!props.showReplies;
   return (
     <div className="thread-post">
       <div className="post-sidebar">
@@ -32,18 +29,7 @@ export default function ThreadPost(props: ThreadPostProps) {
             {commentCount} comments
           </Link>
         </div>
-        {showReplies && <ThreadReplies replies={replies} showReplies={showReplies} />}
       </div>
     </div>
   );
-}
-
-interface ThreadRepliesProps {
-  replies: DiscussionPost[];
-  showReplies?: boolean;
-}
-
-function ThreadReplies(props: ThreadRepliesProps) {
-  const { replies, showReplies } = props;
-  return replies && replies.length > 0 && <ThreadPostsList posts={replies} raised={false} showReplies={showReplies} />;
 }

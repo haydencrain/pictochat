@@ -1,21 +1,23 @@
 import * as React from 'react';
 import discussionService from '../../services/DiscussionService';
 import { DiscussionPost } from '../../models/DiscussionPost';
-import { Segment } from 'semantic-ui-react';
-import ThreadPost from '../ThreadPost';
-import ThreadPostsList from '../ThreadPostsList';
+import { Segment, Loader } from 'semantic-ui-react';
+import Thread from '../Post';
+import ThreadPostsList from '../PostsList';
+import ThreadReplies from '../PostReplies';
+import PostsList from '../PostsList';
 
 export default function DiscussionContainer(props: { id: string }) {
   const [post, isLoading] = useFetchPost(props.id);
-  if (isLoading) return null;
+  if (isLoading) return <Loader active inline />;
   return (
     <>
       <h1>Thread by {post.author.userName}</h1>
       <Segment raised>
-        <ThreadPost post={post} />
+        <Thread post={post} />
       </Segment>
       <h1>Replies ({post.commentCount})</h1>
-      <ThreadPostsList posts={post.replies} showReplies={true} />
+      <PostsList posts={post.replies} raised showReplies />
     </>
   );
 }
