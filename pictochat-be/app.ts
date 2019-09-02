@@ -4,9 +4,12 @@ import createError from 'http-errors';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
+import { Sequelize } from 'sequelize';
 import { apiRouter } from './routes/api-route';
 import { makeFrontEndRouter } from './routes/front-end-route';
 import { makeCORSMiddleware } from './middleware/cors-middleware';
+import { SequelizeConnectionService } from './services/sequelize-connection-service';
+import { loadTestData } from './utils/load-test-data';
 
 // CONSTANTS
 const PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;
@@ -14,6 +17,21 @@ const PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;
 const WEB_CONTENT_DIR = process.env.PICTOCHAT_FRONTEND_DIR || path.join(__dirname, '../pictochat-fe');
 const FRONTEND_REQUEST_ORIGIN = process.env.PICTOCHAT_FRONTEND_REQUEST_ORIGIN || 'http://localhost:3000';
 console.log('WEB_CONTENT_DIR: ' + WEB_CONTENT_DIR);
+
+
+// Database Connection
+
+const sequelize: Sequelize = SequelizeConnectionService.getInstance();
+sequelize.authenticate()
+  .then(async () => {
+    console.log('Sucessfully connected to pictochat database');
+    // FIXME: Move test data loading into testing framework
+    // (cleaner to always assume NODE_ENV = production when app.ts is run)
+    if (process.env.NODE_ENV !== 'production') {
+      await loadTestData();
+    }
+  })
+  .catch((error) => console.log('An error occured attempting to connect to the pictochat database', error));
 
 //// APP ////
 const app = express();
@@ -39,7 +57,7 @@ app.use('/api', apiRouter);
 app.use('*', (req, res) => res.sendFile(path.join(WEB_CONTENT_DIR, 'index.html')));
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 

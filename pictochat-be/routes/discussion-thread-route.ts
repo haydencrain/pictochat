@@ -1,14 +1,30 @@
 import express from 'express';
+import { DiscussionService } from '../services/discussion-service';
+import { ImageService } from '../services/image-service';
+import { DiscussionTreeNode } from '../models/discussion-tree-node';
 
 export const discussionPostRouter = express.Router();
 
-discussionPostRouter.get('/', (req, res) => {
-  res.send(DISCUSSIONS);
+discussionPostRouter.get('/', async (req, res, next) => {
+  try {
+    let threadSummaries = await DiscussionService.getThreadSummaries();
+    let threadSummariesFlat = threadSummaries.map((threadSummary) => threadSummary.toFlatJSON());
+    res.json(threadSummariesFlat);
+  } catch (error) {
+    next(error);
+  }
+  //res.send(DISCUSSIONS);
 });
 
-discussionPostRouter.get('/:discussionId', (req, res) => {
-  const discussion = DISCUSSIONS.find(d => d.discussionId === req.params.discussionId);
-  res.send(discussion);
+discussionPostRouter.get('/:discussionId', async (req, res, next) => {
+  try {
+    let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeForThread(req.params.discussionId);
+    res.json(replyTree.toJSON());
+  } catch (error) {
+    next(error);
+  }
+  // const discussion = DISCUSSIONS.find(d => d.discussionId === req.params.discussionId);
+  // res.send(discussion);
 });
 
 const getRandDogUrl = () => `https://placedog.net/600?random&id=${Math.floor(Math.random() * 20) + 1}`;
