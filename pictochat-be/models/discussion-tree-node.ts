@@ -26,7 +26,7 @@ export class DiscussionTreeNode extends DiscussionPost {
     let baseJSON = super.toJSON();
     let repliesJSON = this.replies.map((reply) => reply.toJSON());
     baseJSON = { ...baseJSON, ...{ replies: repliesJSON } };
-    if (this.commentCount) {
+    if (this.commentCount !== null && this.commentCount !== undefined) {
       baseJSON['commentCount'] = this.commentCount;
     }
     return baseJSON;
