@@ -1,6 +1,6 @@
 # Pictochat
 
-This repository contains the Project for Assessment 3 of 31242 Advanced Internet
+This repository contains the Project for Assessment 3 of 31242 Advanced Internet Programming
 
 ## Links
 
@@ -187,7 +187,7 @@ As this project is almost purely JavaScript, many of the best practices chosen t
 1. Don't use multiple blank lines to pad your code.
 1. Use semicolons after all statements, in order to avoid the use of [Automatic Code Insertion](https://tc39.es/ecma262/#sec-automatic-semicolon-insertion).
 
-### Contributors
+## Contributors
 
 - Jordan Finch
 - Hayden Crain
