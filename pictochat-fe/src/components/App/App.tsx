@@ -8,6 +8,7 @@ import LeaderboardPage from '../../pages/LeaderboardPage';
 import RegisterPage from '../../pages/RegisterPage';
 import ProfileCard from '../ProfileCard';
 import DiscussionPage from '../../pages/DiscussionPage/DiscussionPage';
+import ChallengePage from '../../pages/ChallengePage';
 import './App.less';
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
             <Route exact path={`${FRONTEND_URL_ROOT}discussion`} component={DiscussionPage} />
             <Route exact path={`${FRONTEND_URL_ROOT}leaderboard`} component={LeaderboardPage} />
             <Route exact path={`${FRONTEND_URL_ROOT}register`} component={RegisterPage} />
+            <Route exact path={`${FRONTEND_URL_ROOT}challenge`} component={ChallengePage} />
             <Route component={NotFoundPage} />
           </Switch>
         </main>
