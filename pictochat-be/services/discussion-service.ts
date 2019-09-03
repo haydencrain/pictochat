@@ -20,11 +20,13 @@ export class DiscussionService {
 
   static async getReplyTreeForThread(discussionId: number): Promise<DiscussionTreeNode> {
     const posts: DiscussionPost[] = await DiscussionPost.getPathOrderedPostsInThread(discussionId);
+
     // Create reply tree
     let nodes: { [postId: number]: DiscussionTreeNode } = {};
     let rootPostId: number;
-    posts.forEach((post: DiscussionPost) => {
-      let treeNode = new DiscussionTreeNode(post);
+
+    for (let i = 0; i < posts.length; ++i) {
+      let treeNode = await DiscussionTreeNode.makeInstance(posts[i]);
       nodes[treeNode.getDataValue('postId')] = treeNode;
 
       let parentPostId: number = treeNode.getDataValue('parentPostId');
@@ -35,7 +37,7 @@ export class DiscussionService {
         // Assuming no bugs in the post/threads creation logic there should only be one of these
         rootPostId = treeNode.getDataValue('postId');
       }
-    });
+    }
 
     return nodes[rootPostId];
   }
