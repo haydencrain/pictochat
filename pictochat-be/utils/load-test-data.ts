@@ -1,5 +1,6 @@
 import { DiscussionPost } from '../models/discussion-post';
 import { DiscussionThread } from '../models/discussion-thread';
+import { Users } from '../models/users';
 import { syncModels } from './sync-models';
 
 import { DiscussionService } from '../services/discussion-service';
@@ -50,4 +51,16 @@ export async function loadTestData() {
   console.log('QUERY RESULT:',
       (await DiscussionService.getThreadSummaries())
         .map((thread) => thread.toFlatJSON()));
+
+  console.log('Creating test instances for Users')
+  let sampleUsers = [
+    {userId: 1, userEmail: 'testOne@test.com',   username: 'rach',   password: 'test'},
+    {userId: 2, userEmail: 'testTwo@test.com',   username: 'cat',    password: 'cc'},
+    {userId: 3, userEmail: 'testThree@test.com', username: 'dog',    password: 'dd'},
+    {userId: 4, userEmail: 'testFour@test.com',  username: 'mouse',  password: 'mm'},
+    {userId: 5, userEmail: 'testFive@test.com',  username: 'rabbit', password: 'rr'}
+  ];
+
+  let userCreationPromises = sampleUsers.map((userData) => Users.create(userData));
+  await Promise.all(userCreationPromises);
 }
