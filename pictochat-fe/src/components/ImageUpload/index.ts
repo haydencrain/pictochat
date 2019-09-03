@@ -1,3 +1,3 @@
-import ImageUpload from './ImageUpload';
+import ImageDropzone from './ImageUpload';
 
-export default ImageUpload;
+export default ImageDropzone;

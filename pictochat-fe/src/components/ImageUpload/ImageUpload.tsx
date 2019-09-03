@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 import { useDropzone } from 'react-dropzone';
-import { useImageDropzoneUpload } from '../../hooks/DropzoneHooks';
+import { useImageDropzone } from '../../hooks/ImageHooks';
 import { Icon } from 'semantic-ui-react';
 import './ImageUpload.less';
 
@@ -9,8 +9,8 @@ interface ImageUploadProps {
   onImageUpload: (image: File) => void;
 }
 
-export default function ImageUpload(props: ImageUploadProps) {
-  const { errorMessage, onDropAccepted, onDropRejected, onDragOver } = useImageDropzoneUpload({
+export default function ImageDropzone(props: ImageUploadProps) {
+  const { errorMessage, onDropAccepted, onDropRejected, onDragOver } = useImageDropzone({
     onUpload: props.onImageUpload
   });
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
