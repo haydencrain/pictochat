@@ -2,6 +2,8 @@ import * as React from 'react';
 import PostsList from '../../components/PostsList';
 import { Loader, Button, Modal } from 'semantic-ui-react';
 import { useFetchPosts } from '../../hooks/PostsHooks';
+import ImageUpload from '../../components/ImageUpload';
+import { readFile } from '../../utils/fileHelpers';
 import './HomePage.less';
 
 interface HomePage {}
@@ -24,9 +26,13 @@ export default function HomePage(props: HomePage) {
 
 function NewPostModal(props: { buttonContent: any }) {
   const [isActive, setActive] = React.useState(false);
-
+  const [image, setImage] = React.useState<string>();
   const handleOpen = () => setActive(true);
   const handleClose = () => setActive(false);
+  const handleImageUpload = async (file: File) => {
+    const binaryStr = await readFile(file);
+    setImage(binaryStr.toString());
+  };
   const handleSubmit = () => {};
 
   return (
@@ -38,13 +44,12 @@ function NewPostModal(props: { buttonContent: any }) {
       }
       open={isActive}
       onClose={handleClose}
+      closeIcon={false}
     >
       <Modal.Header>Upload an Image</Modal.Header>
-      <Modal.Content image>
-        <Modal.Description>
-          <p>We've found the following gravatar image associated with your e-mail address.</p>
-          <p>Is it okay to use this photo?</p>
-        </Modal.Description>
+      <Modal.Content>
+        <ImageUpload onImageUpload={handleImageUpload} />
+        {!!image && <img src={image} />}
       </Modal.Content>
       <Modal.Actions>
         <Button onClick={handleClose}>Cancel</Button>

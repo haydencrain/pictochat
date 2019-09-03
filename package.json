@@ -27,6 +27,8 @@
   },
   "homepage": "https://github.com/haydencrain/pictochat#readme",
   "dependencies": {
+    "@types/classnames": "^2.2.9",
+    "classnames": "^2.2.6",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
