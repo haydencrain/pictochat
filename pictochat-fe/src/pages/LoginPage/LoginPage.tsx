@@ -1,9 +1,9 @@
 import * as React from 'react';
 
-import Login from '../../common/Login';
+import Login from '../../components/Login';
 import './LoginPage.less';
 
-interface LoginPage {}
+interface LoginPage { }
 
 export default (props: LoginPage) => {
   return (

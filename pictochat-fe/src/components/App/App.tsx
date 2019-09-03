@@ -6,7 +6,7 @@ import DiscussionPageOld from '../../pages/DiscussionPageOld';
 import DiscussionPage from '../../pages/DiscussionPage/DiscussionPage';
 import LeaderboardPage from '../../pages/LeaderboardPage';
 import RegisterPage from '../../pages/RegisterPage';
-import LoginPage from '../pages/Login';
+import LoginPage from '../../pages/LoginPage';
 import NotFoundPage from '../../pages/NotFoundPage';
 import ProfileCard from '../ProfileCard';
 import './App.less';
