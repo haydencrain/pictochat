@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Loader, Segment, Input, Button } from 'semantic-ui-react';
 import './ChallengePage.less';
+import ChallengeService from '../../services/ChallengeService';
 
 interface ChallengePageProps {}
 
@@ -14,9 +15,10 @@ export default function ChallengePage(props: ChallengePageProps) {
     setSales(event.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setComission(Number(sales) * rate);
+    const res = await ChallengeService.submitSales(Number(sales));
+    setComission(res.commission);
   };
 
   return (
