@@ -1,12 +1,14 @@
 import * as React from 'react';
-import { Modal, Button, Loader } from 'semantic-ui-react';
+import { Modal, Button, Loader, Dimmer } from 'semantic-ui-react';
 import { useImage } from '../../hooks/ImageHooks';
 import ImageDropzone from '../ImageUpload';
 import { useToggleModal } from '../../hooks/ModalHooks';
+import CreatePost from '../../models/CreatePost';
 import './CreatePostModal.less';
 
 interface CreatePostModalProps {
   buttonContent: any;
+  parentId?: string;
 }
 
 export default function CreatePostModal(props: CreatePostModalProps) {
@@ -23,10 +25,19 @@ export default function CreatePostModal(props: CreatePostModalProps) {
     clearImage();
     onClose();
   };
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    setLoading(true);
+    const data: CreatePost = {
+      parentId: props.parentId || null,
+      image: image
+    };
+    // TODO: send data to api
+    console.log(data);
+    setLoading(false);
+    handleClose();
+  };
 
   const renderDropzoneOrImg = () => {
-    if (isLoading) return <Loader active inline />;
     if (!!base64) return <img src={base64} />;
     return <ImageDropzone onImageUpload={handleImageUpload} />;
   };
@@ -38,15 +49,24 @@ export default function CreatePostModal(props: CreatePostModalProps) {
   );
 
   return (
-    <Modal trigger={renderModalTrigger()} open={isActive} onClose={handleClose} closeIcon={false}>
+    <Modal
+      className="create-post-modal"
+      trigger={renderModalTrigger()}
+      open={isActive}
+      onClose={handleClose}
+      closeIcon={false}
+    >
       <Modal.Header>Upload an Image</Modal.Header>
-      <Modal.Content>{renderDropzoneOrImg()}</Modal.Content>
+      <Modal.Content className="modal-content">{renderDropzoneOrImg()}</Modal.Content>
       <Modal.Actions>
         <Button onClick={handleClose}>Cancel</Button>
         <Button primary onClick={handleSubmit}>
           Submit
         </Button>
       </Modal.Actions>
+      <Dimmer inverted active={isLoading}>
+        <Loader />
+      </Dimmer>
     </Modal>
   );
 }
