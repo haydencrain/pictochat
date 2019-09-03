@@ -7,7 +7,12 @@ const IMAGES = {
   '1': getRandDogUrl(),
   '2': getRandDogUrl(),
   '3': getRandDogUrl(),
-  '4': 'https://semantic-ui.com/images/avatar2/large/elyse.png'
+  '4': 'https://semantic-ui.com/images/avatar2/large/elyse.png',
+  '5': getRandDogUrl(),
+  '6': getRandDogUrl(),
+  '7': getRandDogUrl(),
+  '8': getRandDogUrl(),
+  '9': getRandDogUrl()
 };
 
 /**
