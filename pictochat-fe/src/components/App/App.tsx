@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import Navbar from '../common/Navbar';
-import HomePage from '../pages/Home';
-import NotFoundPage from '../pages/NotFound';
-import DiscussionPageOld from '../pages/DiscussionOld';
-import LeaderboardPage from '../pages/Leaderboard';
-import RegisterPage from '../pages/Register';
-import ProfileCard from '../common/ProfileCard';
-import DiscussionPage from '../pages/Discussion/DiscussionPage';
+import Navbar from '../Navbar';
+import HomePage from '../../pages/HomePage';
+import DiscussionPageOld from '../../pages/DiscussionPageOld';
+import DiscussionPage from '../../pages/DiscussionPage/DiscussionPage';
+import LeaderboardPage from '../../pages/LeaderboardPage';
+import RegisterPage from '../../pages/RegisterPage';
 import LoginPage from '../pages/Login';
+import NotFoundPage from '../../pages/NotFoundPage';
+import ProfileCard from '../ProfileCard';
 import './App.less';
 
 export default function App() {

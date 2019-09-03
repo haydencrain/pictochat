@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import Leaderboard from '../../common/Leaderboard';
+import Leaderboard from '../../components/Leaderboard';
 import './LeaderboardPage.less';
 
 interface LeaderboardPage {}

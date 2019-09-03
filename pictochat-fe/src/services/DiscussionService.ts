@@ -2,12 +2,12 @@ import { DiscussionPost } from '../models/DiscussionPost';
 import ApiService from './ApiService';
 
 export class DiscussionService {
-  getRootDiscussionPosts(): Promise<DiscussionPost[]> {
-    return ApiService.get(`/discussions`);
+  async getRootDiscussionPosts(): Promise<DiscussionPost[]> {
+    return await ApiService.get(`/discussions`);
   }
 
-  getDiscussion(discussionId: string): Promise<DiscussionPost> {
-    return ApiService.get(`/discussions/${discussionId}`);
+  async getDiscussion(discussionId: string): Promise<DiscussionPost> {
+    return await ApiService.get(`/discussions/${discussionId}`);
   }
 }
 

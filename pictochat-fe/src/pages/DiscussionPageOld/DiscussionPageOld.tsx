@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Image, Button, Header, Label, Dropdown } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
-import { DiscussionPost } from '../../../models/DiscussionPost';
-import discussionService from '../../../services/DiscussionService';
+import { DiscussionPost } from '../../models/DiscussionPost';
+import discussionService from '../../services/DiscussionService';
 import './DiscussionPageOld.less';
 
 // HELPER COMPONENTS
