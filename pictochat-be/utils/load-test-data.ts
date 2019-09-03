@@ -3,6 +3,7 @@ import { DiscussionThread } from '../models/discussion-thread';
 import { syncModels } from './sync-models';
 
 import { DiscussionService } from '../services/discussion-service';
+import { ChallengeRate } from '../models/challenge-rate';
 
 /**
  * FIXME: Not sure if this is the best way to load test data.
@@ -187,4 +188,6 @@ export async function loadTestData() {
   await Promise.all(threadCreationPromises);
 
   console.log('QUERY RESULT:', (await DiscussionService.getThreadSummaries()).map(thread => thread.toFlatJSON()));
+
+  await ChallengeRate.create({ rateId: 1, rate: 0.2 });
 }

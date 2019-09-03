@@ -1,4 +1,5 @@
 import express from 'express';
+import { ChallengeService } from '../services/challenge-service';
 
 export const challengeRouter = express.Router();
 
@@ -8,10 +9,10 @@ challengeRouter.get('/test', function(req, res, next) {
 });
 
 // POST sales
-challengeRouter.post('/', function(req, res, next) {
+challengeRouter.post('/', async function(req, res, next) {
   try {
     const { sales } = req.body;
-    const rate = 0.2;
+    const rate = await ChallengeService.getChallengeRate();
     const commission = Number(sales) * rate;
     res.json({ commission });
   } catch (error) {
