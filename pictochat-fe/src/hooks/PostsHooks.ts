@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import discussionService from '../services/DiscussionService';
 
 export function useFetchPosts(): [DiscussionPost[], boolean] {
-  const [posts, setPosts] = useState();
-  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState<DiscussionPost[]>();
+  const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
     const fetchData = async () => {
       const posts = await discussionService.getRootDiscussionPosts();
@@ -18,8 +18,8 @@ export function useFetchPosts(): [DiscussionPost[], boolean] {
 }
 
 export function useFetchPost(id: string): [DiscussionPost, boolean] {
-  const [post, setPost] = useState();
-  const [loading, setLoading] = useState(true);
+  const [post, setPost] = useState<DiscussionPost>();
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,4 +31,20 @@ export function useFetchPost(id: string): [DiscussionPost, boolean] {
   }, [id]);
 
   return [post, loading];
+}
+
+export function useFetchPostReplies(id: string): [DiscussionPost[], boolean] {
+  const [replies, setReplies] = useState<DiscussionPost[]>();
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const replies = await discussionService.getDiscussionReplies(id);
+      setReplies(replies);
+      setLoading(false);
+    };
+    fetchData();
+  }, [id]);
+
+  return [replies, loading];
 }

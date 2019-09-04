@@ -1,7 +1,14 @@
 import { useState, useCallback } from 'react';
 import { readFile } from '../utils/fileHelpers';
 
-export function useImageDropzone(params: { onUpload?: (image: File) => void }) {
+export function useImageDropzone(params: {
+  onUpload?: (image: File) => void;
+}): {
+  errorMessage: string;
+  onDropAccepted: (rejectedFiles: File[]) => void;
+  onDropRejected: (acceptedFiles: File[]) => void;
+  onDragOver: (event: React.DragEvent<HTMLElement>) => void;
+} {
   const { onUpload } = params;
   const [errorMessage, setErrorMessage] = useState<string>();
   const onDropAccepted = useCallback((acceptedFiles: File[]) => {
@@ -22,7 +29,14 @@ export function useImageDropzone(params: { onUpload?: (image: File) => void }) {
   };
 }
 
-export function useImage(params: { onSetImageDone?: () => void }) {
+export function useImage(params: {
+  onSetImageDone?: () => void;
+}): {
+  image: File;
+  base64: string;
+  addNewImage: (img: File) => void;
+  clearImage: () => void;
+} {
   const { onSetImageDone } = params;
   const [image, setImage] = useState<File>();
   const [base64, setBase64] = useState<string>();
@@ -34,10 +48,10 @@ export function useImage(params: { onSetImageDone?: () => void }) {
       !!onSetImageDone && onSetImageDone();
     })();
   }, []);
-  const clearImage = () => {
+  const clearImage = useCallback(() => {
     setImage(null);
     setBase64(null);
-  };
+  }, []);
 
   return {
     image,
