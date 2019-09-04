@@ -13,14 +13,14 @@ interface ThreadListContinainerProps {
 }
 
 export default function ThreadListContainer(props: ThreadListContinainerProps) {
-  const { id, sectionHeader, noPostsMessage } = props;
+  const { id, sectionHeader, noPostsMessage, addPostButtonMessage } = props;
   const [posts, isLoading] = useFetchPosts(id);
   const showReplies = !!props.showReplies;
   return (
     <section className="thread-list-container">
       <div className="header">
         <h1>{sectionHeader}</h1>
-        <CreatePostModal buttonContent="Add a Reply" parentId={id} />
+        <CreatePostModal buttonContent={addPostButtonMessage} parentId={id} />
       </div>
       <PostsList isLoading={isLoading} posts={posts} noPostsMessage={noPostsMessage} raised showReplies={showReplies} />
     </section>

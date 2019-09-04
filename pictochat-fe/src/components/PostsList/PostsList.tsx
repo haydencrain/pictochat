@@ -15,10 +15,9 @@ interface Props {
 
 export default function PostsList(props: Props) {
   const { posts, showReplies, raised, noPostsMessage, isLoading } = props;
-  console.log(posts);
 
   const renderLoading = () => (
-    <Segment>
+    <Segment className="post-list-loading">
       <Loader active />
     </Segment>
   );

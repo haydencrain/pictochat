@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router';
 import { Segment, Loader } from 'semantic-ui-react';
 import { parse } from 'query-string';
 import { useFetchPost } from '../../hooks/PostsHooks';
-import ThreadListContainer from '../../components/ThreadListContainer/ThreadListContainer';
+import ThreadListContainer from '../../components/ThreadListContainer';
 import Post from '../../components/Post';
 import './DiscussionPage.less';
 
