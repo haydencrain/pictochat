@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Modal, Button, Loader, Dimmer } from 'semantic-ui-react';
 import { useImage } from '../../hooks/ImageHooks';
-import ImageDropzone from '../ImageUpload';
+import ImageDropzone from '../ImageDropzone';
 import { useToggleModal } from '../../hooks/ModalHooks';
 import CreatePost from '../../models/CreatePost';
 import './CreatePostModal.less';
@@ -47,6 +47,7 @@ export default function CreatePostModal(props: CreatePostModalProps) {
       {props.buttonContent}
     </Button>
   );
+  å;
 
   return (
     <Modal
