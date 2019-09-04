@@ -7,7 +7,7 @@ import CreatePost from '../../models/CreatePost';
 import './CreatePostModal.less';
 
 interface CreatePostModalProps {
-  buttonContent: any;
+  buttonContent?: any;
   parentId?: string;
 }
 
@@ -44,7 +44,7 @@ export default function CreatePostModal(props: CreatePostModalProps) {
 
   const renderModalTrigger = () => (
     <Button primary onClick={onOpen}>
-      {props.buttonContent}
+      {props.buttonContent || 'Add Post'}
     </Button>
   );
 

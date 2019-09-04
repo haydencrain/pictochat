@@ -22,9 +22,10 @@ export default function DiscussionPage(props: Props) {
       </Segment>
       <ThreadListContainer
         id={id}
+        showReplies
         sectionHeader={`Replies (${post.commentCount})`}
         noPostsMessage="No replies have been added yet! Be the first to add a reply!"
-        showReplies
+        addPostButtonMessage="Add Reply"
       />
     </section>
   );
