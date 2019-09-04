@@ -47,7 +47,6 @@ export default function CreatePostModal(props: CreatePostModalProps) {
       {props.buttonContent}
     </Button>
   );
-  å;
 
   return (
     <Modal
