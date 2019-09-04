@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as moment from 'moment-mini';
 import * as classNames from 'classnames';
-import { Link } from 'react-router-dom';
+import PostLinks from '../PostLinks';
 import { Image } from 'semantic-ui-react';
 import { DiscussionPost } from '../../models/DiscussionPost';
 import { PostTypes, getPostTypeName } from '../../models/PostTypes';
@@ -33,40 +33,4 @@ export default function Post(props: PostProps) {
       </div>
     </section>
   );
-}
-
-interface PostLinksProps {
-  postType: PostTypes;
-  id: string;
-  commentCount: number;
-}
-
-function PostLinks(props: PostLinksProps) {
-  const { postType, id, commentCount } = props;
-
-  const renderRootPostLinks = () => (
-    <div className="post-links">
-      <Link className="link" to={`/discussion?id=${id}`}>
-        {commentCount} comments
-      </Link>
-    </div>
-  );
-
-  const renderReplyPostLinks = () => (
-    <div className="post-links">
-      <Link className="link" to={`/discussion?id=${id}`}>
-        permalink
-      </Link>
-      <div
-        className="link"
-        onClick={e => console.log(`I should be seeing a modal so that i can reply to post Id ${id}`)}
-      >
-        reply
-      </div>
-    </div>
-  );
-
-  if (postType === PostTypes.Root) return renderRootPostLinks();
-  if (postType === PostTypes.Reply) return renderReplyPostLinks();
-  return null; // No Links should be shown on the Main Post
 }

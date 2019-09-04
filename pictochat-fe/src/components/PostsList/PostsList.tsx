@@ -2,8 +2,8 @@ import * as React from 'react';
 import { Segment, Loader } from 'semantic-ui-react';
 import { DiscussionPost } from '../../models/DiscussionPost';
 import { PostTypes } from '../../models/PostTypes';
-import Post from '../Post';
-import './PostList.less';
+import PostsListItem from '../PostsListItem';
+import './PostsList.less';
 
 interface PostListsProps {
   posts: DiscussionPost[];
@@ -42,30 +42,5 @@ export default function PostsList(props: PostListsProps) {
     <Segment.Group className="post-list" raised={raised}>
       {renderContent()}
     </Segment.Group>
-  );
-}
-
-interface PostListItemProps {
-  post: DiscussionPost;
-  postType: PostTypes;
-  showReplies: boolean;
-}
-
-function PostsListItem(props: PostListItemProps) {
-  const { post, postType, showReplies } = props;
-  const replies = post.replies || [];
-
-  const renderPostReplies = () =>
-    replies.length > 0 && (
-      <div className="post-replies">
-        <PostsList postsType={PostTypes.Reply} posts={replies} raised={false} showReplies />
-      </div>
-    );
-
-  return (
-    <Segment className="post-and-replies">
-      <Post post={post} postType={postType} />
-      {showReplies && renderPostReplies()}
-    </Segment>
   );
 }
