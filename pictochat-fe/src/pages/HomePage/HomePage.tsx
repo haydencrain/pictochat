@@ -17,7 +17,12 @@ export default function HomePage(props: HomePage) {
           <h1>Threads</h1>
           <CreatePostModal buttonContent="Create Post" />
         </div>
-        <PostsList posts={posts} showReplies={false} raised />
+        <PostsList
+          posts={posts}
+          noPostsMessage="No posts have been added yet! Be the first to add a post!"
+          showReplies={false}
+          raised
+        />
       </div>
     </section>
   );

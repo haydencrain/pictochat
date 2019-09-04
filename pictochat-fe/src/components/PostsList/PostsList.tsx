@@ -7,21 +7,32 @@ import './PostList.less';
 
 interface Props {
   posts: DiscussionPost[];
+  noPostsMessage?: string;
   showReplies: boolean;
   raised: boolean;
 }
 
 export default function PostsList(props: Props) {
-  const { posts, showReplies, raised } = props;
+  const { posts, showReplies, raised, noPostsMessage } = props;
+
+  const renderNoPosts = () =>
+    !!noPostsMessage && (
+      <Segment>
+        <p>{noPostsMessage}</p>
+      </Segment>
+    );
+
+  const renderPosts = () =>
+    posts.map(post => (
+      <Segment className="post-and-replies" key={post.postId}>
+        <Post post={post} />
+        {showReplies && <PostReplies replies={post.replies || []} />}
+      </Segment>
+    ));
 
   return (
     <Segment.Group className="post-list" raised={raised}>
-      {posts.map(post => (
-        <Segment key={post.postId}>
-          <Post post={post} />
-          {showReplies && <PostReplies replies={post.replies || []} />}
-        </Segment>
-      ))}
+      {posts.length === 0 ? renderNoPosts() : renderPosts()}
     </Segment.Group>
   );
 }

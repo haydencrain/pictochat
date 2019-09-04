@@ -11,10 +11,11 @@ interface PostRepliesProps {
 export default function PostReplies(props: PostRepliesProps) {
   const { replies } = props;
   const raised = !!props.raised;
-  if (!replies.length) return null;
   return (
-    <div className="post-replies">
-      <PostsList posts={replies} raised={raised} showReplies />
-    </div>
+    replies.length > 0 && (
+      <div className="post-replies">
+        <PostsList posts={replies} raised={raised} showReplies />
+      </div>
+    )
   );
 }

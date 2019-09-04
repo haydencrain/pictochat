@@ -21,7 +21,12 @@ export default function DiscussionPage(props: Props) {
         <Post post={post} />
       </Segment>
       <h1>Replies ({post.commentCount})</h1>
-      <PostsList posts={post.replies} raised showReplies />
+      <PostsList
+        posts={post.replies}
+        noPostsMessage="No replies have been added yet! Be the first to add a reply!"
+        raised
+        showReplies
+      />
     </section>
   );
 }
