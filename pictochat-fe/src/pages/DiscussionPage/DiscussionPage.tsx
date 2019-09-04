@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router';
 import { Segment, Loader } from 'semantic-ui-react';
 import { parse } from 'query-string';
 import { useFetchPost } from '../../hooks/PostsHooks';
-import PostsList from '../../components/PostsList';
+import ThreadListContainer from '../../components/ThreadListContainer/ThreadListContainer';
 import Post from '../../components/Post';
 import './DiscussionPage.less';
 
@@ -20,11 +20,10 @@ export default function DiscussionPage(props: Props) {
       <Segment raised>
         <Post post={post} />
       </Segment>
-      <h1>Replies ({post.commentCount})</h1>
-      <PostsList
-        posts={post.replies}
+      <ThreadListContainer
+        id={id}
+        sectionHeader={`Replies (${post.commentCount})`}
         noPostsMessage="No replies have been added yet! Be the first to add a reply!"
-        raised
         showReplies
       />
     </section>
