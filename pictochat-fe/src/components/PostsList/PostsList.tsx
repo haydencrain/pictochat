@@ -1,20 +1,21 @@
 import * as React from 'react';
-import { Segment, Dimmer, Loader } from 'semantic-ui-react';
+import { Segment, Loader } from 'semantic-ui-react';
 import { DiscussionPost } from '../../models/DiscussionPost';
+import { PostTypes } from '../../models/PostTypes';
 import Post from '../Post';
-import PostReplies from '../PostReplies';
 import './PostList.less';
 
-interface Props {
+interface PostListsProps {
   posts: DiscussionPost[];
+  postsType: PostTypes;
   noPostsMessage?: string;
   isLoading?: boolean;
   showReplies: boolean;
   raised: boolean;
 }
 
-export default function PostsList(props: Props) {
-  const { posts, showReplies, raised, noPostsMessage, isLoading } = props;
+export default function PostsList(props: PostListsProps) {
+  const { posts, showReplies, raised, noPostsMessage, isLoading, postsType } = props;
 
   const renderLoading = () => (
     <Segment className="post-list-loading">
@@ -29,12 +30,7 @@ export default function PostsList(props: Props) {
   );
 
   const renderPosts = () =>
-    posts.map(post => (
-      <Segment className="post-and-replies" key={post.postId}>
-        <Post post={post} />
-        {showReplies && <PostReplies replies={post.replies || []} />}
-      </Segment>
-    ));
+    posts.map(post => <PostsListItem key={post.postId} post={post} postType={postsType} showReplies={showReplies} />);
 
   const renderContent = () => {
     if (!!isLoading) return renderLoading();
@@ -46,5 +42,30 @@ export default function PostsList(props: Props) {
     <Segment.Group className="post-list" raised={raised}>
       {renderContent()}
     </Segment.Group>
+  );
+}
+
+interface PostListItemProps {
+  post: DiscussionPost;
+  postType: PostTypes;
+  showReplies: boolean;
+}
+
+function PostsListItem(props: PostListItemProps) {
+  const { post, postType, showReplies } = props;
+  const replies = post.replies || [];
+
+  const renderPostReplies = () =>
+    replies.length > 0 && (
+      <div className="post-replies">
+        <PostsList postsType={PostTypes.Reply} posts={replies} raised={false} showReplies />
+      </div>
+    );
+
+  return (
+    <Segment className="post-and-replies">
+      <Post post={post} postType={postType} />
+      {showReplies && renderPostReplies()}
+    </Segment>
   );
 }
