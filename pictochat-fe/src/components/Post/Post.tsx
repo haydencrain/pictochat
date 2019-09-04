@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Image } from 'semantic-ui-react';
 import { DiscussionPost } from '../../models/DiscussionPost';
 import { Link } from 'react-router-dom';
+import * as moment from 'moment-mini';
 import './Post.less';
 
 interface PostProps {
@@ -19,7 +20,7 @@ export default function Post(props: PostProps) {
       <div className="post-content">
         <div className="post-header">
           <div className="post-author">{userName}</div>
-          <div className="post-date">{postedDate}</div>
+          <div className="post-date">{moment(postedDate).fromNow()}</div>
         </div>
         <div className="post-body">
           <Image src={imageSrc} />
