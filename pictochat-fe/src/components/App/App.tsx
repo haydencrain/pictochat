@@ -3,7 +3,6 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Navbar from '../Navbar';
 import HomePage from '../../pages/HomePage';
 import NotFoundPage from '../../pages/NotFoundPage';
-import DiscussionPageOld from '../../pages/DiscussionPageOld';
 import LeaderboardPage from '../../pages/LeaderboardPage';
 import RegisterPage from '../../pages/RegisterPage';
 import ProfileCard from '../ProfileCard';
@@ -19,7 +18,6 @@ export default function App() {
         <main id="app-main">
           <Switch>
             <Route exact path={FRONTEND_URL_ROOT} component={HomePage} />
-            <Route exact path={`${FRONTEND_URL_ROOT}discussionOld`} component={DiscussionPageOld} />
             <Route exact path={`${FRONTEND_URL_ROOT}discussion`} component={DiscussionPage} />
             <Route exact path={`${FRONTEND_URL_ROOT}leaderboard`} component={LeaderboardPage} />
             <Route exact path={`${FRONTEND_URL_ROOT}register`} component={RegisterPage} />

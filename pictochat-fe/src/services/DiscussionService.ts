@@ -9,6 +9,11 @@ export class DiscussionService {
   async getDiscussion(discussionId: string): Promise<DiscussionPost> {
     return await ApiService.get(`/discussions/${discussionId}`);
   }
+
+  async getDiscussionReplies(discussionId: string): Promise<DiscussionPost[]> {
+    const discussion = await this.getDiscussion(discussionId);
+    return discussion.replies;
+  }
 }
 
 export default new DiscussionService();
