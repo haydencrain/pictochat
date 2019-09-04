@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { PostTypes } from '../../models/PostTypes';
 import { Link } from 'react-router-dom';
+import './PostLinks.less';
 
 interface PostLinksProps {
   postType: PostTypes;
