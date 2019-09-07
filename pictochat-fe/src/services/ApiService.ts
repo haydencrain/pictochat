@@ -1,7 +1,7 @@
 import { stringify } from 'query-string';
 import ApiException from '../models/ApiException';
 
-const BACKEND_ENDPOINT = 'http://localhost:443/api';
+const BACKEND_ENDPOINT = process.env.PICTOCHAT_API_ROOT || '/api';
 
 class ApiService {
   async get(path: string, query: any = null): Promise<any> {
@@ -49,7 +49,7 @@ class ApiService {
           let responseBody: any = await response.text();
           try {
             responseBody = JSON.parse(responseBody);
-          } catch {}
+          } catch { }
           if (response.ok) {
             resolve(responseBody);
           } else {
