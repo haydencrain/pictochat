@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import * as DateUtils from '../utils/date-utils';
 import { Image } from '../models/image';
 import { Transaction } from 'sequelize/types';
+import config from '../utils/config';
 
 // TEST DATA
 
@@ -32,7 +33,10 @@ export interface NewImage {
  */
 export class ImageService {
   static getImageURI(imageId: string): string {
-    return IMAGES[imageId];
+    if (IMAGES.hasOwnProperty(imageId)) {
+      return IMAGES[imageId];
+    }
+    return `${config.API_ROOT}/image/${imageId}`;
   }
 
   static getUserAvatarURI(imageId: string): string {
@@ -42,7 +46,7 @@ export class ImageService {
   static async saveImage(newImage: NewImage, transaction?: Transaction): Promise<Image> {
     let uploadedDate: Date = new Date();
     let image: Image = Image.buildImage({ ...newImage, ...{ uploadedDate: uploadedDate } });
-    return image.save({transaction});
+    return image.save({ transaction });
     // let imageId: string = ImageService.getImageId(newImage.data, uploadedDate);
     // let creationOptions = (transaction !== undefined)? {transaction} : {}
     // return Image.create({ ...{ imageId, uploadedDate }, ...newImage }, creationOptions);

@@ -14,7 +14,7 @@ export class DiscussionPost extends Model {
   postedDate!: Date;
   parentPostId!: number;
   commentTreePath!: string;
-  imageId!: number;
+  imageId!: string;
   authorId!: number;
   replyTreePath!: string;
   // Attributes for 'has' associations
@@ -53,7 +53,7 @@ DiscussionPost.init(
     postId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     discussionId: { type: DataTypes.INTEGER },
     isRootPost: { type: DataTypes.BOOLEAN, defaultValue: false },
-    imageId: { type: DataTypes.INTEGER },
+    imageId: { type: DataTypes.STRING },
     authorId: { type: DataTypes.INTEGER },
     postedDate: { type: DataTypes.DATE },
     parentPostId: { type: DataTypes.INTEGER },

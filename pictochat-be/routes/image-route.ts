@@ -1,10 +1,7 @@
 import { Router } from 'express';
 import { Image } from '../models/image';
 import { ImageService } from '../services/image-service';
-
-const ENCODING_CONTENT_TYPES = {
-  jpg: 'image/jpg'
-};
+import { ENCODING_CONTENT_TYPES } from '../utils/encoding-content-types';
 
 export const imageRouter = Router();
 imageRouter.get('/:imageId', async (req, res, next) => {
