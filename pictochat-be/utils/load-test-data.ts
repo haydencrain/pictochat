@@ -1,8 +1,22 @@
+import fs from 'fs';
+import path from 'path';
+import { timestamp } from './date-utils';
 import { DiscussionPost } from '../models/discussion-post';
 import { DiscussionThread } from '../models/discussion-thread';
+import { Image } from '../models/image';
 import { syncModels } from './sync-models';
 
-import { DiscussionService } from '../services/discussion-service';
+/**
+ * Promise-returning wrapper for fs.readFile
+ */
+function readFile(path: fs.PathLike): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, (error, data: Buffer) => {
+      if (error) { return reject(error); }
+      resolve(data);
+    });
+  });
+}
 
 /**
  * FIXME: Not sure if this is the best way to load test data.
@@ -186,5 +200,14 @@ export async function loadTestData() {
   let threadCreationPromises = sampleThreads.map(threadData => DiscussionThread.create(threadData));
   await Promise.all(threadCreationPromises);
 
-  console.log('QUERY RESULT:', (await DiscussionService.getThreadSummaries()).map(thread => thread.toFlatJSON()));
+  // Path relative to compiled js file's location in build folder
+  let testImages: Buffer[] = [
+    await readFile(path.join(__dirname, '../../../test-data/green.JPG')),
+    await readFile(path.join(__dirname, '../../../test-data/green.JPG'))
+  ];
+
+  let imageCreationPromises = testImages.map((data: Buffer, i) => {
+    return Image.create({ imageId: `asdsdfsdfd${i}-${timestamp(new Date())}`, encoding: 'jpg', data: data, uploadedDate: new Date() });
+  });
+  await Promise.all(imageCreationPromises);
 }
