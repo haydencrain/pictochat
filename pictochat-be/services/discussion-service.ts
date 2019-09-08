@@ -15,6 +15,7 @@ export interface NewThread {
 }
 
 export interface NewReply {
+  discussionId: number;
   userId: number;
   parentPostId: number;
   image: NewImage;
@@ -66,7 +67,8 @@ export class DiscussionService {
         { transaction, where: { postId: newPost.parentPostId } });
 
       let reply: DiscussionPost = await DiscussionPost.create({
-        discussionId: parentPost.getDataValue('discussionId'),
+        discussionId: newPost.discussionId,
+        //discussionId: parentPost.getDataValue('discussionId'),
         imageId: image.getDataValue('imageId'),
         autorId: newPost.userId,
         postedDate: new Date(),
