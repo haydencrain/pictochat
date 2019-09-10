@@ -15,7 +15,6 @@ export interface NewThread {
 }
 
 export interface NewReply {
-  discussionId: number;
   userId: number;
   parentPostId: number;
   image: NewImage;
@@ -66,14 +65,15 @@ export class DiscussionService {
       let parentPost: DiscussionPost = await DiscussionPost.findOne(
         { transaction, where: { postId: newPost.parentPostId } });
 
+      let parentReplyPath: string = parentPost.getDataValue('replyTreePath') || '';
       let reply: DiscussionPost = await DiscussionPost.create({
-        discussionId: newPost.discussionId,
-        //discussionId: parentPost.getDataValue('discussionId'),
+        // discussionId: newPost.discussionId,
+        discussionId: parentPost.getDataValue('discussionId'),
         imageId: image.getDataValue('imageId'),
         autorId: newPost.userId,
         postedDate: new Date(),
         parentPostId: parentPost.getDataValue('postId'),
-        replyTreePath: `${parentPost.getDataValue('replyTreePath')}/${parentPost.getDataValue('postId')}`
+        replyTreePath: `${parentReplyPath}/${parentPost.getDataValue('postId')}`
       }, { transaction });
 
       await transaction.commit();
@@ -101,10 +101,21 @@ export class DiscussionService {
 
   static async getReplyTreeForThread(discussionId: number): Promise<DiscussionTreeNode> {
     const posts: DiscussionPost[] = await DiscussionPost.getPathOrderedPostsInThread(discussionId);
+    return await DiscussionService.makeReplyTree(posts);
+  }
 
+  static async getReplyTreeUnderPost(postId: number): Promise<DiscussionTreeNode> {
+    const posts: DiscussionPost[] = await DiscussionPost.getPathOrderedSubTreeUnder(postId);
+    return await DiscussionService.makeReplyTree(posts);
+  }
+
+  /**
+   * @param posts Array of posts ordered by replyTreePath such that the root is the first post
+   */
+  private static async makeReplyTree(posts: DiscussionPost[]): Promise<DiscussionTreeNode> {
     // Create reply tree
     let nodes: { [postId: number]: DiscussionTreeNode } = {};
-    let rootPostId: number;
+    let rootPostId: number = posts[0].getDataValue('postId');
 
     for (let i = 0; i < posts.length; ++i) {
       let treeNode = await DiscussionTreeNode.makeInstance(posts[i]);
@@ -114,10 +125,11 @@ export class DiscussionService {
       if (parentPostId !== null) {
         let parentNode = nodes[parentPostId];
         parentNode.addReply(treeNode);
-      } else if (treeNode.getDataValue('isRootPost')) {
+      }
+      /*else if (treeNode.getDataValue('isRootPost')) {
         // Assuming no bugs in the post/threads creation logic there should only be one of these
         rootPostId = treeNode.getDataValue('postId');
-      }
+      }*/
     }
 
     return nodes[rootPostId];

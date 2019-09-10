@@ -32,6 +32,19 @@ export class DiscussionPost extends Model {
     });
   }
 
+  static async getPathOrderedSubTreeUnder(postId: number): Promise<DiscussionPost[]> {
+    const post: DiscussionPost = await DiscussionPost.findOne({ where: { postId: postId } });
+    let replyPathPrefix: string = `${post.getDataValue('replyTreePath') || ''}/${post.getDataValue('postId')}`
+    return DiscussionPost.findAll({
+      attributes: { include: DiscussionPost.PUBLIC_ATTRIBUTES },
+      where: { ...DiscussionPost.replyTreePathFilter(replyPathPrefix) }
+    });
+  }
+
+  private static replyTreePathFilter(prefix: string) {
+    return { replyTreePath: { [Op.like]: `${prefix}/%` } };
+  }
+
   // INSTANCE METHODS
 
   /**
