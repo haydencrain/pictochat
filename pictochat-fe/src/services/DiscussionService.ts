@@ -1,13 +1,6 @@
 import { DiscussionPost } from '../models/DiscussionPost';
 import ApiService from './ApiService';
-import CreatePost from '../models/CreatePost';
-
-export interface NewPostPayload {
-  userId: string,
-  image: File,
-  parentId?: string,
-  discussionId?: string
-}
+import NewPostPayload from '../models/NewPostPayload';
 
 export class DiscussionService {
   async getRootDiscussionPosts(): Promise<DiscussionPost[]> {
@@ -26,7 +19,7 @@ export class DiscussionService {
   async createPost(post: NewPostPayload): Promise<void> {
     let isReplyPost: boolean = !!post.parentId;
     if (isReplyPost) this.checkReplyPostValidity(post);
-    let path = (!isReplyPost) ? '/discussion' : `/discussion/${post.discussionId}/post`;
+    let path = !isReplyPost ? '/discussion' : `/discussion/${post.discussionId}/post`;
 
     // IMPORTANT: Image must be the last field appended to form data or the server will not see the other fields
     let formData = new FormData();
