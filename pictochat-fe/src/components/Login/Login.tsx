@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Container, Header, Form, Button } from 'semantic-ui-react';
-import UserService from '../../../services/UserService';
+import UserService from '../../services/UserService';
 import './Login.less';
-import { User } from '../../../models/User';
+import { User } from '../../models/User';
 
 interface LoginState {
   email: string;

@@ -1,7 +1,7 @@
 import { stringify } from 'query-string';
 import ApiException from '../models/ApiException';
 
-const BACKEND_ENDPOINT = process.env.PICTOCHAT_API_ROOT || '/api';
+const BACKEND_ENDPOINT = process.env.PICTPICTOCHAT_DB_HOSTOCHAT_API_ROOT || '192.168.99.100:443/api';
 
 export class ApiService {
   static async get(path: string, query: any = null): Promise<any> {

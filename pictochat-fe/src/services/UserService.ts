@@ -15,6 +15,10 @@ class UserService {
   static async authUser(user: User): Promise<User> {
     return await ApiService.post('/user/auth', user);
   }
+
+  static async addUser(user: User): Promise<User> {
+    return await ApiService.post('/user/add-user', user);
+  }
 }
 
 export default UserService;

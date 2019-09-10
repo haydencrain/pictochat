@@ -3,7 +3,7 @@ version: "3"
 services:
   web-app:
     build:
-      dockerfile: ./build-scripts/web-app.Dockerfile
+      dockerfile: /build-scripts/web-app.Dockerfile
       context: .
     command: npm run start-dev-remote
     env_file:

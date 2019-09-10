@@ -7,7 +7,8 @@ userRouter.get('/', async (req, res, next) => {
   try {
     console.log("get");
     let user = await UserService.getUsers();
-    res.json(user.toJSON());
+    let users = user.map((users) => users.toJSON());
+    res.json(users);
   } catch (error) {
     next(error);
   }
@@ -26,26 +27,33 @@ userRouter.get('/:userId', async (req, res, next) => {
 });
 
 // POST create user
-
-
-
-// POST auth user
-userRouter.post('/user/auth', async (req, res, next) => {
+userRouter.post('/add-user', async (req: any, res, next) => {
   try {
-    const { body } = req;
-
-    // use passport, check username n password
-
-    // if success
-    // generate token and send
-
-    // if fail
-    //resturn token
-
-    res.json(body);
-
-    // res.locals.connection.query('INSERT INTO USERS (userEmail, password) VALUES ('' + req.body.userEmail + '','' + req.password+'')');
+    let user = await UserService.saveUser(req.body);
+    res.json(user.toJSON());
   } catch (error) {
     next(error);
   }
-);
+})
+
+
+// // POST auth user
+// userRouter.post('/user/auth', async (req, res, next) => {
+//   try {
+//     const { body } = req;
+
+//     // use passport, check username n password
+
+//     // if success
+//     // generate token and send
+
+//     // if fail
+//     //resturn token
+
+//     res.json(body);
+
+//     // res.locals.connection.query('INSERT INTO USERS (userEmail, password) VALUES ('' + req.body.userEmail + '','' + req.password+'')');
+//   } catch (error) {
+//     next(error);
+//   }
+// );
