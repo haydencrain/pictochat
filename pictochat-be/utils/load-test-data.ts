@@ -34,7 +34,7 @@ export async function loadTestData() {
       // postId: 1,
       discussionId: 1,
       isRootPost: true,
-      imageId: '1',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '1'
@@ -44,7 +44,7 @@ export async function loadTestData() {
       discussionId: 1,
       parentPostId: 1,
       isRootPost: false,
-      imageId: '1',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '1/11'
@@ -54,7 +54,7 @@ export async function loadTestData() {
       discussionId: 1,
       parentPostId: 2,
       isRootPost: false,
-      imageId: '2',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '1/11/111'
@@ -64,7 +64,7 @@ export async function loadTestData() {
       discussionId: 1,
       parentPostId: 3,
       isRootPost: false,
-      imageId: '3',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '1/11/111/1111'
@@ -74,7 +74,7 @@ export async function loadTestData() {
       discussionId: 1,
       parentPostId: 3,
       isRootPost: false,
-      imageId: '5',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '1/11/111/1112'
@@ -84,7 +84,7 @@ export async function loadTestData() {
       discussionId: 1,
       parentPostId: 3,
       isRootPost: false,
-      imageId: '6',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '1/11/111/1113'
@@ -94,7 +94,7 @@ export async function loadTestData() {
       discussionId: 1,
       parentPostId: 2,
       isRootPost: false,
-      imageId: '7',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '1/11/112'
@@ -104,7 +104,7 @@ export async function loadTestData() {
       discussionId: 1,
       parentPostId: 2,
       isRootPost: false,
-      imageId: '8',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '1/11/113'
@@ -114,7 +114,7 @@ export async function loadTestData() {
       discussionId: 1,
       parentPostId: 1,
       isRootPost: false,
-      imageId: '9',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '1/12'
@@ -124,7 +124,7 @@ export async function loadTestData() {
       discussionId: 1,
       parentPostId: 1,
       isRootPost: false,
-      imageId: '2',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '1/13'
@@ -134,7 +134,7 @@ export async function loadTestData() {
       discussionId: 1,
       parentPostId: 1,
       isRootPost: false,
-      imageId: '3',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '1/14'
@@ -144,7 +144,7 @@ export async function loadTestData() {
       discussionId: 1,
       parentPostId: 1,
       isRootPost: false,
-      imageId: '5',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '1/15'
@@ -153,7 +153,7 @@ export async function loadTestData() {
       // postId: 2, 13
       discussionId: 2,
       isRootPost: true,
-      imageId: '6',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '2'
@@ -162,7 +162,7 @@ export async function loadTestData() {
       // postId: 3, 14
       discussionId: 3,
       isRootPost: true,
-      imageId: '7',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '3'
@@ -171,7 +171,7 @@ export async function loadTestData() {
       // postId: 4, 15
       discussionId: 4,
       isRootPost: true,
-      imageId: '8',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '4'
@@ -180,7 +180,7 @@ export async function loadTestData() {
       // postId: 5, 16
       discussionId: 5,
       isRootPost: true,
-      imageId: '9',
+      imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
       commentTreePath: '5'
@@ -225,7 +225,7 @@ export async function loadTestData() {
   ];
 
   let imageCreationPromises = testImages.map((data: Buffer, i) => {
-    return Image.create({ imageId: `asdsdfsdfd${i}-${timestamp(new Date())}`, encoding: 'jpg', data: data, uploadedDate: new Date() });
+    return Image.create({ imageId: `asdsdfsdfd${i}-20190101T010101000`, encoding: 'jpg', data: data, uploadedDate: new Date() });
   });
   await Promise.all(imageCreationPromises);
 }
