@@ -4,6 +4,7 @@ import { useImage } from '../../hooks/ImageHooks';
 import ImageDropzone from '../ImageDropzone';
 import { useToggleModal } from '../../hooks/ModalHooks';
 import NewPostPayload from '../../models/NewPostPayload';
+import { DiscussionService } from '../../services/DiscussionService';
 import './CreatePostModal.less';
 
 interface CreatePostModalProps {
@@ -25,7 +26,7 @@ export default function CreatePostModal(props: CreatePostModalProps) {
     clearImage();
     onClose();
   };
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setLoading(true);
     const user = { userId: '1' }; // getCurrentUser();
     const data: NewPostPayload = {
@@ -33,8 +34,7 @@ export default function CreatePostModal(props: CreatePostModalProps) {
       parentId: props.parentId || null,
       image: image
     };
-    // TODO: send data to api
-    console.log(data);
+    await DiscussionService.createPost(data);
     setLoading(false);
     handleClose();
   };

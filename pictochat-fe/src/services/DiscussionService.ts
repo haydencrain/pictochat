@@ -3,20 +3,20 @@ import ApiService from './ApiService';
 import NewPostPayload from '../models/NewPostPayload';
 
 export class DiscussionService {
-  async getRootDiscussionPosts(): Promise<DiscussionPost[]> {
+  static async getRootDiscussionPosts(): Promise<DiscussionPost[]> {
     return await ApiService.get(`/discussion`);
   }
 
-  async getDiscussion(discussionId: string): Promise<DiscussionPost> {
+  static async getDiscussion(discussionId: string): Promise<DiscussionPost> {
     return await ApiService.get(`/discussion/${discussionId}`);
   }
 
-  async getDiscussionReplies(discussionId: string): Promise<DiscussionPost[]> {
+  static async getDiscussionReplies(discussionId: string): Promise<DiscussionPost[]> {
     const discussion = await this.getDiscussion(discussionId);
     return discussion.replies;
   }
 
-  async createPost(post: NewPostPayload): Promise<void> {
+  static async createPost(post: NewPostPayload): Promise<void> {
     let isReplyPost: boolean = !!post.parentId;
     if (isReplyPost) this.checkReplyPostValidity(post);
     let path = !isReplyPost ? '/discussion' : `/discussion/${post.discussionId}/post`;
@@ -32,11 +32,11 @@ export class DiscussionService {
     return ApiService.post(path, formData, null);
   }
 
-  private checkReplyPostValidity(post: NewPostPayload) {
+  private static checkReplyPostValidity(post: NewPostPayload) {
     if (!post.parentId || !post.discussionId) {
       throw new Error('post.discussionId must be populated when post.parentId is populated and vice versa');
     }
   }
 }
 
-export default new DiscussionService();
+export default DiscussionService;
