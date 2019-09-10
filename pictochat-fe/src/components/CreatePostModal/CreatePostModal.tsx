@@ -3,7 +3,8 @@ import { Modal, Button, Loader, Dimmer } from 'semantic-ui-react';
 import { useImage } from '../../hooks/ImageHooks';
 import ImageDropzone from '../ImageDropzone';
 import { useToggleModal } from '../../hooks/ModalHooks';
-import CreatePost from '../../models/CreatePost';
+import NewPostPayload from '../../models/NewPostPayload';
+import { DiscussionService } from '../../services/DiscussionService';
 import './CreatePostModal.less';
 
 interface CreatePostModalProps {
@@ -25,14 +26,15 @@ export default function CreatePostModal(props: CreatePostModalProps) {
     clearImage();
     onClose();
   };
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setLoading(true);
-    const data: CreatePost = {
+    const user = { userId: '1' }; // getCurrentUser();
+    const data: NewPostPayload = {
+      userId: user.userId,
       parentId: props.parentId || null,
       image: image
     };
-    // TODO: send data to api
-    console.log(data);
+    await DiscussionService.createPost(data);
     setLoading(false);
     handleClose();
   };
