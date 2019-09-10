@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { Segment, Loader } from 'semantic-ui-react';
+import { Loader } from 'semantic-ui-react';
 import { parse } from 'query-string';
 import { useFetchPost } from '../../hooks/PostsHooks';
-import PostsList from '../../components/PostsList';
-import Post from '../../components/Post';
+import ThreadListContainer from '../../components/ThreadListContainer';
+import PostMainContainer from '../../components/PostMainContainer';
 import './DiscussionPage.less';
 
 interface Props extends RouteComponentProps<any> {}
@@ -16,12 +16,14 @@ export default function DiscussionPage(props: Props) {
   if (isLoading) return <Loader active inline />;
   return (
     <section id="discussion-page">
-      <h1>Thread by {post.author.userName}</h1>
-      <Segment raised>
-        <Post post={post} />
-      </Segment>
-      <h1>Replies ({post.commentCount})</h1>
-      <PostsList posts={post.replies} raised showReplies />
+      <PostMainContainer id={id} />
+      <ThreadListContainer
+        id={id}
+        showReplies
+        sectionHeader={`Replies (${post.commentCount})`}
+        noPostsMessage="No replies have been added yet! Be the first to add a reply!"
+        addPostButtonMessage="Add Reply"
+      />
     </section>
   );
 }

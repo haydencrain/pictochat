@@ -1,8 +1,18 @@
 @import '../../styles/_constants.less';
 
 .post-list {
+  .post-and-replies {
+    > *:not(:last-child) {
+      margin-bottom: 15px;
+    }
+  }
+
   .post-replies {
     margin-left: @post-sidebar-width;
     // padding-left: @post-sidebar-margin-right;
+  }
+
+  .post-list-loading {
+    min-height: 50px;
   }
 }

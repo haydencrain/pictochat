@@ -1,46 +1,57 @@
 import { stringify } from 'query-string';
 import ApiException from '../models/ApiException';
 
-const BACKEND_ENDPOINT = 'http://192.168.99.100:443/api';
+const BACKEND_ENDPOINT = process.env.PICTOCHAT_API_ROOT || '/api';
 
-class ApiService {
-  async get(path: string, query: any = null): Promise<any> {
+export class ApiService {
+  static async get(path: string, query: any = null): Promise<any> {
     const queryString = stringify(query);
     const safeQueryString = queryString ? `?${queryString}` : '';
-    return this.ajax('get', `${path}${safeQueryString}`, null);
+    return ApiService.ajax('get', `${path}${safeQueryString}`);
   }
 
-  async post(path: string, data: any): Promise<any> {
-    return this.ajax('post', path, data);
+  static async post(path: string, data: any, contentType: string = 'application/json'): Promise<any> {
+    return ApiService.ajax('post', path, data, null, contentType);
   }
 
-  async put(path: string, data: any, query: any = null): Promise<any> {
-    if (!query) return this.ajax('put', path, data);
+  static async put(path: string, data: any, query: any = null,
+    contentType: string = 'application/json'
+  ): Promise<any> {
+    if (!query) return ApiService.ajax('put', path, data, null, contentType);
     const queryString = stringify(query);
-    return this.ajax('put', `${path}?${queryString}`, data);
+    return ApiService.ajax('put', `${path}?${queryString}`, data, null, contentType);
   }
 
-  async patch(path: string, data: any): Promise<any> {
-    return this.ajax('patch', path, data);
+  static async patch(path: string, data: any, contentType: string = 'application/json'): Promise<any> {
+    return ApiService.ajax('patch', path, data, null, contentType);
   }
 
   // naming inconsistency is due to delete being a reserved JS word
   async sendDelete(path: string): Promise<any> {
-    return this.ajax('delete', path, null);
+    return ApiService.ajax('delete', path, null);
   }
 
-  async ajax(method: string, path: string, data: any, accessToken: string = null) {
-    const headers: any = {
-      'Content-Type': 'application/json',
-      accept: 'application/json'
-    };
+  /**
+   * @param method HTTP method to send
+   * @param path URL path under the root of the backend API to send the request to
+   * @param data Body of the request
+   * @param accessToken
+   * @param contentType value of the Content-Type header field. When null allows the browser to
+   *    set Content-Type automatically (required when sending multi-part forms).
+   */
+  static async ajax(method: string, path: string, data: any = null, accessToken: string = null,
+    contentType: string = 'application/json'
+  ): Promise<any> {
+    const headers: any = { accept: 'application/json' };
+    if (contentType !== null) headers['Content-Type'] = contentType;
     if (accessToken !== null) headers['Authorization'] = `Bearer ${accessToken}`;
 
     const request: RequestInit = {
       headers,
-      method
+      method,
+      mode: 'cors'
     };
-    if (data) request.body = JSON.stringify(data);
+    if (data) request.body = ApiService.maybeEncodeData(data, contentType);
 
     return new Promise<any>((resolve, reject) => {
       fetch(BACKEND_ENDPOINT + path, request)
@@ -68,6 +79,17 @@ class ApiService {
         });
     });
   }
+
+  /**
+   * Encodes data based on the specified contentType if known, otherwise returns data unaltered
+   */
+  private static maybeEncodeData(data: any, contentType: string): any {
+    if (contentType === 'application/json') {
+      return JSON.stringify(data);
+    }
+    return data;
+  }
 }
 
-export default new ApiService();
+export default ApiService;
+//export default new ApiService();

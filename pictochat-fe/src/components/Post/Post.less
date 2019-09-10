@@ -2,7 +2,6 @@
 
 .thread-post {
   display: flex;
-  margin-bottom: 15px;
   .post-sidebar {
     width: @post-sidebar-width;
     margin-right: @post-sidebar-margin-right;
@@ -34,7 +33,12 @@
     }
   }
 
-  .post-links {
-    font-size: 12px;
+  &.main {
+    .post-content {
+      img {
+        max-width: 500px;
+        max-height: unset;
+      }
+    }
   }
 }

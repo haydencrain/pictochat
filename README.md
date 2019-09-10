@@ -23,12 +23,15 @@ The application is split up into two main areas:
 ```
 src
   │   index.tsx     # React App entry point
-  └───components    # Custom React components / View Logic
-  └───hooks         # (IN PROGRESS) Custom React Hooks
+  └───components    # React components / View Logic
+  └───hooks         # Custom React Hooks
   └───images        # Images used in the app
   └───models        # TypeScript Models and Interfaces
+  └───pages         # React components that are mapped to routes
   └───services      # Services for Api Requests
+  └───styles        # global styles and constants
   └───store         # (IN PROGRESS) Mobx stores
+  └───utils         # Helper functions and methods
 ```
 
 #### Architectural Layers

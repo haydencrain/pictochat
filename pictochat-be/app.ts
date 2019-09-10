@@ -17,6 +17,7 @@ const PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;
 const WEB_CONTENT_DIR = process.env.PICTOCHAT_FRONTEND_DIR || path.join(__dirname, '../pictochat-fe');
 const FRONTEND_REQUEST_ORIGIN = process.env.PICTOCHAT_FRONTEND_REQUEST_ORIGIN || 'http:/192.168.99.100:3000';
 console.log('WEB_CONTENT_DIR: ' + WEB_CONTENT_DIR);
+const API_PATH = '/api';
 
 
 // Database Connection
@@ -51,10 +52,16 @@ const frontEndRouter = makeFrontEndRouter(WEB_CONTENT_DIR);
 app.use('/', frontEndRouter);
 
 // API
-app.use('/api', apiRouter);
+app.use(API_PATH, apiRouter);
 
 // Enable client-side routing
-app.use('*', (req, res) => res.sendFile(path.join(WEB_CONTENT_DIR, 'index.html')));
+app.use('*', (req, res, next) => {
+  // Prevents redirects to front-end when clients attempt to request non-existant API URLs
+  if (!req.baseUrl.startsWith(`${API_PATH}/`)) {
+    return res.sendFile(path.join(WEB_CONTENT_DIR, 'index.html'));
+  }
+  next();
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

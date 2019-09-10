@@ -18,7 +18,7 @@ export class DiscussionPost extends Model {
   authorId!: number;
   replyTreePath!: string;
   // Attributes for 'has' associations
-  author?: {userName: string, userAvatarURI: string} // FIXME: currently mocked - Jordan
+  author?: { userName: string, userAvatarURI: string } // FIXME: currently mocked - Jordan
 
   // STATIC/COLLECTION METHODS
 
@@ -46,7 +46,6 @@ export class DiscussionPost extends Model {
       where: { replyTreePath: { [Op.like]: this.getDataValue('replyTreePath') + '/%' } }
     });
   }
-
 }
 
 DiscussionPost.init(
@@ -54,7 +53,7 @@ DiscussionPost.init(
     postId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     discussionId: { type: DataTypes.INTEGER },
     isRootPost: { type: DataTypes.BOOLEAN, defaultValue: false },
-    imageId: { type: DataTypes.STRING }, // using a string so the id can be imageHash+uploadedDate
+    imageId: { type: DataTypes.STRING },
     authorId: { type: DataTypes.INTEGER },
     postedDate: { type: DataTypes.DATE },
     parentPostId: { type: DataTypes.INTEGER },
