@@ -23,7 +23,7 @@ export default function ThreadListContainer(props: ThreadListContainerProps) {
     <section className="thread-list-container">
       <div className="thread-list-header">
         <h1>{sectionHeader}</h1>
-        <CreatePostModal buttonContent={addPostButtonMessage} parentId={id} />
+        <CreatePostModal triggerType="button" triggerContent={addPostButtonMessage} parentId={id} />
       </div>
       <PostsList
         isLoading={isLoading}

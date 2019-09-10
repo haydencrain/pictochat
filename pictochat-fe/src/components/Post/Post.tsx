@@ -14,7 +14,7 @@ interface PostProps {
 
 export default function Post(props: PostProps) {
   const { postType, post } = props;
-  const { author, postedDate, imageSrc, commentCount, postId } = post;
+  const { author, postedDate, imageSrc } = post;
   const { userAvatarURI, userName } = author;
   return (
     <section className={classNames('thread-post', getPostTypeName(postType))}>
@@ -29,7 +29,7 @@ export default function Post(props: PostProps) {
         <div className="post-body">
           <Image src={imageSrc} />
         </div>
-        <PostLinks postType={postType} id={postId} commentCount={commentCount} />
+        <PostLinks postType={postType} post={post} />
       </div>
     </section>
   );

@@ -1,16 +1,18 @@
 import * as React from 'react';
 import { PostTypes } from '../../models/PostTypes';
 import { Link } from 'react-router-dom';
+import CreatePostModal from '../CreatePostModal/CreatePostModal';
+import { DiscussionPost } from '../../models/DiscussionPost';
 import './PostLinks.less';
 
 interface PostLinksProps {
   postType: PostTypes;
-  id: string;
-  commentCount: number;
+  post: DiscussionPost;
 }
 
 export default function PostLinks(props: PostLinksProps) {
-  const { postType, id, commentCount } = props;
+  const { postType, post } = props;
+  const { postId, commentCount, parentPostId } = post;
 
   const mapLinks = (links: JSX.Element[]) =>
     links.map((link, index) => (
@@ -21,7 +23,7 @@ export default function PostLinks(props: PostLinksProps) {
 
   const renderRootPostLinks = () => {
     const rootPostLinks = [
-      <Link className="link" to={`/discussion?id=${id}`}>
+      <Link className="link" to={`/discussion?id=${postId}`}>
         {commentCount} comments
       </Link>
     ];
@@ -30,15 +32,10 @@ export default function PostLinks(props: PostLinksProps) {
 
   const renderReplyPostLinks = () => {
     const replyPostLinks = [
-      <Link className="link" to={`/discussion?id=${id}`}>
+      <Link className="link" to={`/discussion?id=${postId}`}>
         permalink
       </Link>,
-      <div
-        className="link"
-        onClick={e => console.log(`I should be seeing a modal so that i can reply to post Id ${id}`)}
-      >
-        reply
-      </div>
+      <CreatePostModal triggerType="link" triggerContent="reply" parentId={parentPostId} />
     ];
     return mapLinks(replyPostLinks);
   };
