@@ -75,7 +75,7 @@ discussionRouter.get('/:discussionId', async (req, res, next) => {
  *     discussionId: string
  *     image: File
  */
-discussionRouter.post('/:discussionId', imageStager.single('image'), async (req: any, res, next) => {
+discussionRouter.post('/:discussionId/post', imageStager.single('image'), async (req: any, res, next) => {
   try {
     let newImageSpec = await makeNewImageSpec(req.file);
     let newReplySpec = {

@@ -26,7 +26,7 @@ export class DiscussionService {
   async createPost(post: NewPostPayload): Promise<void> {
     let isReplyPost: boolean = !!post.parentId;
     if (isReplyPost) this.checkReplyPostValidity(post);
-    let path = (!isReplyPost) ? '/discussion' : `/discussion/${post.discussionId}`;
+    let path = (!isReplyPost) ? '/discussion' : `/discussion/${post.discussionId}/post`;
 
     // IMPORTANT: Image must be the last field appended to form data or the server will not see the other fields
     let formData = new FormData();
