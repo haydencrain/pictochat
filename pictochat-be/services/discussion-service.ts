@@ -10,8 +10,8 @@ import { Image } from '../models/image';
 // HELPER INTERFACES
 
 export interface NewThread {
-  userId: number,
-  image: NewImage
+  userId: number;
+  image: NewImage;
 }
 
 export interface NewReply {
@@ -23,7 +23,6 @@ export interface NewReply {
 // SERVICE
 
 export class DiscussionService {
-
   static async createThread(newThread: NewThread): Promise<DiscussionThread> {
     let sequelize = SequelizeConnectionService.getInstance();
     // FIXME: Move transaction management into model/data-access layer
@@ -32,19 +31,25 @@ export class DiscussionService {
       transaction = await sequelize.transaction();
 
       let image: Image = await ImageService.saveImage(newThread.image, transaction);
-      let rootPost: DiscussionPost = await DiscussionPost.create({
-        isRootPost: true,
-        imageId: image.imageId,
-        authorId: newThread.userId,
-        postedDate: new Date()
-      }, { transaction });
+      let rootPost: DiscussionPost = await DiscussionPost.create(
+        {
+          isRootPost: true,
+          imageId: image.imageId,
+          authorId: newThread.userId,
+          postedDate: new Date()
+        },
+        { transaction }
+      );
 
       let thread: DiscussionThread = await DiscussionThread.create(
-        { rootPostId: rootPost.getDataValue('postId') }, { transaction });
+        { rootPostId: rootPost.getDataValue('postId') },
+        { transaction }
+      );
 
       await rootPost.update(
         { discussionId: thread.getDataValue('discussionId') },
-        { transaction, where: { postId: rootPost.getDataValue('postId') } });
+        { transaction, where: { postId: rootPost.getDataValue('postId') } }
+      );
 
       await transaction.commit();
       return thread;
@@ -62,19 +67,24 @@ export class DiscussionService {
     try {
       transaction = await sequelize.transaction();
       let image: Image = await ImageService.saveImage(newPost.image, transaction);
-      let parentPost: DiscussionPost = await DiscussionPost.findOne(
-        { transaction, where: { postId: newPost.parentPostId } });
+      let parentPost: DiscussionPost = await DiscussionPost.findOne({
+        transaction,
+        where: { postId: newPost.parentPostId }
+      });
 
       let parentReplyPath: string = parentPost.getDataValue('replyTreePath') || '';
-      let reply: DiscussionPost = await DiscussionPost.create({
-        // discussionId: newPost.discussionId,
-        discussionId: parentPost.getDataValue('discussionId'),
-        imageId: image.getDataValue('imageId'),
-        autorId: newPost.userId,
-        postedDate: new Date(),
-        parentPostId: parentPost.getDataValue('postId'),
-        replyTreePath: `${parentReplyPath}/${parentPost.getDataValue('postId')}`
-      }, { transaction });
+      let reply: DiscussionPost = await DiscussionPost.create(
+        {
+          // discussionId: newPost.discussionId,
+          discussionId: parentPost.getDataValue('discussionId'),
+          imageId: image.getDataValue('imageId'),
+          autorId: newPost.userId,
+          postedDate: new Date(),
+          parentPostId: parentPost.getDataValue('postId'),
+          replyTreePath: `${parentReplyPath}${parentPost.getDataValue('postId')}/`
+        },
+        { transaction }
+      );
 
       await transaction.commit();
       return reply;
@@ -92,7 +102,7 @@ export class DiscussionService {
   static async getThreadSummaries(): Promise<DiscussionThreadSummary[]> {
     const threads: DiscussionThread[] = await DiscussionThread.getThreadsPopulated();
 
-    let threadSummaries: DiscussionThreadSummary[] = threads.map((thread) => {
+    let threadSummaries: DiscussionThreadSummary[] = threads.map(thread => {
       return new DiscussionThreadSummary(thread);
     });
 
@@ -121,10 +131,12 @@ export class DiscussionService {
       let treeNode = await DiscussionTreeNode.makeInstance(posts[i]);
       nodes[treeNode.getDataValue('postId')] = treeNode;
 
-      let parentPostId: number = treeNode.getDataValue('parentPostId');
+      const parentPostId: number = treeNode.getDataValue('parentPostId');
       if (parentPostId !== null) {
-        let parentNode = nodes[parentPostId];
-        parentNode.addReply(treeNode);
+        const parentNode = nodes[parentPostId];
+        if (!!parentNode) {
+          parentNode.addReply(treeNode);
+        }
       }
       /*else if (treeNode.getDataValue('isRootPost')) {
         // Assuming no bugs in the post/threads creation logic there should only be one of these

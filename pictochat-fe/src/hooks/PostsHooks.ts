@@ -7,15 +7,13 @@ export function useFetchPosts(id?: string): [DiscussionPost[], boolean] {
   const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
     const fetchData = async () => {
-      const postsPromise = !id
-        ? discussionService.getRootDiscussionPosts()
-        : discussionService.getDiscussionReplies(id);
+      const postsPromise = !id ? discussionService.getDiscussions() : discussionService.getPostReplies(id);
       const posts = await postsPromise;
       setPosts(posts);
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, [id]);
 
   return [posts, loading];
 }
@@ -26,7 +24,7 @@ export function useFetchPost(id: string): [DiscussionPost, boolean] {
 
   useEffect(() => {
     const fetchData = async () => {
-      const post = await discussionService.getDiscussion(id);
+      const post = await discussionService.getPost(id);
       setPost(post);
       setLoading(false);
     };
