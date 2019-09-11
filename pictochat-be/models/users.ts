@@ -12,9 +12,6 @@ export class Users extends Model {
   //temp pre authentication
   password!: string;
 
-
-
-
   static addUser(attrs: { username: string, password: string }): Users {
     let users: Users = Users.build(attrs);
     return users;

@@ -10,6 +10,7 @@ import { makeFrontEndRouter } from './routes/front-end-route';
 import { makeCORSMiddleware } from './middleware/cors-middleware';
 import { SequelizeConnectionService } from './services/sequelize-connection-service';
 import { loadTestData } from './utils/load-test-data';
+import { Passport } from './utils/passport';
 
 // CONSTANTS
 const PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;
