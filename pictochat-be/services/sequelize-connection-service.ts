@@ -22,9 +22,8 @@ export class SequelizeConnectionService {
     databaseName: string = DB_NAME,
     dialect: Dialect = DB_DIALECT
   ): Sequelize {
-
     if (SequelizeConnectionService.instance === null) {
-      console.log('Creating Sequelize instance')
+      console.log('Creating Sequelize instance');
       SequelizeConnectionService.instance = new Sequelize(databaseName, user, password, {
         dialect: dialect,
         host: host,
