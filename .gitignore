@@ -7,3 +7,5 @@ tsc
 
 # Prod environment config files
 .env.prod
+dev_env_setup.sh
+dev_env_setup.bat

@@ -11,16 +11,14 @@ interface Props extends RouteComponentProps<any> {}
 
 export default function DiscussionPage(props: Props) {
   const id = parse(props.location.search).id.toString();
-  const [post, isLoading] = useFetchPost(id);
-
-  if (isLoading) return <Loader active inline />;
+  console.log(id);
   return (
     <section id="discussion-page">
       <PostMainContainer id={id} />
       <ThreadListContainer
         id={id}
         showReplies
-        sectionHeader={`Replies (${post.commentCount})`}
+        sectionHeader="Replies"
         noPostsMessage="No replies have been added yet! Be the first to add a reply!"
         addPostButtonMessage="Add Reply"
       />

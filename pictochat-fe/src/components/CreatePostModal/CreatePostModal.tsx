@@ -3,15 +3,20 @@ import { Modal, Button, Loader, Dimmer } from 'semantic-ui-react';
 import { useImage } from '../../hooks/ImageHooks';
 import ImageDropzone from '../ImageDropzone';
 import { useToggleModal } from '../../hooks/ModalHooks';
-import CreatePost from '../../models/CreatePost';
+import NewPostPayload from '../../models/NewPostPayload';
+import { DiscussionService } from '../../services/DiscussionService';
 import './CreatePostModal.less';
 
+type TriggerTypes = 'button' | 'link';
+
 interface CreatePostModalProps {
-  buttonContent?: any;
+  triggerType: TriggerTypes;
+  triggerContent?: any;
   parentId?: string;
 }
 
 export default function CreatePostModal(props: CreatePostModalProps) {
+  const { triggerType, triggerContent, parentId } = props;
   const { isActive, onOpen, onClose } = useToggleModal();
   const [isLoading, setLoading] = React.useState(false);
   const { image, base64, addNewImage, clearImage } = useImage({
@@ -25,14 +30,17 @@ export default function CreatePostModal(props: CreatePostModalProps) {
     clearImage();
     onClose();
   };
-  const handleSubmit = () => {
+  const handleSubmit = async (e: React.BaseSyntheticEvent) => {
+    e.preventDefault();
     setLoading(true);
-    const data: CreatePost = {
-      parentId: props.parentId || null,
+    // FIXME: get current user from auth when implemented
+    const user = { userId: '1' }; // getCurrentUser();
+    const data: NewPostPayload = {
+      userId: user.userId,
+      parentId: parentId || null,
       image: image
     };
-    // TODO: send data to api
-    console.log(data);
+    await DiscussionService.createPost(data);
     setLoading(false);
     handleClose();
   };
@@ -42,11 +50,23 @@ export default function CreatePostModal(props: CreatePostModalProps) {
     return <ImageDropzone onImageUpload={handleImageUpload} />;
   };
 
-  const renderModalTrigger = () => (
-    <Button primary onClick={onOpen}>
-      {props.buttonContent || 'Add Post'}
-    </Button>
-  );
+  const renderModalTrigger = () => {
+    const content = triggerContent || 'Add Post';
+    switch (triggerType) {
+      case 'button':
+        return (
+          <Button primary onClick={onOpen}>
+            {content}
+          </Button>
+        );
+      case 'link':
+        return (
+          <div className="link" onClick={onOpen}>
+            {content}
+          </div>
+        );
+    }
+  };
 
   return (
     <Modal

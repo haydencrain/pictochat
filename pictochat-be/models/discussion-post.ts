@@ -5,8 +5,25 @@ import { ImageService } from '../services/image-service';
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
 export class DiscussionPost extends Model {
-  static readonly PUBLIC_ATTRIBUTES = ['postId', 'discussionId', 'isRootPost', 'imageSrc', 'author', 'postedDate', 'parentPostId', 'replyTreePath'];
-  static readonly ROOT_POST_ATTRIBUTES = ['postId', 'discussionId', 'postedDate', 'imageSrc', 'author', 'imageId', 'authorId'];
+  static readonly PUBLIC_ATTRIBUTES = [
+    'postId',
+    'discussionId',
+    'isRootPost',
+    'imageSrc',
+    'author',
+    'postedDate',
+    'parentPostId',
+    'replyTreePath'
+  ];
+  static readonly ROOT_POST_ATTRIBUTES = [
+    'postId',
+    'discussionId',
+    'postedDate',
+    'imageSrc',
+    'author',
+    'imageId',
+    'authorId'
+  ];
 
   postId!: number;
   discussionId!: number;
@@ -18,18 +35,41 @@ export class DiscussionPost extends Model {
   authorId!: number;
   replyTreePath!: string;
   // Attributes for 'has' associations
-  author?: { userName: string, userAvatarURI: string } // FIXME: currently mocked - Jordan
+  author?: { userName: string; userAvatarURI: string }; // FIXME: currently mocked - Jordan
 
   // STATIC/COLLECTION METHODS
 
   static async getPathOrderedPostsInThread(discussionId: number): Promise<DiscussionPost[]> {
     return DiscussionPost.findAll({
-      attributes: {
-        include: DiscussionPost.PUBLIC_ATTRIBUTES
-      },
+      attributes: { include: DiscussionPost.PUBLIC_ATTRIBUTES },
       where: { discussionId: discussionId },
       order: [['replyTreePath', 'ASC']]
     });
+  }
+
+  static async getPathOrderedSubTreeUnder(postId: number): Promise<DiscussionPost[]> {
+    const rootPost: DiscussionPost = await DiscussionPost.findOne({ where: { postId } });
+    const rootReplyTreePath = rootPost.getDataValue('replyTreePath');
+    const replyPathPrefix: string = rootPost.getReplyPathPrefix();
+    let posts = await DiscussionPost.findAll({
+      attributes: { include: DiscussionPost.PUBLIC_ATTRIBUTES },
+      where: { ...DiscussionPost.replyTreePathFilter(replyPathPrefix) },
+      order: [['replyTreePath', 'ASC'], ['postId', 'ASC']]
+    });
+    posts.unshift(rootPost);
+    console.log(posts.map(post => post.toJSON()));
+    return posts;
+  }
+
+  private static replyTreePathFilter(prefix: string) {
+    return { replyTreePath: { [Op.like]: `${prefix}/%` } };
+  }
+
+  private getReplyPathPrefix(): string {
+    const replyTreePath = this.getDataValue('replyTreePath');
+    return replyTreePath !== null
+      ? `${replyTreePath || ''}${this.getDataValue('postId')}`
+      : `${this.getDataValue('postId')}`;
   }
 
   // INSTANCE METHODS
@@ -43,7 +83,7 @@ export class DiscussionPost extends Model {
    */
   async getDeepReplyCount(): Promise<number> {
     return DiscussionPost.count({
-      where: { replyTreePath: { [Op.like]: this.getDataValue('replyTreePath') + '/%' } }
+      where: { replyTreePath: { [Op.like]: this.getReplyPathPrefix() + '/%' } }
     });
   }
 }
@@ -68,7 +108,7 @@ DiscussionPost.init(
       type: DataTypes.VIRTUAL,
       get() {
         // FIXME: MOCK DATA
-        return { userName: 'Doss', userAvatarURI: ImageService.getImageURI('4') }
+        return { userName: 'Doss', userAvatarURI: ImageService.getImageURI('4') };
       }
     }
   },
@@ -80,7 +120,4 @@ DiscussionPost.init(
   }
 );
 
-DiscussionPost.belongsTo(
-  DiscussionPost,
-  { foreignKey: 'parentPostId', targetKey: 'postId', constraints: false }
-);
+DiscussionPost.belongsTo(DiscussionPost, { foreignKey: 'parentPostId', targetKey: 'postId', constraints: false });

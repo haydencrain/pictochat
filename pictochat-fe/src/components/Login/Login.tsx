@@ -24,24 +24,24 @@ class Login extends React.Component<{}, LoginState> {
 
   handleEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
     console.log(event.target.value);
-    this.setState({ email: event.target.value })
+    this.setState({ email: event.target.value });
   }
 
   handlePasswordChange(event: React.ChangeEvent<HTMLInputElement>) {
     console.log(event.target.value);
-    this.setState({ password: event.target.value })
+    this.setState({ password: event.target.value });
   }
 
   async handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const user: User = {
+      // TODO: 'email' field should be 'username'!!!
       username: '',
       email: this.state.email,
       password: this.state.password
-    }
+    };
     const res = await UserService.authUser(user);
     console.log(res);
-
 
     // this.setState({ email: event.target.value });
     // this.setState({ password: event.target.value });
@@ -75,7 +75,7 @@ class Login extends React.Component<{}, LoginState> {
         <Form id="login-form" className="ui raised segment" onSubmit={this.handleSubmit} method="POST">
           <Form.Field className="login-field">
             <label>Username or Email</label>
-            <input type="text" placeholder="name@domain.com" value={this.state.email} onChange={this.handleEmailChange} />
+            <input type="text" placeholder="username" value={this.state.email} onChange={this.handleEmailChange} />
           </Form.Field>
           <Form.Field className="login-field">
             <label>Password</label>

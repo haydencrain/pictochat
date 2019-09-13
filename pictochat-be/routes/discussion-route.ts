@@ -45,27 +45,39 @@ discussionRouter.get('/', async (req, res, next) => {
  *     userId: string
  *     image: File
  */
-discussionRouter.post('/', imageStager.single('image'), async (req: any, res, next) => {
-  try {
-    let newImageSpec = await makeNewImageSpec(req.file);
-    let newThreadSpec = { image: newImageSpec, userId: req.body.userId }
-    let thread = await DiscussionService.createThread(newThreadSpec);
-    res.json(thread.toJSON());
-    await deleteFile(req.file.path);
-  } catch (error) {
-    next(error);
-  }
-});
+// discussionRouter.post('/', imageStager.single('image'), async (req: any, res, next) => {
+//   try {
+//     let newImageSpec = await makeNewImageSpec(req.file);
+//     let newThreadSpec = { image: newImageSpec, userId: req.body.userId }
+//     let thread = await DiscussionService.createThread(newThreadSpec);
+//     res.json(thread.toJSON());
+//     await deleteFile(req.file.path);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 
-discussionRouter.get('/:discussionId', async (req, res, next) => {
-  try {
-    let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeForThread(req.params.discussionId);
-    res.json(replyTree.toJSON());
-  } catch (error) {
-    next(error);
-  }
-});
+// discussionRouter.get('/:discussionId', async (req, res, next) => {
+//   try {
+//     let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeForThread(req.params.discussionId);
+//     res.json(replyTree.toJSON());
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+/**
+ * Get post in discussion
+ */
+// discussionRouter.get('/post/:postId', async (req, res, next) => {
+//   try {
+//     let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(req.params.postId);
+//     res.json(replyTree.toJSON());
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 /**
  * Endpoint for creating a new post within an existing thread/discussion.
@@ -75,19 +87,19 @@ discussionRouter.get('/:discussionId', async (req, res, next) => {
  *     discussionId: string
  *     image: File
  */
-discussionRouter.post('/:discussionId', imageStager.single('image'), async (req: any, res, next) => {
-  try {
-    let newImageSpec = await makeNewImageSpec(req.file);
-    let newReplySpec = {
-      image: newImageSpec,
-      discussionId: req.params.discussionId,
-      parentPostId: req.body.parentPostId,
-      userId: req.body.userId
-    };
-    let post = await DiscussionService.createReply(newReplySpec);
-    res.json(post.toJSON());
-    await deleteFile(req.file.path);
-  } catch (error) {
-    next(error);
-  }
-});
+// discussionRouter.post('/post', imageStager.single('image'), async (req: any, res, next) => {
+//   try {
+//     let newImageSpec = await makeNewImageSpec(req.file);
+//     let newReplySpec = {
+//       image: newImageSpec,
+//       discussionId: req.params.discussionId,
+//       parentPostId: req.body.parentPostId,
+//       userId: req.body.userId
+//     };
+//     let post = await DiscussionService.createReply(newReplySpec);
+//     res.json(post.toJSON());
+//     await deleteFile(req.file.path);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
