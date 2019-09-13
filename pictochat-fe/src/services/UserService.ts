@@ -1,5 +1,12 @@
 import { User } from '../models/User';
 import ApiService from './ApiService';
+import * as cookies from 'js-cookie';
+
+interface LoginResult {
+  auth: boolean;
+  token: string;
+  message: string;
+}
 
 class UserService {
   static async getUser(userId: string): Promise<User> {
@@ -12,12 +19,18 @@ class UserService {
       password
     }
   } */
-  static async authUser(user: User): Promise<User> {
+  static async authUser(user: User): Promise<string> {
     const data = {
-      email: user.email,
+      username: user.email,
       password: user.password
     };
-    return await ApiService.post('/user/login', data);
+    const res: LoginResult = await ApiService.post('/user/login', data);
+    if (res.auth) {
+      cookies.set('pictochatJWT', res.token);
+      return res.message;
+    } else {
+      throw new Error(res.message);
+    }
   }
 
   static async addUser(user: User): Promise<User> {

@@ -37,6 +37,7 @@ userRouter.get('/authed', passport.authenticate(strategies.JWT, { session: false
 userRouter.post('/', async (req: any, res, next) => {
   passport.authenticate(strategies.REGISTER, (err, user, info) => {
     if (err) return next(err);
+    if (!user && !!info) res.send(401).json(info);
     if (!!info) return res.json(info);
     try {
       req.logIn(user, async err => {
