@@ -1,25 +1,33 @@
 import express from 'express';
-import { UserService } from '../services/user-service';
 import passport from 'passport';
+import jwt from 'jsonwebtoken';
+import config from '../utils/config';
+import { UserService } from '../services/user-service';
+import { strategies } from '../middleware/passport-middleware';
+
 export const userRouter = express.Router();
 
 // GET /user
 userRouter.get('/', async (req, res, next) => {
   try {
-    console.log('get');
-    let users = await UserService.getUsers();
-    res.json(users);
+    if (req.params.username) {
+      // get user by username
+      const user = await UserService.getUserByUsername(req.params.username);
+      return res.json(user.toJSON());
+    } else {
+      // get all users
+      let users = await UserService.getUsers();
+      return res.json(users);
+    }
   } catch (error) {
     next(error);
   }
 });
 
-// GET /user/:userId
-userRouter.get('/:userId', async (req, res, next) => {
+// GET current user ONLY IF AUTHED
+userRouter.get('/authed', passport.authenticate(strategies.JWT, { session: false }), (req, res, next) => {
   try {
-    console.log('get');
-    let user = await UserService.getUser(req.params.userId);
-    res.json(user.toJSON());
+    res.status(200).json(req.user);
   } catch (error) {
     next(error);
   }
@@ -27,42 +35,38 @@ userRouter.get('/:userId', async (req, res, next) => {
 
 // POST create user
 userRouter.post('/', async (req: any, res, next) => {
-  passport.authenticate('register', async (err, user, info) => {
+  passport.authenticate(strategies.REGISTER, (err, user, info) => {
     if (err) return next(err);
     if (!!info) return res.json(info);
-
     try {
-      req.logIn(async (user, err) => {
-        const loggedInUser = await UserService.getUser(user.username);
-        await UserService.updateUser(loggedInUser.userId, {
-          userEmail: req.body.email
-        });
+      req.logIn(user, async err => {
+        await UserService.updateUser(user.userId, { email: req.body.email });
+        res.status(200).json({ message: 'User created successfully' });
       });
-
-      res.status(200).json({ message: 'User created successfully' });
     } catch (error) {
       next(error);
     }
-  });
+  })(req, res, next);
 });
 
 // POST auth user
-// userRouter.post('/auth', async (req, res, next) => {
-//   passport.authenticate('login', async (err, user, info) => {
-//     if (err) return next(err);
-//     if (!!info) return res.json(info);
-
-//     try {
-//       req.logIn(async (user, err) => {
-//         const loggedInUser = await UserService.getUser(user.username);
-//         await UserService.updateUser(loggedInUser.userId, {
-//           userEmail: req.body.email
-//         })
-//       });
-
-//       res.status(200).json({ message: 'User created successfully' });
-//     } catch (error) {
-//       next(error);
-//     }
-//   });
-// );
+userRouter.post('/login', (req, res, next) => {
+  passport.authenticate(strategies.LOGIN, (err, user, info) => {
+    if (err) return next(err);
+    if (!!info) return res.json(info);
+    try {
+      req.logIn(user, async err => {
+        const token = jwt.sign({ id: user.userId }, config.JWT_SECRET, {
+          expiresIn: '24h'
+        });
+        res.status(200).json({
+          auth: true,
+          message: 'User logged in successfully',
+          token
+        });
+      });
+    } catch (error) {
+      next(error);
+    }
+  })(req, res, next);
+});

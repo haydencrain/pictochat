@@ -6,7 +6,7 @@ const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 export class User extends Model {
   static readonly PUBLIC_ATTRIBUTES = [
     'userId',
-    'userEmail',
+    'email',
     'username',
     'password',
     'resetPasswordToken',
@@ -16,7 +16,7 @@ export class User extends Model {
   userId!: number;
   username!: string;
   password!: string;
-  userEmail: string;
+  email: string;
   //temp pre authentication
   resetPasswordToken: string;
   resetPasswordExpiry: Date;
@@ -25,7 +25,7 @@ export class User extends Model {
     return await User.create({ username, password: hashedPassword });
   }
 
-  static async getUser(username: string): Promise<User> {
+  static async getUserByUsername(username: string): Promise<User> {
     return User.findOne({
       attributes: {
         include: User.PUBLIC_ATTRIBUTES
@@ -34,9 +34,13 @@ export class User extends Model {
     });
   }
 
-  static async updateUser(userId: number, data: User): Promise<User> {
-    const [numRows, [updatedUser]] = await User.update(data, { where: { userId } });
-    return updatedUser;
+  static async getUser(userId: number): Promise<User> {
+    return await User.findOne({
+      attributes: {
+        include: User.PUBLIC_ATTRIBUTES
+      },
+      where: { userId }
+    });
   }
 
   static async getUsers(): Promise<User[]> {
@@ -52,7 +56,7 @@ export class User extends Model {
 User.init(
   {
     userId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    userEmail: { type: DataTypes.STRING },
+    email: { type: DataTypes.STRING },
     username: { type: DataTypes.STRING },
     //temp pre authentication
     password: { type: DataTypes.STRING },
@@ -61,7 +65,7 @@ User.init(
   },
   {
     sequelize: sequelize,
-    modelName: 'users',
+    modelName: 'user',
     tableName: 'users',
     freezeTableName: true
   }

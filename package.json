@@ -28,6 +28,10 @@
   "homepage": "https://github.com/haydencrain/pictochat#readme",
   "dependencies": {
     "@types/classnames": "^2.2.9",
+    "@types/jsonwebtoken": "^8.3.3",
+    "@types/passport": "^1.0.1",
+    "@types/passport-jwt": "^3.0.2",
+    "@types/passport-local": "^1.0.33",
     "bcrypt": "^3.0.6",
     "classnames": "^2.2.6",
     "cookie-parser": "~1.4.4",

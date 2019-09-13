@@ -3,19 +3,19 @@ import bcrypt from 'bcrypt';
 
 const BCRYPT_SALT_ROUNDS = 12;
 
-interface NewUser {
-  username: string;
-  password: string;
-}
-
-interface UpdatedUser {
+interface UpdateUserData {
   username?: string;
-  userEmail?: string;
+  email?: string;
 }
 
 export class UserService {
-  static async getUser(username: string): Promise<User> {
-    let user: User = await User.getUser(username);
+  static async getUserByUsername(username: string): Promise<User> {
+    let user: User = await User.getUserByUsername(username);
+    return user;
+  }
+
+  static async getUser(userId: number): Promise<User> {
+    let user: User = await User.getUser(userId);
     return user;
   }
 
@@ -29,8 +29,11 @@ export class UserService {
     return await User.createUser(username, hashedPassword);
   }
 
-  static async updateUser(userId: number, data: UpdatedUser): Promise<User> {
-    return await User.updateUser(userId, { ...data } as User);
+  static async updateUser(userId: number, data: UpdateUserData): Promise<User> {
+    let user = await User.getUser(userId);
+    user.email = data.email;
+    user.username = data.username;
+    return await user.save();
   }
 
   static async assertPasswordMatch(userToCheck: User, password): Promise<boolean> {

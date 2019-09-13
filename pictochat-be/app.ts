@@ -10,20 +10,21 @@ import { makeFrontEndRouter } from './routes/front-end-route';
 import { makeCORSMiddleware } from './middleware/cors-middleware';
 import { SequelizeConnectionService } from './services/sequelize-connection-service';
 import { loadTestData } from './utils/load-test-data';
+import { initialisePassport } from './middleware/passport-middleware';
 
 // CONSTANTS
 const PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;
 // Default path is relative to the compiled app.js file's location in the build directory
 const WEB_CONTENT_DIR = process.env.PICTOCHAT_FRONTEND_DIR || path.join(__dirname, '../pictochat-fe');
-const FRONTEND_REQUEST_ORIGIN = process.env.PICTOCHAT_FRONTEND_REQUEST_ORIGIN || 'http:/192.168.99.100:3000';
+const FRONTEND_REQUEST_ORIGIN = process.env.PICTOCHAT_FRONTEND_REQUEST_ORIGIN || 'http://localhost:3000';
 console.log('WEB_CONTENT_DIR: ' + WEB_CONTENT_DIR);
 const API_PATH = '/api';
-
 
 // Database Connection
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
-sequelize.authenticate()
+sequelize
+  .authenticate()
   .then(async () => {
     console.log('Sucessfully connected to pictochat database');
     // FIXME: Move test data loading into testing framework
@@ -32,7 +33,7 @@ sequelize.authenticate()
       await loadTestData();
     }
   })
-  .catch((error) => console.log('An error occured attempting to connect to the pictochat database', error));
+  .catch(error => console.log('An error occured attempting to connect to the pictochat database', error));
 
 //// APP ////
 const app = express();
@@ -43,9 +44,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-
-
+app.use(initialisePassport());
 
 /// ROUTES ///
 
@@ -66,7 +65,7 @@ app.use('*', (req, res, next) => {
 });
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   next(createError(404));
 });
 
