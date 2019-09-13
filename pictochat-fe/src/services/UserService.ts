@@ -13,7 +13,11 @@ class UserService {
     }
   } */
   static async authUser(user: User): Promise<User> {
-    return await ApiService.post('/user/auth', user);
+    const data = {
+      email: user.email,
+      password: user.password
+    };
+    return await ApiService.post('/user/login', data);
   }
 
   static async addUser(user: User): Promise<User> {

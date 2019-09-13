@@ -6,7 +6,7 @@ FROM node:10.16.1
 # NOTE: Host (local) paths are relative to the root of the pictochat git repo
 
 # Install dependencies
-RUN mkdir -p ./pictochat/
-WORKDIR ./pictochat
+RUN mkdir -p /pictochat/
+WORKDIR /pictochat
 COPY ./package.json ./package-lock.json ./
 RUN npm install
