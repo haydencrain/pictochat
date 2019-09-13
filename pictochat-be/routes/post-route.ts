@@ -1,5 +1,6 @@
 import path from 'path';
 import util from 'util';
+import passport from 'passport';
 import fs from 'fs';
 import express from 'express';
 import multer from 'multer';
@@ -7,6 +8,7 @@ import { DiscussionService } from '../services/discussion-service';
 import { MIMETYPE_TO_ENCODING } from '../utils/encoding-content-types';
 import { DiscussionTreeNode } from '../models/discussion-tree-node';
 import config from '../utils/config';
+import { strategies } from '../middleware/passport-middleware';
 
 //// HELPER FUNCTIONS ////
 
@@ -37,18 +39,21 @@ postRouter.get('/:postId', async (req, res, next) => {
   }
 });
 
-postRouter.post('/', imageStager.single('image'), async (req, res, next) => {
-  console.log(req.body);
-  try {
-    if (!!req.body.parentId) {
-      await handleNewReplyPOST(req, res, next);
-    } else {
-      await handleNewThreadPOST(req, res, next);
+postRouter.post('/',
+  passport.authenticate(strategies.JWT, { session: false }),
+  imageStager.single('image'),
+  async (req, res, next) => {
+    try {
+      if (!!req.body.parentId) {
+        await handleNewReplyPOST(req, res, next);
+      } else {
+        await handleNewThreadPOST(req, res, next);
+      }
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 async function handleNewReplyPOST(req, res, next) {
   let newImageSpec = await makeNewImageSpec(req.file);
