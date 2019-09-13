@@ -1,24 +1,23 @@
 import express from 'express';
 import { UserService } from '../services/user-service';
+import passport from 'passport';
 export const userRouter = express.Router();
 
 // GET /user
 userRouter.get('/', async (req, res, next) => {
   try {
-    console.log("get");
-    let user = await UserService.getUsers();
-    let users = user.map((users) => users.toJSON());
+    console.log('get');
+    let users = await UserService.getUsers();
     res.json(users);
   } catch (error) {
     next(error);
   }
 });
 
-
 // GET /user/:userId
 userRouter.get('/:userId', async (req, res, next) => {
   try {
-    console.log("get");
+    console.log('get');
     let user = await UserService.getUser(req.params.userId);
     res.json(user.toJSON());
   } catch (error) {
@@ -27,33 +26,43 @@ userRouter.get('/:userId', async (req, res, next) => {
 });
 
 // POST create user
-userRouter.post('/add-user', async (req: any, res, next) => {
-  try {
-    let user = await UserService.saveUser(req.body);
-    res.json(user.toJSON());
-  } catch (error) {
-    next(error);
-  }
-})
+userRouter.post('/', async (req: any, res, next) => {
+  passport.authenticate('register', async (err, user, info) => {
+    if (err) return next(err);
+    if (!!info) return res.json(info);
 
+    try {
+      req.logIn(async (user, err) => {
+        const loggedInUser = await UserService.getUser(user.username);
+        await UserService.updateUser(loggedInUser.userId, {
+          userEmail: req.body.email
+        });
+      });
 
-// // POST auth user
-// userRouter.post('/user/auth', async (req, res, next) => {
-//   try {
-//     const { body } = req;
+      res.status(200).json({ message: 'User created successfully' });
+    } catch (error) {
+      next(error);
+    }
+  });
+});
 
-//     // use passport, check username n password
+// POST auth user
+// userRouter.post('/auth', async (req, res, next) => {
+//   passport.authenticate('login', async (err, user, info) => {
+//     if (err) return next(err);
+//     if (!!info) return res.json(info);
 
-//     // if success
-//     // generate token and send
+//     try {
+//       req.logIn(async (user, err) => {
+//         const loggedInUser = await UserService.getUser(user.username);
+//         await UserService.updateUser(loggedInUser.userId, {
+//           userEmail: req.body.email
+//         })
+//       });
 
-//     // if fail
-//     //resturn token
-
-//     res.json(body);
-
-//     // res.locals.connection.query('INSERT INTO USERS (userEmail, password) VALUES ('' + req.body.userEmail + '','' + req.password+'')');
-//   } catch (error) {
-//     next(error);
-//   }
+//       res.status(200).json({ message: 'User created successfully' });
+//     } catch (error) {
+//       next(error);
+//     }
+//   });
 // );

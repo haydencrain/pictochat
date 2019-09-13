@@ -10,7 +10,6 @@ import { makeFrontEndRouter } from './routes/front-end-route';
 import { makeCORSMiddleware } from './middleware/cors-middleware';
 import { SequelizeConnectionService } from './services/sequelize-connection-service';
 import { loadTestData } from './utils/load-test-data';
-import { Passport } from './utils/passport';
 
 // CONSTANTS
 const PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;
@@ -39,12 +38,14 @@ sequelize.authenticate()
 const app = express();
 
 /// MIDDLEWARE ///
-
 app.use(makeCORSMiddleware(FRONTEND_REQUEST_ORIGIN));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+
+
 
 /// ROUTES ///
 

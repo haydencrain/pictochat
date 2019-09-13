@@ -17,7 +17,7 @@ class UserService {
   }
 
   static async addUser(user: User): Promise<User> {
-    return await ApiService.post('/user/add-user', user);
+    return await ApiService.post('/user', user);
   }
 }
 
