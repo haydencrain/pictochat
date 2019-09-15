@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import { PostTypes } from '../../models/PostTypes';
 import { Link } from 'react-router-dom';
 import CreatePostModal from '../CreatePostModal/CreatePostModal';
@@ -10,7 +11,7 @@ interface PostLinksProps {
   post: DiscussionPost;
 }
 
-export default function PostLinks(props: PostLinksProps) {
+function PostLinks(props: PostLinksProps) {
   // const { postType, post } = props;
   // const { postId, commentCount, parentPostId } = post;
 
@@ -35,7 +36,7 @@ export default function PostLinks(props: PostLinksProps) {
       <Link className="link" to={`/discussion?id=${props.post.postId}`}>
         permalink
       </Link>,
-      <CreatePostModal triggerType="link" triggerContent="reply" parentId={props.post.postId} />
+      <CreatePostModal triggerType="link" triggerContent="reply" parentPostId={props.post.postId} />
     ];
     return mapLinks(replyPostLinks);
   };
@@ -52,3 +53,5 @@ export default function PostLinks(props: PostLinksProps) {
     </div>
   );
 }
+
+export default observer(PostLinks);

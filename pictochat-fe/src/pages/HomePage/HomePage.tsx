@@ -1,10 +1,11 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import ThreadListContainer from '../../components/ThreadListContainer';
 import './HomePage.less';
 
-interface HomePage {}
+interface HomePage { }
 
-export default function HomePage(props: HomePage) {
+function HomePage(props: HomePage) {
   return (
     <section id="home-page">
       <ThreadListContainer
@@ -15,3 +16,5 @@ export default function HomePage(props: HomePage) {
     </section>
   );
 }
+
+export default observer(HomePage);
