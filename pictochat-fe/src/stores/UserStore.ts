@@ -28,6 +28,6 @@ export default class UserStore {
     this.currentUser.replace(new UserModel(user));
   }
 
-  @action.bound
+  // @action.bound
   // async authAndSetCurrentUser(credentials: { username: string, password: string }): Promise<UserModel> { }
 }

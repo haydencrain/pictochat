@@ -10,7 +10,7 @@ export interface User {
 export class UserModel {
   @observable username: string;
   @observable email: string;
-  // shouldn't keep a copy of user's password around!
+  @observable userId: string;
   constructor(data?: { username: string, email: string }) {
     if (data) {
       this.username = data.username;

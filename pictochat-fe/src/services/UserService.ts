@@ -10,7 +10,7 @@ interface LoginResult {
 
 class UserService {
   static async getUser(userId: string): Promise<User> {
-    return await ApiService.get(`/user /${userId}`);
+    return await ApiService.get(`/user/${userId}`);
   }
 
   /* authUser(email: String, password: string) {
