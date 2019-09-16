@@ -4,11 +4,12 @@ import { observer } from 'mobx-react';
 import { StoresContext, initStores } from '../../contexts/StoresContext';
 import Navbar from '../Navbar';
 import HomePage from '../../pages/HomePage';
-import NotFoundPage from '../../pages/NotFoundPage';
 import LeaderboardPage from '../../pages/LeaderboardPage';
+import DiscussionPage from '../../pages/DiscussionPage';
 import RegisterPage from '../../pages/RegisterPage';
+import LoginPage from '../../pages/LoginPage';
+import NotFoundPage from '../../pages/NotFoundPage';
 import ProfileCard from '../ProfileCard';
-import DiscussionPage from '../../pages/DiscussionPage/DiscussionPage';
 import './App.less';
 
 function App() {
@@ -18,21 +19,22 @@ function App() {
     <StoresContext.Provider value={stores}>
       <BrowserRouter>
         <Navbar />
-        <div id="app-body">
-          <main id="app-main">
-            <Switch>
+        <Switch>
+          <Route exact path={`${FRONTEND_URL_ROOT}register`} component={RegisterPage} />
+          <div id="app-body">
+            <main id="app-main">
               <Route exact path={FRONTEND_URL_ROOT} component={HomePage} />
               <Route exact path={`${FRONTEND_URL_ROOT}discussion`} component={DiscussionPage} />
               <Route exact path={`${FRONTEND_URL_ROOT}leaderboard`} component={LeaderboardPage} />
-              <Route exact path={`${FRONTEND_URL_ROOT}register`} component={RegisterPage} />
+              <Route exact path={`${FRONTEND_URL_ROOT}login`} component={LoginPage} />
               <Route component={NotFoundPage} />
-            </Switch>
-          </main>
-          <aside id="app-sidebar">
-            <h1>My Profile</h1>
-            <ProfileCard />
-          </aside>
-        </div>
+            </main>
+            <aside id="app-sidebar">
+              <h1>My Profile</h1>
+              <ProfileCard />
+            </aside>
+          </div>
+        </Switch>
       </BrowserRouter>
     </StoresContext.Provider>
   );

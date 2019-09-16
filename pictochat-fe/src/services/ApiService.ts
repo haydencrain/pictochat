@@ -1,7 +1,8 @@
 import { stringify } from 'query-string';
 import ApiException from '../models/ApiException';
+import * as cookies from 'js-cookie';
 
-const BACKEND_ENDPOINT = process.env.PICTOCHAT_API_ROOT || '/api';
+const BACKEND_ENDPOINT = process.env.PICTPICTOCHAT_DB_HOSTOCHAT_API_ROOT || 'http://localhost:443/api';
 
 export class ApiService {
   static async get(path: string, query: any = null): Promise<any> {
@@ -14,9 +15,7 @@ export class ApiService {
     return ApiService.ajax('post', path, data, null, contentType);
   }
 
-  static async put(path: string, data: any, query: any = null,
-    contentType: string = 'application/json'
-  ): Promise<any> {
+  static async put(path: string, data: any, query: any = null, contentType: string = 'application/json'): Promise<any> {
     if (!query) return ApiService.ajax('put', path, data, null, contentType);
     const queryString = stringify(query);
     return ApiService.ajax('put', `${path}?${queryString}`, data, null, contentType);
@@ -39,12 +38,16 @@ export class ApiService {
    * @param contentType value of the Content-Type header field. When null allows the browser to
    *    set Content-Type automatically (required when sending multi-part forms).
    */
-  static async ajax(method: string, path: string, data: any = null, accessToken: string = null,
+  static async ajax(
+    method: string,
+    path: string,
+    data: any = null,
+    accessToken: string = cookies.get('pictochatJWT'),
     contentType: string = 'application/json'
   ): Promise<any> {
     const headers: any = { accept: 'application/json' };
     if (contentType !== null) headers['Content-Type'] = contentType;
-    if (accessToken !== null) headers['Authorization'] = `Bearer ${accessToken}`;
+    if (accessToken !== null) headers['Authorization'] = `JWT ${accessToken}`;
 
     const request: RequestInit = {
       headers,
@@ -59,7 +62,7 @@ export class ApiService {
           let responseBody: any = await response.text();
           try {
             responseBody = JSON.parse(responseBody);
-          } catch { }
+          } catch {}
           if (response.ok) {
             resolve(responseBody);
           } else {

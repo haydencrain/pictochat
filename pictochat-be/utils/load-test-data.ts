@@ -5,6 +5,7 @@ import { DiscussionPost } from '../models/discussion-post';
 import { DiscussionThread } from '../models/discussion-thread';
 import { Image } from '../models/image';
 import { syncModels } from './sync-models';
+import { User } from '../models/user';
 
 /**
  * Promise-returning wrapper for fs.readFile
@@ -58,4 +59,13 @@ export async function loadTestData() {
     });
   });
   await Promise.all(imageCreationPromises);
+
+  console.log('Creating test instances for DiscussionThreads');
+  // password hash for the password: 'password'
+  const hash = '$2b$12$zKBpkyOWQHkbG9beO1alH.zyZlInYEcCwKEF4lByrypFFpBQu9/9a';
+  await User.create({
+    email: 'test@test.com',
+    username: 'Dosss',
+    password: hash
+  });
 }

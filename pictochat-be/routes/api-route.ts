@@ -1,5 +1,5 @@
 import express from 'express';
-import { userRouter } from './user-route';
+import { userRouter } from './users-route';
 import { discussionRouter } from './discussion-route';
 import { imageRouter } from './image-route';
 import { postRouter } from './post-route';
