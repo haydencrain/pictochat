@@ -1,6 +1,6 @@
 export default interface NewPostPayload {
   userId: string;
   image: File;
-  parentId?: string;
+  parentPostId?: string;
   discussionId?: string;
 }

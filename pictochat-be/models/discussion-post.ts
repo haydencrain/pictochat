@@ -22,7 +22,8 @@ export class DiscussionPost extends Model {
     'imageSrc',
     'author',
     'imageId',
-    'authorId'
+    'authorId',
+    'imageSrc'
   ];
 
   postId!: number;

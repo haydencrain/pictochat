@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import { useFetchPost } from '../../hooks/PostsHooks';
 import { PostTypes } from '../../models/PostTypes';
 import { Segment, Loader } from 'semantic-ui-react';
@@ -9,9 +10,9 @@ interface PostMainContainerProps {
   id: string;
 }
 
-export default function PostMainContainer(props: PostMainContainerProps) {
-  const { id } = props;
-  const [post, isLoading] = useFetchPost(id);
+function PostMainContainer(props: PostMainContainerProps) {
+  // const { id } = props;
+  const [post, isLoading] = useFetchPost(props.id);
 
   const renderContent = () => {
     if (isLoading) return <Loader active />;
@@ -26,3 +27,5 @@ export default function PostMainContainer(props: PostMainContainerProps) {
     </section>
   );
 }
+
+export default observer(PostMainContainer);

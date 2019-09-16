@@ -20,41 +20,11 @@ async function makeNewImageSpec(file): Promise<{ data: Buffer; encoding: string 
   return { data, encoding };
 }
 
-// This will store images in a local staging directory on the API server
-const imageStager = multer({ dest: config.IMAGE_STAGING_DIR });
-
-export const postRouter = express.Router();
-
-/**
- * Get post in discussion
- */
-postRouter.get('/:postId', async (req, res, next) => {
-  try {
-    let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(req.params.postId);
-    res.json(replyTree.toJSON());
-  } catch (error) {
-    next(error);
-  }
-});
-
-postRouter.post('/', imageStager.single('image'), async (req, res, next) => {
-  console.log(req.body);
-  try {
-    if (!!req.body.parentId) {
-      await handleNewReplyPOST(req, res, next);
-    } else {
-      await handleNewThreadPOST(req, res, next);
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
 async function handleNewReplyPOST(req, res, next) {
   let newImageSpec = await makeNewImageSpec(req.file);
   let newReplySpec = {
     image: newImageSpec,
-    parentPostId: req.body.parentId,
+    parentPostId: req.body.parentPostId,
     userId: req.body.userId
   };
   let post = await DiscussionService.createReply(newReplySpec);
@@ -69,3 +39,35 @@ async function handleNewThreadPOST(req, res, next) {
   res.json(thread.toJSON());
   await deleteFile(req.file.path);
 }
+
+// This will store images in a local staging directory on the API server
+const imageStager = multer({ dest: config.IMAGE_STAGING_DIR });
+
+
+//// ROUTER ////
+
+export const postRouter = express.Router();
+
+/**
+ * Get reply tree under post
+ */
+postRouter.get('/:postId', async (req, res, next) => {
+  try {
+    let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(req.params.postId);
+    res.json(replyTree.toJSON());
+  } catch (error) {
+    next(error);
+  }
+});
+
+postRouter.post('/', imageStager.single('image'), async (req, res, next) => {
+  try {
+    if (!!req.body.parentPostId) {
+      await handleNewReplyPOST(req, res, next);
+    } else {
+      await handleNewThreadPOST(req, res, next);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
