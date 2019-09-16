@@ -18,6 +18,7 @@ interface CreatePostModalProps {
 }
 
 export default function CreatePostModal(props: CreatePostModalProps) {
+  console.log('RENDER CreatePostModal, Props: ', props);
   // const { triggerType, triggerContent, parentId } = props;
   const stores = React.useContext(StoresContext);
   const { isActive, onOpen, onClose } = useToggleModal();
@@ -43,10 +44,7 @@ export default function CreatePostModal(props: CreatePostModalProps) {
       parentPostId: props.parentPostId || null,
       image: image
     };
-    console.log(data);
     await stores.discussion.createPost(data);
-    console.log('stores.discussion.activeDiscussionRoot: ', stores.discussion.activeDiscussionRoot);
-    //await DiscussionService.createPost(data);
     setLoading(false);
     handleClose();
   };

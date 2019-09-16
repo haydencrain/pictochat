@@ -5,7 +5,12 @@ export interface IStoresContext {
   discussion: DiscussionStore;
 }
 
-let initialRootStore: IStoresContext = undefined; // Defines context value type
-const StoresContext = React.createContext(initialRootStore);
+// HELPER FUNCTIONS
 
+export function initStores(): IStoresContext {
+  return { discussion: new DiscussionStore() };
+}
+
+// CONTEXT
+export const StoresContext = React.createContext<IStoresContext>(undefined);
 export default StoresContext;

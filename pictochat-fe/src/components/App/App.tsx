@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { observer } from 'mobx-react';
-import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
-import DiscussionStore from '../../stores/DiscussionStore';
+import { StoresContext, initStores } from '../../contexts/StoresContext';
 import Navbar from '../Navbar';
 import HomePage from '../../pages/HomePage';
 import NotFoundPage from '../../pages/NotFoundPage';
@@ -11,11 +10,6 @@ import RegisterPage from '../../pages/RegisterPage';
 import ProfileCard from '../ProfileCard';
 import DiscussionPage from '../../pages/DiscussionPage/DiscussionPage';
 import './App.less';
-
-
-function initStores(): IStoresContext {
-  return { discussion: new DiscussionStore() };
-}
 
 function App() {
   const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';

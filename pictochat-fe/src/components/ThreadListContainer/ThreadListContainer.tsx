@@ -1,12 +1,14 @@
 import * as React from 'react';
-import { observer, useObserver } from 'mobx-react';
-import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
-// import { useFetchPosts } from '../../hooks/PostsHooks';
+import { computed } from 'mobx';
+import { observer } from 'mobx-react';
+import StoresContext from '../../contexts/StoresContext';
 import PostsList from '../PostsList';
 import CreatePostModal from '../CreatePostModal/CreatePostModal';
 import { PostTypes } from '../../models/PostTypes';
-import './ThreadListContainer.less';
 import DiscussionStore from '../../stores/DiscussionStore';
+import { Loader } from 'semantic-ui-react';
+import { DiscussionPost } from '../../models/DiscussionPost';
+import './ThreadListContainer.less';
 
 //// THREADS LIST CONTAINER /////
 
@@ -19,20 +21,23 @@ interface ThreadListContainerProps {
 }
 
 function ThreadListContainer(props: ThreadListContainerProps) {
-  // const [posts, isLoading] = useFetchPosts(props.id);
   const stores = React.useContext(StoresContext)
 
-  let postListProps = { stores: stores, noPostsMessage: props.noPostsMessage, showReplies: props.showReplies };
+  let postListProps = { store: stores.discussion, noPostsMessage: props.noPostsMessage, showReplies: props.showReplies };
   // If no Id is present, then it's the main threads, otherwise it's the replies
   let postList = (!props.id)
     ? <ThreadsSummaryList {...postListProps} />
-    : <RepliesList {...{ ...postListProps, ...{ store: stores.discussion, postId: props.id } }} />;
+    : <RepliesList {...{ ...postListProps, ...{ postId: props.id } }} />;
 
   return (
     <section className="thread-list-container">
       <div className="thread-list-header">
         <h1>{props.sectionHeader}</h1>
-        <CreatePostModal triggerType="button" triggerContent={props.addPostButtonMessage} parentPostId={props.id} />
+        <CreatePostModal
+          triggerType="button"
+          triggerContent={props.addPostButtonMessage}
+          parentPostId={props.id}
+        />
       </div>
       {postList}
     </section>
@@ -49,31 +54,41 @@ const RepliesList = observer(function RepliesList(props: {
   showReplies: boolean,
   noPostsMessage: string
 }) {
-  if (props.store.isLoadingActiveDiscussion) {
-    console.log('Still loading? ', props.store.isLoadingActiveDiscussion);
-    return null;
+  const { postId, store, showReplies, noPostsMessage } = props;
+
+  const posts = computed((): DiscussionPost[] => {
+    return store.activeDiscussionPosts.has(postId)
+      ? store.activeDiscussionPosts.get(postId).replies
+      : [];
+  });
+
+  const isLoading = computed((): boolean => {
+    return store.isLoadingActiveDiscussion || !store.activeDiscussionPosts.has(parseInt(postId))
+  });
+
+  if (isLoading.get()) {
+    return <Loader />;
   }
-  console.log('Finished loading? ', !props.store.isLoadingActiveDiscussion);
-  console.log('ROOT POST(', props.postId, '): ', props.store.activeDiscussionPosts);
+
   return (
     <PostsList
-      isLoading={props.store.isLoadingActiveDiscussion}
-      posts={props.store.activeDiscussionPosts.get(parseInt(props.postId)).replies}
+      isLoading={isLoading.get()}
+      posts={posts.get()}
       postsType={PostTypes.Reply}
-      noPostsMessage={props.noPostsMessage}
+      noPostsMessage={noPostsMessage}
       raised
-      showReplies={props.showReplies}
+      showReplies={showReplies}
     />
   );
 });
 
 const ThreadsSummaryList = observer(function ThreadsSummaryList(props: {
-  stores: IStoresContext, showReplies: boolean, noPostsMessage: string
+  store: DiscussionStore, showReplies: boolean, noPostsMessage: string
 }) {
   return (
     <PostsList
-      isLoading={props.stores.discussion.isLoadingThreads}
-      posts={props.stores.discussion.threadSummaries}
+      isLoading={props.store.isLoadingThreads}
+      posts={props.store.threadSummaries}
       postsType={PostTypes.Root}
       noPostsMessage={props.noPostsMessage}
       raised

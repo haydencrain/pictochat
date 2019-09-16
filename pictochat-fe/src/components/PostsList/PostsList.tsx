@@ -16,7 +16,6 @@ interface PostListsProps {
 }
 
 function PostsList(props: PostListsProps) {
-  console.log(props.posts);
   const renderLoading = () => (
     <Segment className="post-list-loading">
       <Loader active />
@@ -41,6 +40,7 @@ function PostsList(props: PostListsProps) {
     return renderNoPosts();
   };
 
+  // const content = (props.posts.length > 0) ? renderPosts() : renderNoPosts();
   return (
     <Segment.Group className="post-list" raised={props.raised}>
       {renderContent()}

@@ -22,7 +22,7 @@ export class DiscussionService {
     const formData = new FormData();
     formData.append('userId', post.userId);
     if (isReplyPost) {
-      formData.append('parentId', post.parentPostId);
+      formData.append('parentPostId', post.parentPostId);
     }
     formData.append('image', post.image);
 

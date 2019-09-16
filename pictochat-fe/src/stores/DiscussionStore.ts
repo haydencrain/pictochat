@@ -7,9 +7,9 @@ import NewPostPayload from '../models/NewPostPayload';
  * Coordinates updates to discussion data
  */
 export default class DiscussionStore {
-  @observable threadSummariesMap: ObservableMap<number, DiscussionPost> = observable.map(undefined, { name: "threadSummariesMap" });
+  @observable threadSummariesMap: ObservableMap<any, DiscussionPost> = observable.map(undefined, { name: "threadSummariesMap" });
   @observable activeDiscussionRoot: DiscussionPost = new DiscussionPost();
-  @observable activeDiscussionPosts: ObservableMap<number, DiscussionPost> = observable.map(undefined, { name: "activeDiscussionPosts" });
+  @observable activeDiscussionPosts: ObservableMap<any, DiscussionPost> = observable.map(undefined, { name: "activeDiscussionPosts" });
   @observable isLoadingThreads = true;
   @observable isLoadingActiveDiscussion = true;
 
@@ -33,7 +33,7 @@ export default class DiscussionStore {
       this.isLoadingThreads = true;
       this.threadSummariesMap.clear();
       jsonPosts.forEach((postJson) => {
-        this.threadSummariesMap.set(parseInt(postJson.discussionId), this.parseJsonTree(postJson));
+        this.threadSummariesMap.set(postJson.discussionId, this.parseJsonTree(postJson));
       });
       this.isLoadingThreads = false;
     });
@@ -67,18 +67,18 @@ export default class DiscussionStore {
     this.isLoadingActiveDiscussion = true;
     let reply = new DiscussionPost(await DiscussionService.createPost(post))
     runInAction(() => {
-      this.activeDiscussionPosts.set(parseInt(reply.postId), reply);
+      this.activeDiscussionPosts.set(reply.postId, reply);
 
       // Update thread summary
-      if (this.threadSummariesMap.has(parseInt(reply.discussionId))) {
-        this.threadSummariesMap.get(parseInt(reply.discussionId)).commentCount += 1;
+      if (this.threadSummariesMap.has(reply.discussionId)) {
+        this.threadSummariesMap.get(reply.discussionId).commentCount += 1;
       } else {
         // This isn't an error if users have been linked directly to a discussion page without accessing the main threads lists
         console.log(`Post reply (postId=${reply.postId}) created for a discusion (discussionId=${reply.discussionId}) thread that doesn't exist in DiscussionService`);
       }
       // Update local copy of parent
-      if (this.activeDiscussionPosts.toJS().has(parseInt(reply.parentPostId))) {
-        this.activeDiscussionPosts.get(parseInt(reply.parentPostId)).replies.push(reply);
+      if (this.activeDiscussionPosts.has(reply.parentPostId)) {
+        this.activeDiscussionPosts.get(reply.parentPostId).replies.push(reply);
       }
       this.isLoadingActiveDiscussion = false;
     });
@@ -89,7 +89,7 @@ export default class DiscussionStore {
   async createThread(post: NewPostPayload): Promise<DiscussionPost> {
     let threadRoot: DiscussionPost = new DiscussionPost(await DiscussionService.createPost(post));
     runInAction(() => {
-      this.threadSummariesMap.set(parseInt(threadRoot.discussionId), threadRoot);
+      this.threadSummariesMap.set(threadRoot.discussionId, threadRoot);
     });
     return threadRoot;
   }
@@ -100,7 +100,7 @@ export default class DiscussionStore {
     let replies: DiscussionPost[] = repliesJson.map(post => this.parseJsonTree(post, shouldBuildPostMap));
     let post = new DiscussionPost({ ...postJson, ...{ replies } });
     if (shouldBuildPostMap) {
-      this.activeDiscussionPosts.set(parseInt(post.postId), post);
+      this.activeDiscussionPosts.set(post.postId, post);
     }
     return post;
   }
