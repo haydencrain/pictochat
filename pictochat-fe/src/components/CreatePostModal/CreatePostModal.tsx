@@ -14,7 +14,6 @@ interface CreatePostModalProps {
   triggerType: TriggerTypes;
   triggerContent?: any;
   parentPostId?: string;
-
 }
 
 export default function CreatePostModal(props: CreatePostModalProps) {
@@ -38,9 +37,9 @@ export default function CreatePostModal(props: CreatePostModalProps) {
     e.preventDefault();
     setLoading(true);
     // FIXME: get current user from auth when implemented
-    const user = { userId: '1' }; // getCurrentUser();
+    // const user = { userId: '1' }; // getCurrentUser();
     const data: NewPostPayload = {
-      userId: user.userId,
+      userId: stores.user.currentUser.userId,
       parentPostId: props.parentPostId || null,
       image: image
     };
