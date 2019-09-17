@@ -1,8 +1,11 @@
 import * as React from 'react';
 import { Segment, Rating, Image, Container } from 'semantic-ui-react';
 import './ProfileCard.less';
+import { User } from '../../models/User';
 
-interface Props {}
+interface Props {
+  user: User;
+}
 
 export default (props: Props) => {
   return (
@@ -12,7 +15,7 @@ export default (props: Props) => {
           <Image src="https://semantic-ui.com/images/avatar2/large/elyse.png" />
         </div>
         <div className="header-info">
-          <div className="user-name">Dosss</div>
+          <div className="user-name">{props.user.username}</div>
           <div className="user-rating">
             <label>Rating</label>
             <span className="value">4.05</span>

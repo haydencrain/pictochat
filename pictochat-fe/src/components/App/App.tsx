@@ -56,7 +56,7 @@ function UserSection() {
   const getCard = () => {
     if (isLoading) return <Loader active />;
     if (user === undefined) return <Login />;
-    return <ProfileCard />;
+    return <ProfileCard user={user} />;
   };
 
   return (
