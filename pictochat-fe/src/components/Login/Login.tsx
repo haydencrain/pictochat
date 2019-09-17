@@ -41,29 +41,9 @@ class Login extends React.Component<{}, LoginState> {
       password: this.state.password
     };
     const res = await UserService.authUser(user);
-    console.log(res);
-
-    // this.setState({ email: event.target.value });
-    // this.setState({ password: event.target.value });
-
-    // fetch('http://192.168.99.100:443/api/user', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Accept': 'application/json',
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({
-    //     userEmail: this.state.email,
-    //     password: this.state.password
-    //   })
-    // }).then(Response => Response.text())
-    //   .then(text => console.log(text))
-    //   .then((Result) => {
-    //     if (Result.Status == 'Success')
-    //       console.log("Data has been sent");
-    //   }).catch(function (err) {
-    //     console.log(err);
-    //   });
+    alert(res);
+    // FIXME: don't hard refresh the window. rather we should be refecthing the user from the UserStore
+    window.location.reload();
   }
 
   render() {

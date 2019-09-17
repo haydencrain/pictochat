@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Segment, Rating, Image, Container } from 'semantic-ui-react';
-import './ProfileCard.less';
+import { Segment, Rating, Image } from 'semantic-ui-react';
 import { User } from '../../models/User';
+import * as cookies from 'js-cookie';
+import './ProfileCard.less';
 
 interface Props {
   user: User;
@@ -42,7 +43,15 @@ export default (props: Props) => {
             <a>Settings</a>
           </li>
           <li>
-            <a>Logout</a>
+            <a
+              onClick={() => {
+                // FIXME: don't hard refresh the window. rather we should be refecthing the user from the UserStore
+                cookies.remove('pictochatJWT');
+                window.location.reload();
+              }}
+            >
+              Logout
+            </a>
           </li>
         </ul>
       </Segment>
