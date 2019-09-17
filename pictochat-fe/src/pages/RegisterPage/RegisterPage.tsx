@@ -1,10 +1,11 @@
 import * as React from 'react';
-import './RegisterPage.less';
 import SignUp from '../../components/SignUp';
-interface RegisterPage { }
+import './RegisterPage.less';
 
-export default (props: RegisterPage) => {
-  return <section id="register-page">
-    <SignUp />
-  </section>;
-};
+export default function RegiserPage(props: any) {
+  return (
+    <section id="register-page">
+      <SignUp />
+    </section>
+  );
+}

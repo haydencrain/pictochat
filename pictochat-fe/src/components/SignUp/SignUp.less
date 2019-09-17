@@ -1,40 +1,32 @@
-.heading {
-  color: #f8ffff !important;
-}
-
-.nav-links-container {
-  visibility: hidden;
-}
-
-.ui.container {
-  height: 69% !important;
-}
-
-#navbar {
-  height: 156px;
-  position: absolute;
-}
-
-#register-page {
-  position: relative;
-  width: 100%;
-  min-height: 1009px !important;
-}
+@import '../../styles/_constants.less';
 
 #register-form {
   width: 236px;
-  margin-left: 40%;
-}
+  color: @white;
+  label,
+  h1 {
+    color: @white;
+  }
 
-label {
-  color: white !important;
-}
+  h1 {
+    text-align: center;
+  }
 
-.ui.divider {
-  margin: 1.7rem !important;
-}
+  .register-field-password,
+  .register-actions {
+    margin-top: 54px;
+  }
 
-.signup-button {
-  padding-left: 36px !important;
-  padding-right: 0px !important;
+  .register-field-username {
+    margin-top: 36px;
+  }
+
+  .register-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    .ui.button {
+      margin: 0;
+    }
+  }
 }

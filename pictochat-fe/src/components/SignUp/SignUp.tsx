@@ -1,10 +1,8 @@
 import * as React from 'react';
 import { Container, Header, Form, Button, Divider } from 'semantic-ui-react';
 import UserService from '../../services/UserService';
-import './Signup.less';
 import { User } from '../../models/User';
-import { render } from 'react-dom';
-import { toUnicode } from 'punycode';
+import './Signup.less';
 
 interface SignUpState {
   username: string;
@@ -28,6 +26,7 @@ class SignUp extends React.Component<{}, SignUpState> {
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.handleRetryPwdChange = this.handleRetryPwdChange.bind(this);
+    this.handleCancelClick = this.handleCancelClick.bind(this);
   }
 
   handleUsernameChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -46,8 +45,12 @@ class SignUp extends React.Component<{}, SignUpState> {
     this.setState({ retryPwd: event.target.value });
   }
 
-  clearForm = (event: any) => {
+  handleCancelClick(event: React.SyntheticEvent<any>) {
     event.preventDefault();
+    this.clearForm();
+  }
+
+  clearForm = () => {
     this.setState({
       username: '',
       email: '',
@@ -67,41 +70,41 @@ class SignUp extends React.Component<{}, SignUpState> {
     const res = await UserService.addUser(user);
     console.log(res);
   }
+
   render() {
     return (
-      <Container id="register-container">
-        <Header as="h1" className="heading center aligned header">
-          Create an Account
-        </Header>
-        <Form id="register-form" onSubmit={this.handleSubmit} method="POST">
-          <Form.Field className="register-field">
-            <label>Username</label>
-            <input type="text" value={this.state.username} onChange={this.handleUsernameChange} />
+      <Form id="register-form" onSubmit={this.handleSubmit} method="POST">
+        <h1>Create an Account</h1>
+        <Form.Field className="register-field-username">
+          <label>Username</label>
+          <input name="username" type="text" value={this.state.username} onChange={this.handleUsernameChange} />
+        </Form.Field>
+        <Form.Field className="register-field-email">
+          <label>Email</label>
+          <input name="email" type="text" value={this.state.email} onChange={this.handleEmailChange} />
+        </Form.Field>
+        <Form.Field className="register-field-password">
+          <label>Password</label>
+          <input name="password" type="password" value={this.state.password} onChange={this.handlePasswordChange} />
+        </Form.Field>
+        <Form.Field className="register-field-retry-password">
+          <label>Re-type Password</label>
+          <input
+            name="retryPassword"
+            type="password"
+            value={this.state.retryPwd}
+            onChange={this.handleRetryPwdChange}
+          />
+        </Form.Field>
+        <Form.Group className="register-actions">
+          <Form.Field className="cancel-button">
+            <Button onClick={this.handleCancelClick}>Cancel</Button>
           </Form.Field>
-          <Form.Field className="register-field">
-            <label>Email</label>
-            <input type="text" value={this.state.email} onChange={this.handleEmailChange} />
+          <Form.Field className="register-button">
+            <Button primary>Sign Up</Button>
           </Form.Field>
-          <Divider hidden />
-          <Form.Field className="resgister-field">
-            <label>Password</label>
-            <input type="password" value={this.state.password} onChange={this.handlePasswordChange} />
-          </Form.Field>
-          <Form.Field className="resgister-field">
-            <label>Re-type Password</label>
-            <input type="password" value={this.state.retryPwd} onChange={this.handleRetryPwdChange} />
-          </Form.Field>
-          <Divider hidden />
-          <Form.Group widths="equal">
-            <Form.Field>
-              <Button onClick={this.clearForm}>Cancel</Button>
-            </Form.Field>
-            <Form.Field className="signup-button">
-              <Button primary>Sign Up</Button>
-            </Form.Field>
-          </Form.Group>
-        </Form>
-      </Container>
+        </Form.Group>
+      </Form>
     );
   }
 }
