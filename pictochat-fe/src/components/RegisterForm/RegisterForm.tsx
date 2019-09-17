@@ -2,21 +2,21 @@ import * as React from 'react';
 import { Form, Button } from 'semantic-ui-react';
 import UserService from '../../services/UserService';
 import { User } from '../../models/User';
-import './Signup.less';
+import './RegisterForm.less';
 
-interface SignUpState {
+interface RegisterFormState {
   username: string;
   email: string;
   password: string;
   retryPwd: string;
 }
 
-interface SignUpProps {
+interface RegisterFormProps {
   onCancelClick?: () => void;
   onSubmitSuccess?: () => void;
 }
 
-class SignUp extends React.Component<SignUpProps, SignUpState> {
+export default class RegisterForm extends React.Component<RegisterFormProps, RegisterFormState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -136,5 +136,3 @@ class SignUp extends React.Component<SignUpProps, SignUpState> {
     );
   }
 }
-
-export default SignUp;

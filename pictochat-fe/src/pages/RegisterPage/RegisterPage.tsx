@@ -1,5 +1,5 @@
 import * as React from 'react';
-import SignUp from '../../components/SignUp';
+import RegisterForm from '../../components/RegisterForm';
 import './RegisterPage.less';
 import { RouteComponentProps } from 'react-router';
 
@@ -16,7 +16,7 @@ export default function RegisterPage(props: RegisterPageProps) {
 
   return (
     <section id="register-page">
-      <SignUp onCancelClick={handleCancelClick} onSubmitSuccess={handleSubmitSuccess} />
+      <RegisterForm onCancelClick={handleCancelClick} onSubmitSuccess={handleSubmitSuccess} />
     </section>
   );
 }
