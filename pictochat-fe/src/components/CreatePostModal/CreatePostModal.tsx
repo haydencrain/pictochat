@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Modal, Button, Loader, Dimmer } from 'semantic-ui-react';
+import * as cookies from 'js-cookie';
 import StoresContext from '../../contexts/StoresContext';
 import { useImage } from '../../hooks/ImageHooks';
 import ImageDropzone from '../ImageDropzone';
@@ -7,6 +8,8 @@ import { useToggleModal } from '../../hooks/ModalHooks';
 import NewPostPayload from '../../models/NewPostPayload';
 import { DiscussionService } from '../../services/DiscussionService';
 import './CreatePostModal.less';
+import ApiService from '../../services/ApiService';
+
 
 type TriggerTypes = 'button' | 'link';
 
@@ -38,12 +41,19 @@ export default function CreatePostModal(props: CreatePostModalProps) {
     setLoading(true);
     // FIXME: get current user from auth when implemented
     // const user = { userId: '1' }; // getCurrentUser();
-    const data: NewPostPayload = {
-      userId: stores.user.currentUser.userId,
-      parentPostId: props.parentPostId || null,
-      image: image
-    };
-    await stores.discussion.createPost(data);
+    if (cookies.get('pictochatJWT')) {
+      let user = await ApiService.get('/user/authed');
+      console.log("USER: ", user);
+      const data: NewPostPayload = {
+        userId: user.userId,
+        // userId: stores.user.currentUser.userId,
+        parentPostId: props.parentPostId || null,
+        image: image
+      };
+      await stores.discussion.createPost(data);
+    } else {
+      alert("You must login to create posts");
+    }
     setLoading(false);
     handleClose();
   };
