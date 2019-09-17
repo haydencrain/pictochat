@@ -9,7 +9,10 @@ import DiscussionPage from '../../pages/DiscussionPage';
 import RegisterPage from '../../pages/RegisterPage';
 import LoginPage from '../../pages/LoginPage';
 import NotFoundPage from '../../pages/NotFoundPage';
+import { useFetchCurrentUser } from '../../hooks/UsersHooks';
 import ProfileCard from '../ProfileCard';
+import { Loader } from 'semantic-ui-react';
+import Login from '../Login';
 import './App.less';
 
 const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
@@ -42,10 +45,25 @@ function AppBody() {
         </Switch>
       </main>
       <aside id="app-sidebar">
-        <h1>My Profile</h1>
-        <ProfileCard />
+        <UserSection />
       </aside>
     </div>
+  );
+}
+
+function UserSection() {
+  const [user, isLoading] = useFetchCurrentUser();
+  const getCard = () => {
+    if (isLoading) return <Loader active />;
+    if (user === undefined) return <Login />;
+    return <ProfileCard user={user} />;
+  };
+
+  return (
+    <>
+      <h1>My Profile</h1>
+      {getCard()}
+    </>
   );
 }
 

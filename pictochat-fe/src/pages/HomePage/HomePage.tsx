@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import ThreadListContainer from '../../components/ThreadListContainer';
 import './HomePage.less';
 
-interface HomePage { }
+interface HomePage {}
 
 function HomePage(props: HomePage) {
   return (

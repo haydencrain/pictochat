@@ -13,14 +13,14 @@ export default class UserStore {
   @action.bound
   async createUser(userJson: User): Promise<UserModel> {
     this.isLoading = true;
-    let userModelJson = await UserService.addUser(userJson);
-    let user: UserModel;
+    let { user } = await UserService.addUser(userJson);
+    let realUser: UserModel;
     runInAction(() => {
-      user = new UserModel(userModelJson);
+      realUser = new UserModel(user);
       // this.users.set(user.username, user);
       this.isLoading = false;
     });
-    return user;
+    return realUser;
   }
 
   @action.bound
