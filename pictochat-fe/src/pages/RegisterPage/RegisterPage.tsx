@@ -1,10 +1,22 @@
 import * as React from 'react';
+import RegisterForm from '../../components/RegisterForm';
 import './RegisterPage.less';
-import SignUp from '../../components/SignUp';
-interface RegisterPage { }
+import { RouteComponentProps } from 'react-router';
 
-export default (props: RegisterPage) => {
-  return <section id="register-page">
-    <SignUp />
-  </section>;
-};
+interface RegisterPageProps extends RouteComponentProps<any> {}
+
+export default function RegisterPage(props: RegisterPageProps) {
+  const handleCancelClick = React.useCallback(() => {
+    props.history.goBack();
+  }, []);
+
+  const handleSubmitSuccess = React.useCallback(() => {
+    props.history.goBack();
+  }, []);
+
+  return (
+    <section id="register-page">
+      <RegisterForm onCancelClick={handleCancelClick} onSubmitSuccess={handleSubmitSuccess} />
+    </section>
+  );
+}

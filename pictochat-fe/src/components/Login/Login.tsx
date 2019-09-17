@@ -69,9 +69,6 @@ class Login extends React.Component<{}, LoginState> {
   render() {
     return (
       <Container id="login-container">
-        <Header as="h1" className="heading">
-          My Profile
-        </Header>
         <Form id="login-form" className="ui raised segment" onSubmit={this.handleSubmit} method="POST">
           <Form.Field className="login-field">
             <label>Username or Email</label>

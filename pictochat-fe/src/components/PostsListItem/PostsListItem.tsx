@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import { Segment } from 'semantic-ui-react';
 import { DiscussionPost } from '../../models/DiscussionPost';
 import { PostTypes } from '../../models/PostTypes';
@@ -12,21 +13,24 @@ interface PostListItemProps {
   showReplies: boolean;
 }
 
-export default function PostsListItem(props: PostListItemProps) {
-  const { post, postType, showReplies } = props;
-  const replies = post.replies || [];
+function PostsListItem(props: PostListItemProps) {
+  // const { post, postType, showReplies } = props;
 
-  const renderPostReplies = () =>
-    replies.length > 0 && (
+  const renderPostReplies = () => {
+    if (props.post.replies.length === 0) { return null; }
+    return (
       <div className="post-replies">
-        <PostsList postsType={PostTypes.Reply} posts={replies} raised={false} showReplies />
+        <PostsList postsType={PostTypes.Reply} posts={props.post.replies} raised={false} showReplies />
       </div>
     );
+  };
 
   return (
     <Segment className="post-and-replies">
-      <Post post={post} postType={postType} />
-      {showReplies && renderPostReplies()}
+      <Post post={props.post} postType={props.postType} />
+      {props.showReplies && renderPostReplies()}
     </Segment>
   );
 }
+
+export default observer(PostsListItem);

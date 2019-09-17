@@ -9,6 +9,7 @@ export default (props: {}) => (
       <span className="nav-links-container">
         <Link to="/">Home</Link>
         <Link to="/leaderboard">Leaderboard</Link>
+        <Link to="/register">Register</Link>
       </span>
     </div>
   </nav>
