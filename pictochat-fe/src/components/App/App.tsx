@@ -10,27 +10,36 @@ import NotFoundPage from '../../pages/NotFoundPage';
 import ProfileCard from '../ProfileCard';
 import './App.less';
 
+const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
+
 export default function App() {
-  const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
   return (
     <BrowserRouter>
       <Navbar />
       <Switch>
         <Route exact path={`${FRONTEND_URL_ROOT}register`} component={RegisterPage} />
-        <div id="app-body">
-          <main id="app-main">
-            <Route exact path={FRONTEND_URL_ROOT} component={HomePage} />
-            <Route exact path={`${FRONTEND_URL_ROOT}discussion`} component={DiscussionPage} />
-            <Route exact path={`${FRONTEND_URL_ROOT}leaderboard`} component={LeaderboardPage} />
-            <Route exact path={`${FRONTEND_URL_ROOT}login`} component={LoginPage} />
-            <Route component={NotFoundPage} />
-          </main>
-          <aside id="app-sidebar">
-            <h1>My Profile</h1>
-            <ProfileCard />
-          </aside>
-        </div>
+        <Route component={AppBody} />
       </Switch>
     </BrowserRouter>
+  );
+}
+
+function AppBody() {
+  return (
+    <div id="app-body">
+      <main id="app-main">
+        <Switch>
+          <Route exact path={FRONTEND_URL_ROOT} component={HomePage} />
+          <Route exact path={`${FRONTEND_URL_ROOT}discussion`} component={DiscussionPage} />
+          <Route exact path={`${FRONTEND_URL_ROOT}leaderboard`} component={LeaderboardPage} />
+          <Route exact path={`${FRONTEND_URL_ROOT}login`} component={LoginPage} />
+          <Route component={NotFoundPage} />
+        </Switch>
+      </main>
+      <aside id="app-sidebar">
+        <h1>My Profile</h1>
+        <ProfileCard />
+      </aside>
+    </div>
   );
 }

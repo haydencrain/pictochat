@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Container, Header, Form, Button, Divider } from 'semantic-ui-react';
+import { Form, Button } from 'semantic-ui-react';
 import UserService from '../../services/UserService';
 import { User } from '../../models/User';
 import './Signup.less';
@@ -11,7 +11,12 @@ interface SignUpState {
   retryPwd: string;
 }
 
-class SignUp extends React.Component<{}, SignUpState> {
+interface SignUpProps {
+  onCancelClick?: () => void;
+  onSubmitSuccess?: () => void;
+}
+
+class SignUp extends React.Component<SignUpProps, SignUpState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -27,6 +32,7 @@ class SignUp extends React.Component<{}, SignUpState> {
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.handleRetryPwdChange = this.handleRetryPwdChange.bind(this);
     this.handleCancelClick = this.handleCancelClick.bind(this);
+    this.checkFormValidation = this.checkFormValidation.bind(this);
   }
 
   handleUsernameChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -48,6 +54,7 @@ class SignUp extends React.Component<{}, SignUpState> {
   handleCancelClick(event: React.SyntheticEvent<any>) {
     event.preventDefault();
     this.clearForm();
+    this.props.onCancelClick && this.props.onCancelClick();
   }
 
   clearForm = () => {
@@ -59,6 +66,16 @@ class SignUp extends React.Component<{}, SignUpState> {
     });
   };
 
+  checkFormValidation() {
+    const { username, email, password, retryPwd } = this.state;
+    if (!username || !email || !password) {
+      throw new Error('One or more required fields are empty!');
+    }
+    if (retryPwd !== password) {
+      throw new Error('Passwords do not match!');
+    }
+  }
+
   async handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const user: User = {
@@ -66,9 +83,16 @@ class SignUp extends React.Component<{}, SignUpState> {
       email: this.state.email,
       password: this.state.password
     };
-    console.log(user);
-    const res = await UserService.addUser(user);
-    console.log(res);
+    try {
+      this.checkFormValidation();
+      const res = await UserService.addUser(user);
+      if (res.message) {
+        alert(res.message);
+        this.props.onSubmitSuccess && this.props.onSubmitSuccess();
+      }
+    } catch (e) {
+      alert(e.message);
+    }
   }
 
   render() {
@@ -98,10 +122,14 @@ class SignUp extends React.Component<{}, SignUpState> {
         </Form.Field>
         <Form.Group className="register-actions">
           <Form.Field className="cancel-button">
-            <Button onClick={this.handleCancelClick}>Cancel</Button>
+            <Button type="button" onClick={this.handleCancelClick}>
+              Cancel
+            </Button>
           </Form.Field>
           <Form.Field className="register-button">
-            <Button primary>Sign Up</Button>
+            <Button primary type="submit">
+              Sign Up
+            </Button>
           </Form.Field>
         </Form.Group>
       </Form>

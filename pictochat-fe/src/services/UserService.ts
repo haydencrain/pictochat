@@ -9,16 +9,10 @@ interface LoginResult {
 }
 
 class UserService {
-  static async getUser(userId: string): Promise<User> {
-    return await ApiService.get(`/user /${userId}`);
+  static async getUser(username: string): Promise<User> {
+    return await ApiService.get(`/user?username=${username}`);
   }
 
-  /* authUser(email: String, password: string) {
-    let body = {
-      email,
-      password
-    }
-  } */
   static async authUser(user: User): Promise<string> {
     const data = {
       username: user.email,
@@ -33,7 +27,7 @@ class UserService {
     }
   }
 
-  static async addUser(user: User): Promise<User> {
+  static async addUser(user: User): Promise<{ message: string; user?: User }> {
     return await ApiService.post('/user', user);
   }
 }
