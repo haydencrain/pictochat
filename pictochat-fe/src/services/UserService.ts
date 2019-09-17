@@ -8,9 +8,15 @@ interface LoginResult {
   message: string;
 }
 
+const u = {
+  username: 'test',
+  email: 'test@test',
+  password: '124'
+};
+
 class UserService {
   static async getUser(userId: string): Promise<User> {
-    return await ApiService.get(`/user /${userId}`);
+    return await ApiService.get(`/user/${1}`);
   }
 
   /* authUser(email: String, password: string) {
