@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { observer } from 'mobx-react';
+import { StoresContext, initStores } from '../../contexts/StoresContext';
 import Navbar from '../Navbar';
 import HomePage from '../../pages/HomePage';
 import LeaderboardPage from '../../pages/LeaderboardPage';
@@ -12,15 +14,18 @@ import './App.less';
 
 const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
 
-export default function App() {
+function App() {
+  const [stores, setStores] = React.useState(initStores());
   return (
-    <BrowserRouter>
-      <Navbar />
-      <Switch>
-        <Route exact path={`${FRONTEND_URL_ROOT}register`} component={RegisterPage} />
-        <Route component={AppBody} />
-      </Switch>
-    </BrowserRouter>
+    <StoresContext.Provider value={stores}>
+      <BrowserRouter>
+        <Navbar />
+        <Switch>
+          <Route exact path={`${FRONTEND_URL_ROOT}register`} component={RegisterPage} />
+          <Route component={AppBody} />
+        </Switch>
+      </BrowserRouter>
+    </StoresContext.Provider>
   );
 }
 
@@ -43,3 +48,5 @@ function AppBody() {
     </div>
   );
 }
+
+export default observer(App);

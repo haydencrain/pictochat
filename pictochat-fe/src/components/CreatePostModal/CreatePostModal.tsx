@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Modal, Button, Loader, Dimmer } from 'semantic-ui-react';
+import StoresContext from '../../contexts/StoresContext';
 import { useImage } from '../../hooks/ImageHooks';
 import ImageDropzone from '../ImageDropzone';
 import { useToggleModal } from '../../hooks/ModalHooks';
@@ -12,11 +13,14 @@ type TriggerTypes = 'button' | 'link';
 interface CreatePostModalProps {
   triggerType: TriggerTypes;
   triggerContent?: any;
-  parentId?: string;
+  parentPostId?: string;
+
 }
 
 export default function CreatePostModal(props: CreatePostModalProps) {
-  const { triggerType, triggerContent, parentId } = props;
+  console.log('RENDER CreatePostModal, Props: ', props);
+  // const { triggerType, triggerContent, parentId } = props;
+  const stores = React.useContext(StoresContext);
   const { isActive, onOpen, onClose } = useToggleModal();
   const [isLoading, setLoading] = React.useState(false);
   const { image, base64, addNewImage, clearImage } = useImage({
@@ -37,10 +41,10 @@ export default function CreatePostModal(props: CreatePostModalProps) {
     const user = { userId: '1' }; // getCurrentUser();
     const data: NewPostPayload = {
       userId: user.userId,
-      parentId: parentId || null,
+      parentPostId: props.parentPostId || null,
       image: image
     };
-    await DiscussionService.createPost(data);
+    await stores.discussion.createPost(data);
     setLoading(false);
     handleClose();
   };
@@ -51,8 +55,8 @@ export default function CreatePostModal(props: CreatePostModalProps) {
   };
 
   const renderModalTrigger = () => {
-    const content = triggerContent || 'Add Post';
-    switch (triggerType) {
+    const content = props.triggerContent || 'Add Post';
+    switch (props.triggerType) {
       case 'button':
         return (
           <Button primary onClick={onOpen}>
