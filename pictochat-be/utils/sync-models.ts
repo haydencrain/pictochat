@@ -1,5 +1,4 @@
 import { DiscussionPost } from '../models/discussion-post';
-import { DiscussionThread } from '../models/discussion-thread';
 import { User } from '../models/user';
 import { Image } from '../models/image';
 

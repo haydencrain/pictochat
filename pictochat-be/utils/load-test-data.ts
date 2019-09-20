@@ -58,7 +58,7 @@ export async function loadTestData() {
   });
   await Promise.all(imageCreationPromises);
 
-  console.log('Creating test instances for DiscussionThreads');
+  console.log('Creating test instances for users');
   // password hash for the password: 'password'
   const hash = '$2b$12$zKBpkyOWQHkbG9beO1alH.zyZlInYEcCwKEF4lByrypFFpBQu9/9a';
   await User.create({

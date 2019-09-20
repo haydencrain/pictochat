@@ -57,13 +57,14 @@ const RepliesList = observer(function RepliesList(props: {
   const { postId, store, showReplies, noPostsMessage } = props;
 
   const posts = computed((): DiscussionPost[] => {
+    // return store.activeDiscussionPosts.get(postId).replies;
     return store.activeDiscussionPosts.has(postId)
       ? store.activeDiscussionPosts.get(postId).replies
       : [];
   });
 
   const isLoading = computed((): boolean => {
-    return store.isLoadingActiveDiscussion || !store.activeDiscussionPosts.has(parseInt(postId))
+    return store.isLoadingActiveDiscussion || !store.activeDiscussionPosts.has(postId)
   });
 
   if (isLoading.get()) {

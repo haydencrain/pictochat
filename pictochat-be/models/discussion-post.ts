@@ -52,7 +52,6 @@ export class DiscussionPost extends Model {
 
   static async getPathOrderedSubTreeUnder(postId: number): Promise<DiscussionPost[]> {
     const rootPost: DiscussionPost = await DiscussionPost.findOne({ where: { postId } });
-    const rootReplyTreePath = rootPost.getDataValue('replyTreePath');
     const replyPathPrefix: string = rootPost.getReplyPathPrefix();
     let posts = await DiscussionPost.findAll({
       attributes: { include: DiscussionPost.PUBLIC_ATTRIBUTES },
@@ -60,7 +59,6 @@ export class DiscussionPost extends Model {
       order: [['replyTreePath', 'ASC'], ['postId', 'ASC']]
     });
     posts.unshift(rootPost);
-    console.log(posts.map(post => post.toJSON()));
     return posts;
   }
 
@@ -92,9 +90,10 @@ export class DiscussionPost extends Model {
 
   private getReplyPathPrefix(): string {
     const replyTreePath = this.getDataValue('replyTreePath');
-    return replyTreePath !== null
-      ? `${replyTreePath || ''}${this.getDataValue('postId')}`
-      : `${this.getDataValue('postId')}`;
+    return `${replyTreePath || ''}${this.getDataValue('postId')}`;
+    // return replyTreePath !== null
+    //   ? `${replyTreePath || ''}${this.getDataValue('postId')}`
+    //   : `${this.getDataValue('postId')}`;
   }
 }
 

@@ -1,7 +1,6 @@
 import uuid from 'uuid/v4';
 import { DiscussionPost } from '../models/discussion-post';
 import { DiscussionThread } from '../models/discussion-thread';
-// import { DiscussionThreadSummary } from '../models/discussion-thread-summary';
 import { DiscussionTreeNode } from '../models/discussion-tree-node';
 import { NewImage, ImageService } from '../services/image-service';
 import { SequelizeConnectionService } from './sequelize-connection-service';
@@ -47,20 +46,8 @@ export class DiscussionService {
         },
         { transaction }
       );
-
-      // let thread: DiscussionThread = await DiscussionThread.create(
-      //   { rootPostId: rootPost.getDataValue('postId') },
-      //   { transaction }
-      // );
-      // await rootPost.update(
-      //   { discussionId: thread.getDataValue('discussionId') },
-      //   { transaction, where: { postId: rootPost.getDataValue('postId') } }
-      // );
-
       await transaction.commit();
-      let result = new DiscussionThread({ discussionId, rootPost, replyCount: 0 });
-      console.log('result: ', result.toFlatJSON());
-      return result;
+      return new DiscussionThread({ discussionId, rootPost, replyCount: 0 });;
     } catch (error) {
       if (transaction !== undefined) {
         transaction.rollback();
@@ -86,7 +73,7 @@ export class DiscussionService {
           // discussionId: newPost.discussionId,
           discussionId: parentPost.getDataValue('discussionId'),
           imageId: image.getDataValue('imageId'),
-          autorId: newPost.userId,
+          authorId: newPost.userId,
           postedDate: new Date(),
           parentPostId: parentPost.getDataValue('postId'),
           replyTreePath: `${parentReplyPath}${parentPost.getDataValue('postId')}/`
@@ -105,20 +92,10 @@ export class DiscussionService {
   }
 
   /** Creates a list of summaries for each thread containing the rootPost
-   *  and agggregate metrics (e.g. comment count).
-   */
+   *  and agggregate metrics (e.g. comment count). */
   static async getThreadSummaries(): Promise<DiscussionThread[]> {
     return await DiscussionThread.findAll();
   }
-  // static async getThreadSummaries(): Promise<DiscussionThreadSummary[]> {
-  //   const threads: DiscussionThread[] = await DiscussionThread.getThreadsPopulated();
-
-  //   let threadSummaries: DiscussionThreadSummary[] = threads.map(thread => {
-  //     return new DiscussionThreadSummary(thread);
-  //   });
-
-  //   return threadSummaries;
-  // }
 
   static async getReplyTreeForThread(discussionId: number): Promise<DiscussionTreeNode> {
     const posts: DiscussionPost[] = await DiscussionPost.getPathOrderedPostsInThread(discussionId);

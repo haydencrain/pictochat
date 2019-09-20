@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes, Model, QueryTypes } from 'sequelize';
+import { Sequelize, QueryTypes } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { DiscussionPost } from './discussion-post';
 
@@ -35,7 +35,7 @@ export class DiscussionThread {
   // STATIC/COLLECTION METHODS
 
   /**
-   * @param string discussionId
+   * @param discussionId
    * @returns A DiscussionThread instance for the specified discussionId */
   static async findOne(discussionId: string): Promise<DiscussionThread> {
     let rootPost: DiscussionPost = await DiscussionPost.findOne({
@@ -53,14 +53,12 @@ export class DiscussionThread {
     let rootPosts: DiscussionPost[] = await DiscussionPost.findAll({ where: DiscussionPost.isRootPostFilter() });
     let replyCounts: { [discussionId: number]: number } = await DiscussionThread.getReplyCountsForAllThreads();
     let threads: DiscussionThread[] = [];
-    console.log('replyCounts: ', replyCounts);
     for (let rootPost of rootPosts) {
       let discussionId = rootPost.discussionId;
       let thread = new DiscussionThread(
         { discussionId: discussionId, rootPost, replyCount: replyCounts[discussionId] });
       threads.push(thread);
     }
-    console.log('threads: ', threads);
     return threads;
   }
 
@@ -71,7 +69,6 @@ export class DiscussionThread {
        GROUP BY "discussionId"`,
       { raw: true, type: QueryTypes.SELECT }
     );
-    console.log('getReplyCountsForAllThreads$records: ', records);
     let threadReplyCountMap = {};
     for (let record of records) {
       threadReplyCountMap[record.discussionId] = record.replyCount;
@@ -79,54 +76,3 @@ export class DiscussionThread {
     return threadReplyCountMap;
   }
 }
-
-
-// export class DiscussionThread_v1 extends Model {
-//   rootPostId!: number;
-//   discussionId!: number;
-
-//   // attributes for all of the 'has' associations
-//   rootPost?: DiscussionPost;
-//   allReplies?: { postId: number }[]; // list of postIds for all replies, incl. replies to replies, etc.
-
-//   /**
-//    * @returns Promise for a list for DiscussionThreads with rootPost and allReplies populated
-//    */
-//   static async getThreadsPopulated(): Promise<DiscussionThread[]> {
-//     let threads = await DiscussionThread.findAll({
-//       include: [
-//         {
-//           model: DiscussionPost,
-//           as: 'rootPost',
-//           required: true,
-//           attributes: DiscussionPost.ROOT_POST_ATTRIBUTES
-//         },
-//         { model: DiscussionPost, as: 'allReplies', attributes: ['postId'] }
-//       ]
-//     });
-//     return threads;
-//   }
-// }
-
-// DiscussionThread.init(
-//   {
-//     discussionId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-//     rootPostId: { type: DataTypes.INTEGER, allowNull: false }
-//   },
-//   {
-//     sequelize,
-//     modelName: 'DiscussionThread',
-//     tableName: 'discussion_threads',
-//     freezeTableName: true,
-//     underscored: false
-//   }
-// );
-
-// DiscussionThread.hasOne(
-//   DiscussionPost,
-//   { as: 'rootPost', foreignKey: 'postId', sourceKey: 'rootPostId', constraints: false }
-// );
-// DiscussionThread.hasMany(
-//   DiscussionPost,
-//   { as: 'allReplies', foreignKey: 'discussionId', sourceKey: 'discussionId', constraints: false }
-// );
