@@ -32,17 +32,15 @@ export async function loadTestData() {
   await syncModels();
 
   console.log('Creating test instances for DiscussionPosts');
-  let samplePosts = [];
-  for (let postData of samplePosts) {
-    await DiscussionPost.create(postData);
-  }
-  // let sampleCreationPromises = samplePosts.map(postData => DiscussionPost.create(postData));
-  // await Promise.all(sampleCreationPromises);
+  // let samplePosts = [];
+  // for (let postData of samplePosts) {
+  //   await DiscussionPost.create(postData);
+  // }
 
   console.log('Creating test instances for DiscussionThreads');
-  let sampleThreads = [];
-  let threadCreationPromises = sampleThreads.map(threadData => DiscussionThread.create(threadData));
-  await Promise.all(threadCreationPromises);
+  // let sampleThreads = [];
+  // let threadCreationPromises = sampleThreads.map(threadData => DiscussionThread.create(threadData));
+  // await Promise.all(threadCreationPromises);
 
   // Path relative to compiled js file's location in build folder
   let testImages: Buffer[] = [

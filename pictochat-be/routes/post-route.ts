@@ -36,7 +36,7 @@ async function handleNewThreadPOST(req, res, next) {
   let newImageSpec = await makeNewImageSpec(req.file);
   let newThreadSpec = { image: newImageSpec, userId: req.body.userId };
   let thread = await DiscussionService.createThread(newThreadSpec);
-  res.json(thread.toJSON());
+  res.json(thread.toFlatJSON());
   await deleteFile(req.file.path);
 }
 

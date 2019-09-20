@@ -9,7 +9,9 @@ export class DiscussionPost extends Model {
     'postId',
     'discussionId',
     'isRootPost',
+    'imageId',
     'imageSrc',
+    'authorId',
     'author',
     'postedDate',
     'parentPostId',
@@ -27,7 +29,7 @@ export class DiscussionPost extends Model {
   ];
 
   postId!: number;
-  discussionId!: number;
+  discussionId!: string;
   isRootPost!: boolean;
   postedDate!: Date;
   parentPostId!: number;
@@ -62,15 +64,15 @@ export class DiscussionPost extends Model {
     return posts;
   }
 
-  private static replyTreePathFilter(prefix: string) {
-    return { replyTreePath: { [Op.like]: `${prefix}/%` } };
+  /**
+   * Returns a Sequelize where clause condition of the form {fieldName: condition}
+   * for retireving root posts */
+  static isRootPostFilter(): { [fieldName: string]: any } {
+    return { isRootPost: true };
   }
 
-  private getReplyPathPrefix(): string {
-    const replyTreePath = this.getDataValue('replyTreePath');
-    return replyTreePath !== null
-      ? `${replyTreePath || ''}${this.getDataValue('postId')}`
-      : `${this.getDataValue('postId')}`;
+  private static replyTreePathFilter(prefix: string) {
+    return { replyTreePath: { [Op.like]: `${prefix}/%` } };
   }
 
   // INSTANCE METHODS
@@ -87,16 +89,23 @@ export class DiscussionPost extends Model {
       where: { replyTreePath: { [Op.like]: this.getReplyPathPrefix() + '/%' } }
     });
   }
+
+  private getReplyPathPrefix(): string {
+    const replyTreePath = this.getDataValue('replyTreePath');
+    return replyTreePath !== null
+      ? `${replyTreePath || ''}${this.getDataValue('postId')}`
+      : `${this.getDataValue('postId')}`;
+  }
 }
 
 DiscussionPost.init(
   {
     postId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    discussionId: { type: DataTypes.INTEGER },
+    discussionId: { type: DataTypes.STRING, allowNull: false },
     isRootPost: { type: DataTypes.BOOLEAN, defaultValue: false },
-    imageId: { type: DataTypes.STRING },
-    authorId: { type: DataTypes.INTEGER },
-    postedDate: { type: DataTypes.DATE },
+    imageId: { type: DataTypes.STRING, allowNull: false },
+    authorId: { type: DataTypes.INTEGER, allowNull: false },
+    postedDate: { type: DataTypes.DATE, allowNull: false },
     parentPostId: { type: DataTypes.INTEGER },
     replyTreePath: { type: DataTypes.STRING },
     imageSrc: {
@@ -117,7 +126,10 @@ DiscussionPost.init(
     sequelize: sequelize,
     modelName: 'discussionPost',
     tableName: 'discussion_posts',
-    freezeTableName: true
+    freezeTableName: true,
+    indexes: [
+      { fields: ['discussionId'], using: 'BTREE' }
+    ]
   }
 );
 
