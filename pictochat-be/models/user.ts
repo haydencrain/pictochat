@@ -1,10 +1,11 @@
-import { Sequelize, Model, DataTypes, Transaction } from 'sequelize';
+import { Sequelize, Model, DataTypes } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
+import { ImageService } from '../services/image-service';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
 export class User extends Model {
-  static readonly PUBLIC_ATTRIBUTES = ['userId', 'email', 'username'];
+  static readonly PUBLIC_ATTRIBUTES = ['userId', 'email', 'username', 'userAvatarURI'];
 
   userId!: number;
   username!: string;
@@ -57,11 +58,16 @@ User.init(
   {
     userId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     email: { type: DataTypes.STRING },
-    username: { type: DataTypes.STRING },
+    username: { type: DataTypes.STRING, unique: true },
     //temp pre authentication
     password: { type: DataTypes.STRING },
     resetPasswordToken: { type: DataTypes.STRING },
-    resetPasswordExpiry: { type: DataTypes.DATE }
+    resetPasswordExpiry: { type: DataTypes.DATE },
+    // FIXME: All users currently assigned to the same static mock avatar
+    userAvatarURI: {
+      type: DataTypes.VIRTUAL,
+      get() { return ImageService.getUserAvatarURI('4'); }
+    }
   },
   {
     sequelize: sequelize,

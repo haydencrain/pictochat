@@ -56,6 +56,10 @@ export class DiscussionService {
     }
   }
 
+  /**
+   * Creates and persists a new reply to an existing post
+   * @param NewThread Object of structure {image, userId, parentPostId}, where userId is the id for the root post's author
+   * @returns DiscussionPost instance created with the specified newPost data */
   static async createReply(newPost: NewReply) {
     let sequelize = SequelizeConnectionService.getInstance();
     let transaction: Transaction;
@@ -70,7 +74,6 @@ export class DiscussionService {
       let parentReplyPath: string = parentPost.getDataValue('replyTreePath') || '';
       let reply: DiscussionPost = await DiscussionPost.create(
         {
-          // discussionId: newPost.discussionId,
           discussionId: parentPost.getDataValue('discussionId'),
           imageId: image.getDataValue('imageId'),
           authorId: newPost.userId,
@@ -94,13 +97,8 @@ export class DiscussionService {
   /** Creates a list of summaries for each thread containing the rootPost
    *  and agggregate metrics (e.g. comment count). */
   static async getThreadSummaries(): Promise<DiscussionThread[]> {
-    return await DiscussionThread.findAll();
+    return await DiscussionThread.getDiscussionThreads();
   }
-
-  // static async getReplyTreeForThread(discussionId: number): Promise<DiscussionTreeNode> {
-  //   const posts: DiscussionPost[] = await DiscussionPost.getPathOrderedPostsInThread(discussionId);
-  //   return await DiscussionService.makeReplyTree(posts);
-  // }
 
   static async getReplyTreeUnderPost(postId: number): Promise<DiscussionTreeNode> {
     const posts: DiscussionPost[] = await DiscussionPost.getPathOrderedSubTreeUnder(postId);
@@ -126,10 +124,6 @@ export class DiscussionService {
           parentNode.addReply(treeNode);
         }
       }
-      /*else if (treeNode.getDataValue('isRootPost')) {
-        // Assuming no bugs in the post/threads creation logic there should only be one of these
-        rootPostId = treeNode.getDataValue('postId');
-      }*/
     }
 
     return nodes[rootPostId];

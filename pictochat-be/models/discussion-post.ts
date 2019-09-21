@@ -2,7 +2,6 @@ import { Sequelize, Model, DataTypes, Op, FindOptions } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { ImageService } from '../services/image-service';
 import { User } from './user';
-import { Literal } from 'sequelize/types/lib/utils';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
@@ -14,21 +13,11 @@ export class DiscussionPost extends Model {
     'imageId',
     'imageSrc',
     'authorId',
-    // 'author',
     'postedDate',
     'parentPostId',
     'replyTreePath'
   ];
-  // static readonly ROOT_POST_ATTRIBUTES = [
-  //   'postId',
-  //   'discussionId',
-  //   'postedDate',
-  //   'imageSrc',
-  //   'author',
-  //   'imageId',
-  //   'authorId',
-  //   'imageSrc'
-  // ];
+  private static readonly USER_JOIN = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
 
   postId!: number;
   discussionId!: string;
@@ -39,84 +28,71 @@ export class DiscussionPost extends Model {
   imageId!: string;
   authorId!: number;
   replyTreePath!: string;
-  // Attributes for 'has' associations
-  author?: User;
-  //author?: { userName: string; userAvatarURI: string }; // FIXME: currently mocked - Jordan
 
-  // STATIC/COLLECTION METHODS
+  // Attributes for associations
+  author?: User;
+
+
+  //// INSTANCE METHODS ////
+
+  /**
+   * Number of replies made to this post or to replies of this post and so on
+   * (number of nodes under this node in the reply tree).
+   *
+   * NOTE: This isn't a virtual column because its expensive to compute and best not
+   *   included in every toJSON call. */
+  async getDeepReplyCount(): Promise<number> {
+    return DiscussionPost.count({
+      where: { replyTreePath: { [Op.like]: this.getReplyPathPrefix() + '/%' } }
+    });
+  }
+
+  private getReplyPathPrefix(): string {
+    const replyTreePath = this.getDataValue('replyTreePath');
+    return `${replyTreePath || ''}${this.getDataValue('postId')}`;
+  }
+
+
+  //// STATIC/COLLECTION METHODS ////
 
   /**
    * Wrapper for Sequelize Model.findAll that ensures author data is included in the result
    * and only returns PUBLIC_ATTRIBUTES by default. */
-  static async findDiscussionPosts(options: FindOptions = {}): Promise<DiscussionPost[]> {
-    const userJoin = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
+  static async getDiscussionPosts(options: FindOptions = {}): Promise<DiscussionPost[]> {
     const optionDefaults = {
-      include: [userJoin],
+      include: [DiscussionPost.USER_JOIN],
       attributes: DiscussionPost.PUBLIC_ATTRIBUTES
     };
     options = { ...optionDefaults, ...options };
-    // if (!!options) {
-    //   if (!options.include) { options['include'] = optionDefaults.include; }
-    //   if (!options.attributes) { options['attributes'] = optionDefaults.attributes; }
-    //   return await DiscussionPost.findAll(options);
-    // }
     return await DiscussionPost.findAll(options);
   }
 
-  /**
-   * Wrapper for Model.findOne that ensures auther data is included in result
-   * and only returns PUBLIC_ATTRIBUTES by default. */
-  static async findDiscussionPost(postId: number, options: FindOptions = {}): Promise<DiscussionPost> {
-    const userJoin = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
-    const optionDefaults = {
-      include: [userJoin],
-      attributes: DiscussionPost.PUBLIC_ATTRIBUTES,
-      where: { postId }
-    };
-    options = { ...optionDefaults, ...options };
-    return await DiscussionPost.findOne(options);
-    // if (!!options) {
-    //   if (!options.include) { options['include'] = [userJoin]; }
-    //   // if (!options.attributes) { options['attributes'] = DiscussionPost.PUBLIC_ATTRIBUTES; }
-
-    //   let existingFilter = options['where'] || {};
-    //   options['where'] = { ...existingFilter, ...filter };
-
-    //   return await DiscussionPost.findOne(options);
-    // }
-    // return await DiscussionPost.findOne({ where: filter });
+  static async getDiscussionPost(postId: number, options: FindOptions = {}): Promise<DiscussionPost> {
+    options['where'] = { ...(options['where'] || {}), postId };
+    return await DiscussionPost._findOne(options);
   }
 
+  static async getDiscussionRoot(discussionId: string, options: FindOptions = {}): Promise<DiscussionPost> {
+    const existingFilter = options['where'] || {};
+    options['where'] = {
+      ...existingFilter,
+      ...DiscussionPost.isRootPostFilter(),
+      discussionId
+    };
+    return await DiscussionPost._findOne(options);
+  }
 
-  // static async getPathOrderedPostsInThread(discussionId: number): Promise<DiscussionPost[]> {
-  //   return DiscussionPost.findAll({
-  //     attributes: { include: DiscussionPost.PUBLIC_ATTRIBUTES },
-  //     where: { discussionId: discussionId },
-  //     order: [['replyTreePath', 'ASC']],
-  //     include: [{ all: true }]
-  //   });
-  // }
-
+  /**
+   * Get all replies (and replies of replies) to the specified postId, ordered
+   * such that parent posts always come before their replies (aka pre-order traversal order). */
   static async getPathOrderedSubTreeUnder(postId: number): Promise<DiscussionPost[]> {
-    const rootPost = await DiscussionPost.findDiscussionPost(postId);
-    console.log('rootPost: ', rootPost.toJSON());
-    // const rootPost: DiscussionPost = await DiscussionPost.findOne({
-    //   attributes: DiscussionPost.PUBLIC_ATTRIBUTES,
-    //   where: { postId },
-    //   include: [userJoin]
-    // });
+    const rootPost = await DiscussionPost.getDiscussionPost(postId);
 
     const replyPathPrefix: string = rootPost.getReplyPathPrefix();
-    let posts: DiscussionPost[] = await DiscussionPost.findDiscussionPosts({
+    let posts: DiscussionPost[] = await DiscussionPost.getDiscussionPosts({
       where: DiscussionPost.replyTreePathFilter(replyPathPrefix),
       order: [['replyTreePath', 'ASC'], ['postId', 'ASC']]
     });
-    // let posts: DiscussionPost[] = await DiscussionPost.findAll({
-    //   attributes: { include: DiscussionPost.PUBLIC_ATTRIBUTES },
-    //   where: DiscussionPost.replyTreePathFilter(replyPathPrefix),
-    //   order: [['replyTreePath', 'ASC'], ['postId', 'ASC']],
-    //   include: [userJoin]
-    // });
 
     posts.unshift(rootPost);
 
@@ -135,29 +111,21 @@ export class DiscussionPost extends Model {
     return { replyTreePath: { [Op.like]: `${prefix}/%` } };
   }
 
-  // INSTANCE METHODS
-
   /**
-   * Number of replies made to this post or to replies of this post and so on
-   * (number of nodes under this node in the reply tree).
-   *
-   * NOTE: This isn't a virtual column because its expensive to compute and best
-   *       not included in every toJSON call.
-   */
-  async getDeepReplyCount(): Promise<number> {
-    return DiscussionPost.count({
-      where: { replyTreePath: { [Op.like]: this.getReplyPathPrefix() + '/%' } }
-    });
-  }
-
-  private getReplyPathPrefix(): string {
-    const replyTreePath = this.getDataValue('replyTreePath');
-    return `${replyTreePath || ''}${this.getDataValue('postId')}`;
-    // return replyTreePath !== null
-    //   ? `${replyTreePath || ''}${this.getDataValue('postId')}`
-    //   : `${this.getDataValue('postId')}`;
+   * Wrapper for Model.findOne that ensures author data is included in result
+   * and only returns PUBLIC_ATTRIBUTES by default. */
+  private static async _findOne(options: FindOptions = {}) {
+    const optionDefaults = {
+      include: [DiscussionPost.USER_JOIN],
+      attributes: DiscussionPost.PUBLIC_ATTRIBUTES
+    };
+    options = { ...optionDefaults, ...options };
+    return await DiscussionPost.findOne(options);
   }
 }
+
+
+//// SCHEMA DEFINITION ////
 
 DiscussionPost.init(
   {
@@ -174,14 +142,7 @@ DiscussionPost.init(
       get() {
         return ImageService.getImageURI(this.getDataValue('imageId'));
       }
-    }/*,
-    author: {
-      type: DataTypes.VIRTUAL,
-      get() {
-        // FIXME: MOCK DATA
-        return { userName: 'Doss', userAvatarURI: ImageService.getImageURI('4') };
-      }
-    }*/
+    }
   },
   {
     sequelize: sequelize,
@@ -194,8 +155,12 @@ DiscussionPost.init(
   }
 );
 
+
+//// ASSOCIATIONS ////
+
 DiscussionPost.belongsTo(DiscussionPost,
   { as: 'parentPost', foreignKey: 'parentPostId', targetKey: 'postId', constraints: false });
+
 DiscussionPost.belongsTo(User,
   { targetKey: 'userId', foreignKey: 'authorId', constraints: true, as: 'author' });
 

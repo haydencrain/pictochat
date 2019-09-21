@@ -38,25 +38,18 @@ export class DiscussionThread {
   /**
    * @param discussionId
    * @returns A DiscussionThread instance for the specified discussionId */
-  static async findOne(discussionId: string): Promise<DiscussionThread> {
-    let rootPost: DiscussionPost = await DiscussionPost.findOne({
-      where: { discussionId: discussionId, ...DiscussionPost.isRootPostFilter() }
-    });
+  static async getDiscussionThread(discussionId: string): Promise<DiscussionThread> {
+    let rootPost: DiscussionPost = await DiscussionPost.getDiscussionRoot(discussionId);
     return new DiscussionThread(
       { rootPost, discussionId, replyCount: await rootPost.getDeepReplyCount() });
   }
 
   /**
    * @returns A DiscussionThread instance for all discussion threads */
-  static async findAll(): Promise<DiscussionThread[]> {
+  static async getDiscussionThreads(): Promise<DiscussionThread[]> {
     // Using application side join rather than one raw SQL query to avoid
     // cascading changes to this method when columns are added to the DiscussionPost model/table.
-    // const userJoin = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
-    // let rootPosts: DiscussionPost[] = await DiscussionPost.findAll({
-    //   where: DiscussionPost.isRootPostFilter(),
-    //   include: [userJoin]
-    // });
-    let rootPosts: DiscussionPost[] = await DiscussionPost.findDiscussionPosts({ where: DiscussionPost.isRootPostFilter() });
+    let rootPosts: DiscussionPost[] = await DiscussionPost.getDiscussionPosts({ where: DiscussionPost.isRootPostFilter() });
     let replyCounts: { [discussionId: number]: number } = await DiscussionThread.getReplyCountsForAllThreads();
     let threads: DiscussionThread[] = [];
     for (let rootPost of rootPosts) {
