@@ -32,7 +32,7 @@ function App() {
   );
 }
 
-function AppBody() {
+const AppBody = observer(function AppBody() {
   return (
     <div id="app-body">
       <main id="app-main">
@@ -49,22 +49,33 @@ function AppBody() {
       </aside>
     </div>
   );
-}
+});
 
-function UserSection() {
-  const [user, isLoading] = useFetchCurrentUser();
-  const getCard = () => {
-    if (isLoading) return <Loader active />;
-    if (user === undefined) return <Login />;
-    return <ProfileCard user={user} />;
-  };
+const UserSection = observer(function UserSection() {
+  const stores = React.useContext(StoresContext);
+  console.log('UserSection$currentUser: ', stores.user.currentUser);
+  // const [user, isLoading] = useFetchCurrentUser();
+  // const getCard = () => {
+  //   if (stores.user.isLoading) return <Loader active />;
+  //   if (!stores.user.isLoggedIn) return <Login />;
+  //   return <ProfileCard user={stores.user.currentUser} />;
+  // };
+
+  let card;
+  if (stores.user.isLoading) {
+    card = <Loader active />;
+  } else if (!stores.user.isLoggedIn) {
+    card = <Login />;
+  } else {
+    card = <ProfileCard user={stores.user.currentUser} />;
+  }
 
   return (
-    <>
+    <div>
       <h1>My Profile</h1>
-      {getCard()}
-    </>
+      {/*getCard()*/ card}
+    </div>
   );
-}
+});
 
 export default observer(App);

@@ -17,6 +17,7 @@ export class DiscussionService {
   }
 
   static async createPost(post: NewPostPayload): Promise<IDiscussionPost> {
+    console.log('createPost$post: ', post);
     const isReplyPost: boolean = !!post.parentPostId;
     // IMPORTANT: Image must be the last field appended to form data or the server will not see the other fields
     const formData = new FormData();

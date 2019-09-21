@@ -15,6 +15,17 @@ export class User extends Model {
   resetPasswordToken: string;
   resetPasswordExpiry: Date;
 
+  /**
+   * @returns JSON with only PUBLIC_ATTRIBUTES */
+  getPublicJSON(): any {
+    let json = {};
+    // FIXME: Use PUBLIC_ATTRIBUTES - Jordan
+    for (let attr of ['userId', 'email', 'username']) {
+      json[attr] = this.getDataValue(attr as any);
+    }
+    return json;
+  }
+
   static async createUser(username: string, hashedPassword: string): Promise<User> {
     return await User.create({ username, password: hashedPassword });
   }
