@@ -1,7 +1,6 @@
 import { Sequelize, QueryTypes } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { DiscussionPost } from './discussion-post';
-import { User } from './user';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
