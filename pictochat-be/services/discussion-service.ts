@@ -6,6 +6,9 @@ import { NewImage, ImageService } from '../services/image-service';
 import { SequelizeConnectionService } from './sequelize-connection-service';
 import { Transaction } from 'sequelize/types';
 import { Image } from '../models/image';
+import { NotFoundError } from '../exceptions/not-found-error';
+import { ForbiddenError } from '../exceptions/forbidden-error';
+import { UnprocessableError } from '../exceptions/unprocessable-error';
 
 // HELPER INTERFACES
 
@@ -17,6 +20,12 @@ export interface NewThread {
 export interface NewReply {
   userId: number;
   parentPostId: number;
+  image: NewImage;
+}
+
+export interface PostUpdate {
+  userId: number;
+  postId: number;
   image: NewImage;
 }
 
@@ -86,6 +95,34 @@ export class DiscussionService {
 
       await transaction.commit();
       return reply;
+    } catch (error) {
+      if (transaction !== undefined) {
+        transaction.rollback();
+      }
+      throw error;
+    }
+  }
+
+  static async updatePost(postUpdate: PostUpdate): Promise<DiscussionPost> {
+    let sequelize = SequelizeConnectionService.getInstance();
+    let transaction: Transaction;
+    try {
+      transaction = await sequelize.transaction();
+      let post: DiscussionPost = await DiscussionPost.getDiscussionPost(postUpdate.postId);
+      if (!post) throw new NotFoundError();
+      // Can't update another user's post
+      if (post.authorId !== postUpdate.userId) throw new ForbiddenError();
+      if ( !(await post.isUpdatable()) ) {
+        throw new UnprocessableError('A post cannot be editted if its has been replied too or has active reactions');
+      }
+
+      let image: Image = await ImageService.saveImage(postUpdate.image, transaction);
+
+      post.imageId = image.imageId;
+      post.save({ transaction });
+
+      await transaction.commit();
+      return post;
     } catch (error) {
       if (transaction !== undefined) {
         transaction.rollback();

@@ -58,4 +58,11 @@ export class DiscussionPost implements IDiscussionPost {
     this.commentCount = other.commentCount;
     this.replies.replace(other.replies.toJS());
   }
+
+  static fromJSON(post: IDiscussionPost): DiscussionPost {
+    if (post.replies !== null || post.replies !== undefined) {
+      post['replies'] = post.replies.map(replyJson => DiscussionPost.fromJSON(replyJson));
+    }
+    return new DiscussionPost(post);
+  }
 }

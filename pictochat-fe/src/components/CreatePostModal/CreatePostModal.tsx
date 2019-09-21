@@ -42,7 +42,6 @@ function CreatePostModal(props: CreatePostModalProps) {
     e.preventDefault();
     setLoading(true);
     if (stores.user.isLoggedIn && !stores.user.isLoading) {
-      console.log('USER: ', currentUser);
       const data: NewPostPayload = {
         userId: currentUser.userId,
         parentPostId: props.parentPostId || null,

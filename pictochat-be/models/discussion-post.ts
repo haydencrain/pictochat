@@ -35,6 +35,12 @@ export class DiscussionPost extends Model {
 
   //// INSTANCE METHODS ////
 
+  async isUpdatable(): Promise<boolean> {
+    let replyCount: number = await this.getDirectReplyCount();
+    // TODO: Check if the post has any reactions
+    return replyCount === 0;
+  }
+
   /**
    * Number of replies made to this post or to replies of this post and so on
    * (number of nodes under this node in the reply tree).
@@ -45,6 +51,10 @@ export class DiscussionPost extends Model {
     return DiscussionPost.count({
       where: { replyTreePath: { [Op.like]: this.getReplyPathPrefix() + '/%' } }
     });
+  }
+
+  async getDirectReplyCount(): Promise<number> {
+    return await DiscussionPost.count({ where: { parentPostId: this.getDataValue('postId') }});
   }
 
   private getReplyPathPrefix(): string {

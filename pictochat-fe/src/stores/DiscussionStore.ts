@@ -103,12 +103,24 @@ export default class DiscussionStore {
   }
 
   @action.bound
+  async updatePost(data: {postId: number, image: File}): Promise<DiscussionPost> {
+    let postJson: IDiscussionPost = await DiscussionService.updatePost(data);
+    let post: DiscussionPost = await this.parseJsonTree(postJson, true);
+    return post;
+  }
+
+  @action.bound
   private parseJsonTree(postJson: IDiscussionPost, shouldBuildPostMap: boolean = false): DiscussionPost {
     let repliesJson: IDiscussionPost[] = postJson.replies || [];
     let replies: DiscussionPost[] = repliesJson.map(post => this.parseJsonTree(post, shouldBuildPostMap));
     let post = new DiscussionPost({ ...postJson, ...{ replies } });
     if (shouldBuildPostMap) {
-      this.activeDiscussionPosts.set(post.postId, post);
+      if (this.activeDiscussionPosts.has(post.postId)) {
+        // Using replace to avoid breaking any existing observer dependencies
+        this.activeDiscussionPosts.get(post.postId).replace(post);
+      } else {
+        this.activeDiscussionPosts.set(post.postId, post);
+      }
     }
     return post;
   }
