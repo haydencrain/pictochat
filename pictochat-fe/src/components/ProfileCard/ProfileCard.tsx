@@ -21,7 +21,8 @@ function ProfileCard(props: Props) {
     <Segment.Group className="profile-card" raised>
       <Segment className="profile-card-header" horizontal="true">
         <div className="header-image">
-          <Image src="https://semantic-ui.com/images/avatar2/large/elyse.png" />
+          <Image src={stores.user.currentUser.userAvatarURI} />
+          {/*<Image src="https://semantic-ui.com/images/avatar2/large/elyse.png" />*/}
         </div>
         <div className="header-info">
           <div className="user-name">{props.user.username}</div>

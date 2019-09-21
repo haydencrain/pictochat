@@ -71,7 +71,7 @@ class Login extends React.Component<{}, LoginState> {
 
             <Form.Field className="membership-field">
               <p className="membership">Not a member?</p>
-              <Link to="/login">Create an Account</Link>
+              <Link to="/register">Create an Account</Link>
             </Form.Field>
           </Form.Group>
         </Form>

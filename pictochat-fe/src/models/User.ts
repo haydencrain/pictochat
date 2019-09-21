@@ -4,6 +4,7 @@ export interface IUser {
   username: string;
   email: string;
   userId: string;
+  userAvatarURI: string;
 }
 
 // TODO: Rename class to User once register and login code is stable
@@ -11,11 +12,13 @@ export class User implements IUser {
   @observable username: string;
   @observable email: string;
   @observable userId: string;
-  constructor(data?: { username: string; email: string; userId: string }) {
+  @observable userAvatarURI: string;
+  constructor(data?: IUser) {
     if (data) {
       this.username = data.username;
       this.email = data.email;
       this.userId = data.userId;
+      this.userAvatarURI = data.userAvatarURI;
     }
   }
 
@@ -24,6 +27,7 @@ export class User implements IUser {
     this.username = other.username;
     this.email = other.email;
     this.userId = other.userId;
+    this.userAvatarURI = other.userAvatarURI;
   }
 
   /**

@@ -16,7 +16,8 @@ const IMAGES = {
   '6': getRandDogUrl(),
   '7': getRandDogUrl(),
   '8': getRandDogUrl(),
-  '9': getRandDogUrl()
+  '9': getRandDogUrl(),
+  DEFAULT_AVATAR: 'https://semantic-ui.com/images/avatar2/large/elyse.png'
 };
 
 // HELPER INTERFACES

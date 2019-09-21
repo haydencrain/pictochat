@@ -77,7 +77,9 @@ User.init(
     // FIXME: All users currently assigned to the same static mock avatar
     userAvatarURI: {
       type: DataTypes.VIRTUAL,
-      get() { return ImageService.getUserAvatarURI('4'); }
+      get() {
+        return ImageService.getUserAvatarURI('DEFAULT_AVATAR');
+      }
     }
   },
   {
