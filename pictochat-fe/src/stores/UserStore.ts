@@ -30,9 +30,7 @@ export default class UserStore {
         this.isLoggedIn = hasValidSession;
       });
     } finally {
-      runInAction(() => {
-        this.isLoading = false;
-      });
+      runInAction(() => (this.isLoading = false));
     }
   }
 
@@ -50,9 +48,7 @@ export default class UserStore {
       });
       return realUser;
     } finally {
-      runInAction(() => {
-        this.isLoading = false;
-      });
+      runInAction(() => (this.isLoading = false));
     }
   }
 
@@ -71,7 +67,7 @@ export default class UserStore {
     } catch (error) {
       throw error;
     } finally {
-      this.isLoading = false;
+      runInAction(() => (this.isLoading = false));
     }
   }
 
@@ -83,7 +79,7 @@ export default class UserStore {
       this.currentUser.clear();
       await UserService.clearSession();
     } finally {
-      this.isLoading = false;
+      runInAction(() => (this.isLoading = false));
     }
   }
 
