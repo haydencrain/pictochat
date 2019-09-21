@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Container, Header, Form, Button } from 'semantic-ui-react';
-import UserService from '../../services/UserService';
+import { Container, Form, Button } from 'semantic-ui-react';
+import StoresContext from '../../contexts/StoresContext';
+import UnauthenticatedUser from '../../models/UnauthenticatedUser';
 import './Login.less';
-import { User } from '../../models/User';
 
 interface LoginState {
   email: string;
@@ -10,6 +10,8 @@ interface LoginState {
 }
 
 class Login extends React.Component<{}, LoginState> {
+  static contextType = StoresContext;
+
   constructor(props: any) {
     super(props);
     this.state = {
@@ -33,17 +35,18 @@ class Login extends React.Component<{}, LoginState> {
   }
 
   async handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const user: User = {
-      // TODO: 'email' field should be 'username'!!!
-      username: '',
-      email: this.state.email,
-      password: this.state.password
-    };
-    const res = await UserService.authUser(user);
-    alert(res);
-    // FIXME: don't hard refresh the window. rather we should be refecthing the user from the UserStore
-    window.location.reload();
+    try {
+      event.preventDefault();
+      const user: UnauthenticatedUser = {
+        // TODO: 'email' field should be 'username'!!!
+        username: '',
+        email: this.state.email,
+        password: this.state.password
+      };
+      await this.context.user.authAndLoadCurrentUser(user);
+    } catch (error) {
+      alert(error);
+    }
   }
 
   render() {

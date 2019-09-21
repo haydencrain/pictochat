@@ -57,8 +57,8 @@ const RepliesList = observer(function RepliesList(props: {
   const { postId, store, showReplies, noPostsMessage } = props;
 
   const posts = computed((): DiscussionPost[] => {
-    return store.activeDiscussionPosts.has(postId)
-      ? store.activeDiscussionPosts.get(postId).replies
+    return store.activeDiscussionPosts.has(parseInt(postId))
+      ? store.activeDiscussionPosts.get(parseInt(postId)).replies
       : [];
   });
 

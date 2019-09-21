@@ -66,11 +66,8 @@ export class ApiService {
           if (response.ok) {
             resolve(responseBody);
           } else {
-            reject({
-              status: response.status,
-              statusText: response.statusText,
-              body: responseBody
-            } as ApiException);
+            let error = new ApiException(response.status, response.statusText, responseBody);
+            reject(error);
           }
         })
         .catch(e => {

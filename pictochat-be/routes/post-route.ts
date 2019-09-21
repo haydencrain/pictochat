@@ -43,7 +43,6 @@ async function handleNewThreadPOST(req, res, next) {
 // This will store images in a local staging directory on the API server
 const imageStager = multer({ dest: config.IMAGE_STAGING_DIR });
 
-
 //// ROUTER ////
 
 export const postRouter = express.Router();
