@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import { Container, Header, Form, Button } from 'semantic-ui-react';
 import UserService from '../../services/UserService';
 import './Login.less';
@@ -67,7 +68,7 @@ class Login extends React.Component<{}, LoginState> {
 
             <Form.Field className="membership-field">
               <p className="membership">Not a member?</p>
-              <a>Create an Account</a>
+              <Link to="/login">Create an Account</Link>
             </Form.Field>
           </Form.Group>
         </Form>

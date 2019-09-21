@@ -1,6 +1,8 @@
-import { Sequelize, Model, DataTypes, Op } from 'sequelize';
+import { Sequelize, Model, DataTypes, Op, FindOptions } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { ImageService } from '../services/image-service';
+import { User } from './user';
+import { Literal } from 'sequelize/types/lib/utils';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
@@ -12,21 +14,21 @@ export class DiscussionPost extends Model {
     'imageId',
     'imageSrc',
     'authorId',
-    'author',
+    // 'author',
     'postedDate',
     'parentPostId',
     'replyTreePath'
   ];
-  static readonly ROOT_POST_ATTRIBUTES = [
-    'postId',
-    'discussionId',
-    'postedDate',
-    'imageSrc',
-    'author',
-    'imageId',
-    'authorId',
-    'imageSrc'
-  ];
+  // static readonly ROOT_POST_ATTRIBUTES = [
+  //   'postId',
+  //   'discussionId',
+  //   'postedDate',
+  //   'imageSrc',
+  //   'author',
+  //   'imageId',
+  //   'authorId',
+  //   'imageSrc'
+  // ];
 
   postId!: number;
   discussionId!: string;
@@ -38,37 +40,97 @@ export class DiscussionPost extends Model {
   authorId!: number;
   replyTreePath!: string;
   // Attributes for 'has' associations
-  author?: { userName: string; userAvatarURI: string }; // FIXME: currently mocked - Jordan
+  author?: User;
+  //author?: { userName: string; userAvatarURI: string }; // FIXME: currently mocked - Jordan
 
   // STATIC/COLLECTION METHODS
 
-  static async getPathOrderedPostsInThread(discussionId: number): Promise<DiscussionPost[]> {
-    return DiscussionPost.findAll({
-      attributes: { include: DiscussionPost.PUBLIC_ATTRIBUTES },
-      where: { discussionId: discussionId },
-      order: [['replyTreePath', 'ASC']]
-    });
+  /**
+   * Wrapper for Sequelize Model.findAll that ensures author data is included in the result
+   * and only returns PUBLIC_ATTRIBUTES by default. */
+  static async findDiscussionPosts(options: FindOptions = {}): Promise<DiscussionPost[]> {
+    const userJoin = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
+    const optionDefaults = {
+      include: [userJoin],
+      attributes: DiscussionPost.PUBLIC_ATTRIBUTES
+    };
+    options = { ...optionDefaults, ...options };
+    // if (!!options) {
+    //   if (!options.include) { options['include'] = optionDefaults.include; }
+    //   if (!options.attributes) { options['attributes'] = optionDefaults.attributes; }
+    //   return await DiscussionPost.findAll(options);
+    // }
+    return await DiscussionPost.findAll(options);
   }
 
+  /**
+   * Wrapper for Model.findOne that ensures auther data is included in result
+   * and only returns PUBLIC_ATTRIBUTES by default. */
+  static async findDiscussionPost(postId: number, options: FindOptions = {}): Promise<DiscussionPost> {
+    const userJoin = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
+    const optionDefaults = {
+      include: [userJoin],
+      attributes: DiscussionPost.PUBLIC_ATTRIBUTES,
+      where: { postId }
+    };
+    options = { ...optionDefaults, ...options };
+    return await DiscussionPost.findOne(options);
+    // if (!!options) {
+    //   if (!options.include) { options['include'] = [userJoin]; }
+    //   // if (!options.attributes) { options['attributes'] = DiscussionPost.PUBLIC_ATTRIBUTES; }
+
+    //   let existingFilter = options['where'] || {};
+    //   options['where'] = { ...existingFilter, ...filter };
+
+    //   return await DiscussionPost.findOne(options);
+    // }
+    // return await DiscussionPost.findOne({ where: filter });
+  }
+
+
+  // static async getPathOrderedPostsInThread(discussionId: number): Promise<DiscussionPost[]> {
+  //   return DiscussionPost.findAll({
+  //     attributes: { include: DiscussionPost.PUBLIC_ATTRIBUTES },
+  //     where: { discussionId: discussionId },
+  //     order: [['replyTreePath', 'ASC']],
+  //     include: [{ all: true }]
+  //   });
+  // }
+
   static async getPathOrderedSubTreeUnder(postId: number): Promise<DiscussionPost[]> {
-    const rootPost: DiscussionPost = await DiscussionPost.findOne({ where: { postId } });
+    const rootPost = await DiscussionPost.findDiscussionPost(postId);
+    console.log('rootPost: ', rootPost.toJSON());
+    // const rootPost: DiscussionPost = await DiscussionPost.findOne({
+    //   attributes: DiscussionPost.PUBLIC_ATTRIBUTES,
+    //   where: { postId },
+    //   include: [userJoin]
+    // });
+
     const replyPathPrefix: string = rootPost.getReplyPathPrefix();
-    let posts = await DiscussionPost.findAll({
-      attributes: { include: DiscussionPost.PUBLIC_ATTRIBUTES },
-      where: { ...DiscussionPost.replyTreePathFilter(replyPathPrefix) },
+    let posts: DiscussionPost[] = await DiscussionPost.findDiscussionPosts({
+      where: DiscussionPost.replyTreePathFilter(replyPathPrefix),
       order: [['replyTreePath', 'ASC'], ['postId', 'ASC']]
     });
+    // let posts: DiscussionPost[] = await DiscussionPost.findAll({
+    //   attributes: { include: DiscussionPost.PUBLIC_ATTRIBUTES },
+    //   where: DiscussionPost.replyTreePathFilter(replyPathPrefix),
+    //   order: [['replyTreePath', 'ASC'], ['postId', 'ASC']],
+    //   include: [userJoin]
+    // });
+
     posts.unshift(rootPost);
+
     return posts;
   }
 
   /**
-   * Returns a Sequelize where clause condition of the form {fieldName: condition}
-   * for retireving root posts */
+   * @returns Sequelize where clause condition for getting rootPosts */
   static isRootPostFilter(): { [fieldName: string]: any } {
     return { isRootPost: true };
   }
 
+  /**
+   * @returns Sequelize where clause condition for finding posts under the specified path prefix */
   private static replyTreePathFilter(prefix: string) {
     return { replyTreePath: { [Op.like]: `${prefix}/%` } };
   }
@@ -112,14 +174,14 @@ DiscussionPost.init(
       get() {
         return ImageService.getImageURI(this.getDataValue('imageId'));
       }
-    },
+    }/*,
     author: {
       type: DataTypes.VIRTUAL,
       get() {
         // FIXME: MOCK DATA
         return { userName: 'Doss', userAvatarURI: ImageService.getImageURI('4') };
       }
-    }
+    }*/
   },
   {
     sequelize: sequelize,
@@ -132,4 +194,8 @@ DiscussionPost.init(
   }
 );
 
-DiscussionPost.belongsTo(DiscussionPost, { foreignKey: 'parentPostId', targetKey: 'postId', constraints: false });
+DiscussionPost.belongsTo(DiscussionPost,
+  { as: 'parentPost', foreignKey: 'parentPostId', targetKey: 'postId', constraints: false });
+DiscussionPost.belongsTo(User,
+  { targetKey: 'userId', foreignKey: 'authorId', constraints: true, as: 'author' });
+

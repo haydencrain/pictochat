@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { readFile } from '../utils/fileHelpers';
+import { readFile } from '../utils/FileHelpers';
 
 export function useImageDropzone(params: {
   onUpload?: (image: File) => void;

@@ -31,21 +31,24 @@ function readFile(path: fs.PathLike): Promise<Buffer> {
 export async function loadTestData() {
   await syncModels();
 
-  console.log('Creating test instances for DiscussionPosts');
-  // let samplePosts = [];
-  // for (let postData of samplePosts) {
-  //   await DiscussionPost.create(postData);
-  // }
-
-  console.log('Creating test instances for DiscussionThreads');
-  // let sampleThreads = [];
-  // let threadCreationPromises = sampleThreads.map(threadData => DiscussionThread.create(threadData));
-  // await Promise.all(threadCreationPromises);
+  console.log('Creating test instances for users');
+  // password hash for the password: 'password'
+  const hash = '$2b$12$zKBpkyOWQHkbG9beO1alH.zyZlInYEcCwKEF4lByrypFFpBQu9/9a';
+  await User.create({
+    email: 'test@test.com',
+    username: 'testuser1', // please avoid using Dosss as that's the name we've been hardcoding for mock data
+    password: hash
+  });
+  await User.create({
+    email: 'test2@test.com',
+    username: 'testuser2', // please avoid using Dosss as that's the name we've been hardcoding for mock data
+    password: hash
+  });
 
   // Path relative to compiled js file's location in build folder
   let testImages: Buffer[] = [
     await readFile(path.join(__dirname, '../../../test-data/green.JPG')),
-    await readFile(path.join(__dirname, '../../../test-data/green.JPG'))
+    await readFile(path.join(__dirname, '../../../test-data/yellow.JPG'))
   ];
 
   let imageCreationPromises = testImages.map((data: Buffer, i) => {
@@ -58,12 +61,149 @@ export async function loadTestData() {
   });
   await Promise.all(imageCreationPromises);
 
-  console.log('Creating test instances for users');
-  // password hash for the password: 'password'
-  const hash = '$2b$12$zKBpkyOWQHkbG9beO1alH.zyZlInYEcCwKEF4lByrypFFpBQu9/9a';
-  await User.create({
-    email: 'test@test.com',
-    username: 'Dosss',
-    password: hash
-  });
+  console.log('Creating test instances for DiscussionPosts');
+  let samplePosts = [
+    {
+      discussionId: '1',
+      isRootPost: true,
+      imageId: 'asdsdfsdfd1-20190101T010101000',
+      authorId: 1,
+      postedDate: new Date()
+    },
+    {
+      discussionId: '1',
+      parentPostId: 1,
+      isRootPost: false,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date(),
+      replyTreePath: '1/'
+    },
+    {
+      discussionId: '1',
+      parentPostId: 2,
+      isRootPost: false,
+      imageId: 'asdsdfsdfd1-20190101T010101000',
+      authorId: 1,
+      postedDate: new Date(),
+      replyTreePath: '1/2/'
+    },
+    {
+      discussionId: '1',
+      parentPostId: 3,
+      isRootPost: false,
+      imageId: 'asdsdfsdfd1-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date(),
+      replyTreePath: '1/2/3/'
+    },
+    {
+      discussionId: '1',
+      parentPostId: 3,
+      isRootPost: false,
+      imageId: 'asdsdfsdfd1-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date(),
+      replyTreePath: '1/2/3/'
+    },
+    {
+      discussionId: 1,
+      parentPostId: 3,
+      isRootPost: false,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 1,
+      postedDate: new Date(),
+      replyTreePath: '1/2/3/'
+    },
+    {
+      discussionId: 1,
+      parentPostId: 2,
+      isRootPost: false,
+      imageId: 'asdsdfsdfd1-20190101T010101000',
+      authorId: 1,
+      postedDate: new Date(),
+      replyTreePath: '1/2/'
+    },
+    {
+      discussionId: 1,
+      parentPostId: 2,
+      isRootPost: false,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date(),
+      replyTreePath: '1/2/'
+    },
+    {
+      discussionId: 1,
+      parentPostId: 1,
+      isRootPost: false,
+      imageId: 'asdsdfsdfd1-20190101T010101000',
+      authorId: 1,
+      postedDate: new Date(),
+      replyTreePath: '1/'
+    },
+    {
+      discussionId: 1,
+      parentPostId: 1,
+      isRootPost: false,
+      imageId: 'asdsdfsdfd1-20190101T010101000',
+      authorId: 1,
+      postedDate: new Date(),
+      replyTreePath: '1/'
+    },
+    {
+      discussionId: 1,
+      parentPostId: 1,
+      isRootPost: false,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 1,
+      postedDate: new Date(),
+      replyTreePath: '1/'
+    },
+    {
+      discussionId: 1,
+      parentPostId: 1,
+      isRootPost: false,
+      imageId: 'asdsdfsdfd1-20190101T010101000',
+      authorId: 1,
+      postedDate: new Date(),
+      replyTreePath: '1/'
+    },
+    {
+      discussionId: 2,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 1,
+      postedDate: new Date()
+    },
+    {
+      discussionId: 3,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date()
+    },
+    {
+      discussionId: 4,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 1,
+      postedDate: new Date()
+    },
+    {
+      discussionId: 5,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date()
+    }
+  ];
+  for (let postData of samplePosts) {
+    await DiscussionPost.create(postData);
+  }
+
+  console.log('Creating test instances for DiscussionThreads');
+  // let sampleThreads = [];
+  // let threadCreationPromises = sampleThreads.map(threadData => DiscussionThread.create(threadData));
+  // await Promise.all(threadCreationPromises);
 }

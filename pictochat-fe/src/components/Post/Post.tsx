@@ -27,7 +27,7 @@ function Post(props: PostProps) {
       </div>
       <div className="post-content">
         <div className="post-header">
-          <div className="post-author">{props.post.author.userName}</div>
+          <div className="post-author">{props.post.author.username}</div>
           <div className="post-date">{moment(props.post.postedDate).fromNow()}</div>
         </div>
         <div className="post-body">

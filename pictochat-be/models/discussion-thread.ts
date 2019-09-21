@@ -1,6 +1,7 @@
 import { Sequelize, QueryTypes } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { DiscussionPost } from './discussion-post';
+import { User } from './user';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
@@ -50,7 +51,12 @@ export class DiscussionThread {
   static async findAll(): Promise<DiscussionThread[]> {
     // Using application side join rather than one raw SQL query to avoid
     // cascading changes to this method when columns are added to the DiscussionPost model/table.
-    let rootPosts: DiscussionPost[] = await DiscussionPost.findAll({ where: DiscussionPost.isRootPostFilter() });
+    // const userJoin = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
+    // let rootPosts: DiscussionPost[] = await DiscussionPost.findAll({
+    //   where: DiscussionPost.isRootPostFilter(),
+    //   include: [userJoin]
+    // });
+    let rootPosts: DiscussionPost[] = await DiscussionPost.findDiscussionPosts({ where: DiscussionPost.isRootPostFilter() });
     let replyCounts: { [discussionId: number]: number } = await DiscussionThread.getReplyCountsForAllThreads();
     let threads: DiscussionThread[] = [];
     for (let rootPost of rootPosts) {

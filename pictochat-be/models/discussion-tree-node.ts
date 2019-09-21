@@ -13,6 +13,9 @@ export class DiscussionTreeNode extends DiscussionPost {
   private constructor(post: DiscussionPost, commentCount?: number) {
     super(post.toJSON());
     this.replies = [];
+    if (post.author) {
+      this.author = post.author;
+    }
     if (commentCount !== undefined) {
       this.commentCount = commentCount;
     }
@@ -23,13 +26,19 @@ export class DiscussionTreeNode extends DiscussionPost {
   }
 
   toJSON(): object {
-    let baseJSON = super.toJSON();
-    let repliesJSON = this.replies.map((reply) => reply.toJSON());
-    baseJSON = { ...baseJSON, ...{ replies: repliesJSON } };
-    if (this.commentCount !== null && this.commentCount !== undefined) {
-      baseJSON['commentCount'] = this.commentCount;
+    try {
+      let baseJSON = super.toJSON();
+      let repliesJSON = this.replies.map((reply) => reply.toJSON());
+      baseJSON = { ...baseJSON, ...{ replies: repliesJSON }, author: this.author.toJSON() };
+      // FIXME:
+      baseJSON['author']['userName'] = baseJSON['author']['username'];
+      if (this.commentCount !== null && this.commentCount !== undefined) {
+        baseJSON['commentCount'] = this.commentCount;
+      }
+      return baseJSON;
+    } catch (error) {
+      console.log(this);
     }
-    return baseJSON;
   }
 
   // Factory

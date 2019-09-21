@@ -97,10 +97,10 @@ export class DiscussionService {
     return await DiscussionThread.findAll();
   }
 
-  static async getReplyTreeForThread(discussionId: number): Promise<DiscussionTreeNode> {
-    const posts: DiscussionPost[] = await DiscussionPost.getPathOrderedPostsInThread(discussionId);
-    return await DiscussionService.makeReplyTree(posts);
-  }
+  // static async getReplyTreeForThread(discussionId: number): Promise<DiscussionTreeNode> {
+  //   const posts: DiscussionPost[] = await DiscussionPost.getPathOrderedPostsInThread(discussionId);
+  //   return await DiscussionService.makeReplyTree(posts);
+  // }
 
   static async getReplyTreeUnderPost(postId: number): Promise<DiscussionTreeNode> {
     const posts: DiscussionPost[] = await DiscussionPost.getPathOrderedSubTreeUnder(postId);

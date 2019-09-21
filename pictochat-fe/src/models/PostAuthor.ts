@@ -1,15 +1,15 @@
 import { observable } from 'mobx';
 
 export interface IPostAuthor {
-  userName: string;
+  username: string;
   userAvatarURI: string;
 }
 
 export class PostAuthor implements IPostAuthor {
-  @observable userName: string;
+  @observable username: string;
   @observable userAvatarURI: string;
   constructor(data: IPostAuthor) {
-    this.userName = data.userName;
+    this.username = data.username;
     this.userAvatarURI = data.userAvatarURI;
   }
 }
