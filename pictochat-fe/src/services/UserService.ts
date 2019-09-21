@@ -1,6 +1,7 @@
-import { User } from '../models/User';
-import ApiService from './ApiService';
 import * as cookies from 'js-cookie';
+import ApiService from './ApiService';
+import { IUser } from '../models/User';
+import UnauthenticatedUser from '../models/UnauthenticatedUser';
 
 interface LoginResult {
   auth: boolean;
@@ -8,37 +9,61 @@ interface LoginResult {
   message: string;
 }
 
-const u = {
-  username: 'test',
-  email: 'test@test',
-  password: '124'
-};
-
 class UserService {
-  static async getUser(username: string): Promise<User> {
+  static async getUser(username: string): Promise<IUser> {
     return await ApiService.get(`/user?username=${username}`);
   }
 
-  static async getCurrentUser(): Promise<User> {
+  static async getCurrentUser(): Promise<IUser> {
     return await ApiService.get(`/user/authed`);
   }
 
-  static async authUser(user: User): Promise<string> {
+  static async hasValidSession(): Promise<boolean> {
+    try {
+      let user = await UserService.getCurrentUser();
+      // If we can get the current user without a 401 ApiException,
+      // we must have a valid session token
+      return !!user;
+    } catch (error) {
+      if (!!error.status && error.status === 401) {
+        return false;
+      }
+      throw error;
+    }
+  }
+
+  static async authUser(user: UnauthenticatedUser): Promise<string> {
     const data = {
       username: user.email,
       password: user.password
     };
     const res: LoginResult = await ApiService.post('/user/login', data);
     if (res.auth) {
-      cookies.set('pictochatJWT', res.token);
+      UserService.maybeSetSessionToken(res);
       return res.message;
     } else {
       throw new Error(res.message);
     }
   }
 
-  static async addUser(user: User): Promise<{ message: string; user?: User }> {
-    return await ApiService.post('/user', user);
+  static async clearSession() {
+    cookies.remove('pictochatJWT');
+  }
+
+  static async addUser(user: UnauthenticatedUser, shouldAuthenticate: boolean = false): Promise<IUser> {
+    let res = await ApiService.post('/user', user); // throws an error if creation fails
+    if (shouldAuthenticate) {
+      UserService.maybeSetSessionToken(res);
+    }
+    return res.user;
+  }
+
+  private static maybeSetSessionToken(response: any) {
+    if (response.auth && response.token) {
+      cookies.set('pictochatJWT', response.token);
+      return true;
+    }
+    return false;
   }
 }
 

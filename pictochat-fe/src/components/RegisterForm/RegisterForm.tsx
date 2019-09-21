@@ -1,8 +1,12 @@
 import * as React from 'react';
 import { Form, Button } from 'semantic-ui-react';
+import { observer } from 'mobx-react';
+import StoresContext from '../../contexts/StoresContext';
 import UserService from '../../services/UserService';
-import { User } from '../../models/User';
+import { IUser, User } from '../../models/User';
+import APIException from '../../models/ApiException';
 import './RegisterForm.less';
+import UnauthenticatedUser from '../../models/UnauthenticatedUser';
 
 interface RegisterFormState {
   username: string;
@@ -16,7 +20,10 @@ interface RegisterFormProps {
   onSubmitSuccess?: () => void;
 }
 
+@observer
 export default class RegisterForm extends React.Component<RegisterFormProps, RegisterFormState> {
+  static contextType = StoresContext;
+
   constructor(props: any) {
     super(props);
     this.state = {
@@ -78,17 +85,17 @@ export default class RegisterForm extends React.Component<RegisterFormProps, Reg
 
   async handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const user: User = {
+    const userJson: UnauthenticatedUser = {
       username: this.state.username,
       email: this.state.email,
       password: this.state.password
     };
     try {
       this.checkFormValidation();
-      const res = await UserService.addUser(user);
-      if (res.message) {
-        alert(res.message);
-        this.props.onSubmitSuccess && this.props.onSubmitSuccess();
+      const user: User = await this.context.user.createUserAndAuth(userJson); // assuming an error is thrown if creation failed - Jordan
+      alert('User created sucessfully');
+      if (this.props.onSubmitSuccess) {
+        this.props.onSubmitSuccess();
       }
     } catch (e) {
       alert(e.message);

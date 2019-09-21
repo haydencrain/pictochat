@@ -4,6 +4,18 @@ import jwt from 'jsonwebtoken';
 import config from '../utils/config';
 import { UserService } from '../services/user-service';
 import { strategies } from '../middleware/passport-middleware';
+import { User } from '../models/user';
+
+//// HELPERS ////
+
+function makeJWTPayload(user: User): { auth: boolean; token: string } {
+  const token = jwt.sign({ id: user.userId }, config.JWT_SECRET, {
+    expiresIn: '24h'
+  });
+  return { auth: true, token };
+}
+
+//// ROUTER ////
 
 export const userRouter = express.Router();
 
@@ -12,7 +24,7 @@ userRouter.get('/', async (req, res, next) => {
   try {
     if (req.params.username) {
       // get user by username
-      const user = await UserService.getUserByUsername(req.params.username);
+      const user = await UserService.getUserByUsername(req.query.username);
       return res.json(user.toJSON());
     } else {
       // get all users
@@ -35,14 +47,21 @@ userRouter.get('/authed', passport.authenticate(strategies.JWT, { session: false
 
 // POST create user
 userRouter.post('/', async (req: any, res, next) => {
-  passport.authenticate(strategies.REGISTER, (err, user, info) => {
+  passport.authenticate(strategies.REGISTER, (err, user: boolean | User, info) => {
     if (err) return next(err);
-    if (!user && !!info) res.send(401).json(info);
+    if (!user && !!info) {
+      console.log('INFO: ', info);
+      return res.status(400).json(info);
+    }
     if (!!info) return res.json(info);
     try {
       req.logIn(user, async err => {
-        await UserService.updateUser(user.userId, { email: req.body.email });
-        res.status(200).json({ message: 'User created successfully' });
+        let typedUser = user as User;
+        await UserService.updateUser(typedUser.userId, { email: req.body.email });
+        let body = makeJWTPayload(typedUser);
+        body['message'] = 'User created successfully';
+        body['user'] = typedUser.getPublicJSON();
+        res.status(200).json(body);
       });
     } catch (error) {
       next(error);
@@ -57,14 +76,9 @@ userRouter.post('/login', (req, res, next) => {
     if (!!info) return res.json(info);
     try {
       req.logIn(user, async err => {
-        const token = jwt.sign({ id: user.userId }, config.JWT_SECRET, {
-          expiresIn: '24h'
-        });
-        res.status(200).json({
-          auth: true,
-          message: 'User logged in successfully',
-          token
-        });
+        let body = makeJWTPayload(user as User);
+        body['message'] = 'User logged in successfully';
+        res.status(200).json(body);
       });
     } catch (error) {
       next(error);

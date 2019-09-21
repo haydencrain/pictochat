@@ -1,5 +1,8 @@
 import * as React from 'react';
 import { Segment, Rating, Image } from 'semantic-ui-react';
+import { observer } from 'mobx-react';
+import StoresContext from '../../contexts/StoresContext';
+import UserStore from '../../stores/UserStore';
 import { User } from '../../models/User';
 import * as cookies from 'js-cookie';
 import './ProfileCard.less';
@@ -8,7 +11,12 @@ interface Props {
   user: User;
 }
 
-export default (props: Props) => {
+function handleLogout(userStore: UserStore) {
+  userStore.logout();
+}
+
+function ProfileCard(props: Props) {
+  const stores = React.useContext(StoresContext);
   return (
     <Segment.Group className="profile-card" raised>
       <Segment className="profile-card-header" horizontal="true">
@@ -36,25 +44,19 @@ export default (props: Props) => {
       </Segment>
       <Segment className="profile-card-footer">
         <ul>
-          <li>
+          {/*<li>
             <a>View Profile</a>
           </li>
           <li>
             <a>Settings</a>
-          </li>
+          </li>*/}
           <li>
-            <a
-              onClick={() => {
-                // FIXME: don't hard refresh the window. rather we should be refecthing the user from the UserStore
-                cookies.remove('pictochatJWT');
-                window.location.reload();
-              }}
-            >
-              Logout
-            </a>
+            <a onClick={() => handleLogout(stores.user)}>Logout</a>
           </li>
         </ul>
       </Segment>
     </Segment.Group>
   );
-};
+}
+
+export default observer(ProfileCard);

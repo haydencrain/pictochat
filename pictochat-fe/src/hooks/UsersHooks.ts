@@ -1,4 +1,4 @@
-import { User } from '../models/User';
+import User from '../models/User';
 import userService from '../services/UserService';
 import { useState, useEffect } from 'react';
 
@@ -9,7 +9,7 @@ export function useFetchCurrentUser(): [User, boolean] {
     const fetchData = async () => {
       let user = undefined;
       try {
-        user = await userService.getCurrentUser();
+        user = new User(await userService.getCurrentUser());
       } catch (e) {}
       setUser(user);
       setLoading(false);
