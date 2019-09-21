@@ -4,14 +4,7 @@ import { SequelizeConnectionService } from '../services/sequelize-connection-ser
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
 export class User extends Model {
-  static readonly PUBLIC_ATTRIBUTES = [
-    'userId',
-    'email',
-    'username',
-    'password',
-    'resetPasswordToken',
-    'resetPasswordExpiry'
-  ];
+  static readonly PUBLIC_ATTRIBUTES = ['userId', 'email', 'username'];
 
   userId!: number;
   username!: string;
@@ -34,22 +27,29 @@ export class User extends Model {
     });
   }
 
-  static async getUser(userId: number): Promise<User> {
-    return await User.findOne({
-      attributes: {
-        include: User.PUBLIC_ATTRIBUTES
-      },
-      where: { userId }
-    });
+  /**
+   * @param userId
+   * @param onlyIncludePublicAttrs When true, only fields in User.PUBLIC_ATTRIBUTES will be
+   *    included in the returned object.
+   * @returns a User instance with the specified userId
+   */
+  static async getUser(userId: number, onlyIncludePublicAttrs: boolean = true): Promise<User> {
+    let queryParams = { where: { userId } };
+    if (onlyIncludePublicAttrs) {
+      queryParams['attributes'] = { include: User.PUBLIC_ATTRIBUTES };
+    }
+    return await User.findOne(queryParams);
   }
 
-  static async getUsers(): Promise<User[]> {
-    return User.findAll({
-      attributes: {
-        include: User.PUBLIC_ATTRIBUTES
-      },
-      order: [['userId', 'ASC']]
-    });
+  /**
+   * @param onlyIncludePublicAttrs When true, only fields in User.PUBLIC_ATTRIBUTES will be
+   *    included in the returned object. */
+  static async getUsers(onlyIncludePublicAttrs: boolean = true): Promise<User[]> {
+    let queryParams = { order: ['userId'] };
+    if (onlyIncludePublicAttrs) {
+      queryParams['attributes'] = { include: User.PUBLIC_ATTRIBUTES };
+    }
+    return User.findAll(queryParams);
   }
 }
 
