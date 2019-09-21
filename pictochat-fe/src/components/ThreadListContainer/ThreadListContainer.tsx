@@ -21,23 +21,25 @@ interface ThreadListContainerProps {
 }
 
 function ThreadListContainer(props: ThreadListContainerProps) {
-  const stores = React.useContext(StoresContext)
+  const stores = React.useContext(StoresContext);
 
-  let postListProps = { store: stores.discussion, noPostsMessage: props.noPostsMessage, showReplies: props.showReplies };
+  let postListProps = {
+    store: stores.discussion,
+    noPostsMessage: props.noPostsMessage,
+    showReplies: props.showReplies
+  };
   // If no Id is present, then it's the main threads, otherwise it's the replies
-  let postList = (!props.id)
-    ? <ThreadsSummaryList {...postListProps} />
-    : <RepliesList {...{ ...postListProps, ...{ postId: props.id } }} />;
+  let postList = !props.id ? (
+    <ThreadsSummaryList {...postListProps} />
+  ) : (
+    <RepliesList {...{ ...postListProps, ...{ postId: props.id } }} />
+  );
 
   return (
     <section className="thread-list-container">
       <div className="thread-list-header">
         <h1>{props.sectionHeader}</h1>
-        <CreatePostModal
-          triggerType="button"
-          triggerContent={props.addPostButtonMessage}
-          parentPostId={props.id}
-        />
+        <CreatePostModal triggerType="button" triggerContent={props.addPostButtonMessage} parentPostId={props.id} />
       </div>
       {postList}
     </section>
@@ -49,21 +51,19 @@ export default observer(ThreadListContainer);
 //// HELPER COMPONENTS ////
 
 const RepliesList = observer(function RepliesList(props: {
-  postId: string,
-  store: DiscussionStore,
-  showReplies: boolean,
-  noPostsMessage: string
+  postId: string;
+  store: DiscussionStore;
+  showReplies: boolean;
+  noPostsMessage: string;
 }) {
   const { postId, store, showReplies, noPostsMessage } = props;
 
   const posts = computed((): DiscussionPost[] => {
-    return store.activeDiscussionPosts.has(parseInt(postId))
-      ? store.activeDiscussionPosts.get(parseInt(postId)).replies
-      : [];
+    return store.activeDiscussionPosts.has(postId) ? store.activeDiscussionPosts.get(postId).replies : [];
   });
 
   const isLoading = computed((): boolean => {
-    return store.isLoadingActiveDiscussion || !store.activeDiscussionPosts.has(parseInt(postId))
+    return store.isLoadingActiveDiscussion || !store.activeDiscussionPosts.has(postId);
   });
 
   if (isLoading.get()) {
@@ -83,7 +83,9 @@ const RepliesList = observer(function RepliesList(props: {
 });
 
 const ThreadsSummaryList = observer(function ThreadsSummaryList(props: {
-  store: DiscussionStore, showReplies: boolean, noPostsMessage: string
+  store: DiscussionStore;
+  showReplies: boolean;
+  noPostsMessage: string;
 }) {
   return (
     <PostsList

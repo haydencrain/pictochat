@@ -17,9 +17,6 @@ interface PostProps {
 function Post(props: PostProps) {
   const stores = React.useContext(StoresContext);
   // NOTE: Destructuring breaks binding to mobx observables
-  // const { postType, post } = props;
-  // const { author, postedDate, imageSrc } = post;
-  // const { userAvatarURI, userName } = author;
   return (
     <section className={classNames('thread-post', getPostTypeName(props.postType))}>
       <div className="post-sidebar">
@@ -27,7 +24,7 @@ function Post(props: PostProps) {
       </div>
       <div className="post-content">
         <div className="post-header">
-          <div className="post-author">{props.post.author.userName}</div>
+          <div className="post-author">{props.post.author.username}</div>
           <div className="post-date">{moment(props.post.postedDate).fromNow()}</div>
         </div>
         <div className="post-body">

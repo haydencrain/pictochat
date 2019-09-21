@@ -16,7 +16,8 @@ const IMAGES = {
   '6': getRandDogUrl(),
   '7': getRandDogUrl(),
   '8': getRandDogUrl(),
-  '9': getRandDogUrl()
+  '9': getRandDogUrl(),
+  DEFAULT_AVATAR: 'https://semantic-ui.com/images/avatar2/large/elyse.png'
 };
 
 // HELPER INTERFACES
@@ -47,18 +48,12 @@ export class ImageService {
     let uploadedDate: Date = new Date();
     let image: Image = Image.buildImage({ ...newImage, ...{ uploadedDate: uploadedDate } });
     return image.save({ transaction });
-    // let imageId: string = ImageService.getImageId(newImage.data, uploadedDate);
-    // let creationOptions = (transaction !== undefined)? {transaction} : {}
-    // return Image.create({ ...{ imageId, uploadedDate }, ...newImage }, creationOptions);
   }
 
   /**
    * @param string Unique id of the form <md5hash>-<uploadedDatetime>
-   *     where uploaded datetime is in ISO format.
-   */
+   *     where uploaded datetime is in ISO format. */
   static async getImage(imageId: string): Promise<Image> {
-    return Image.findOne({ where: { imageId: imageId } });
+    return await Image.getImage(imageId);
   }
-
-
 }

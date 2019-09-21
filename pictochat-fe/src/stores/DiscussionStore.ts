@@ -1,4 +1,5 @@
 import { observable, computed, action, runInAction, IObservableValue, observe, spy, ObservableMap } from 'mobx';
+import ObservableIntMap from '../utils/ObserableIntMap';
 import { DiscussionPost, IDiscussionPost } from '../models/DiscussionPost';
 import DiscussionService from '../services/DiscussionService';
 import NewPostPayload from '../models/NewPostPayload';
@@ -7,15 +8,20 @@ import NewPostPayload from '../models/NewPostPayload';
  * Coordinates updates to discussion data
  */
 export default class DiscussionStore {
-  @observable threadSummariesMap: ObservableMap<any, DiscussionPost> = observable.map(undefined, { name: "threadSummariesMap" });
+  @observable threadSummariesMap: ObservableIntMap<DiscussionPost> = new ObservableIntMap(observable.map(undefined, { name: "threadSummariesMap" }));
   @observable activeDiscussionRoot: DiscussionPost = new DiscussionPost();
-  @observable activeDiscussionPosts: ObservableMap<any, DiscussionPost> = observable.map(undefined, { name: "activeDiscussionPosts" });
+  @observable activeDiscussionPosts: ObservableIntMap<DiscussionPost> = new ObservableIntMap(observable.map(undefined, { name: "activeDiscussionPosts" }));
   @observable isLoadingThreads = true;
   @observable isLoadingActiveDiscussion = true;
 
   constructor() {
     this.loadThreadSummaries()
       .catch((error) => { console.error('Error occured when fetching thread summaries:', error) });
+    spy((change) => {
+      if (change.type !== undefined) {
+        console.log('CHANGE: ', change)
+      }
+    });
   }
 
   @computed
@@ -71,7 +77,9 @@ export default class DiscussionStore {
 
       // Update thread summary
       if (this.threadSummariesMap.has(reply.discussionId)) {
-        this.threadSummariesMap.get(reply.discussionId).commentCount += 1;
+        // Use of parseInt here fixes weird bug where mobx converts commentCount to string
+        let commentCount = parseInt(this.threadSummariesMap.get(reply.discussionId).commentCount as any) + 1;
+        this.threadSummariesMap.get(reply.discussionId).commentCount = commentCount;
       } else {
         // This isn't an error if users have been linked directly to a discussion page without accessing the main threads lists
         console.log(`Post reply (postId=${reply.postId}) created for a discusion (discussionId=${reply.discussionId}) thread that doesn't exist in DiscussionService`);

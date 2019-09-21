@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import { Container, Form, Button } from 'semantic-ui-react';
 import StoresContext from '../../contexts/StoresContext';
 import UnauthenticatedUser from '../../models/UnauthenticatedUser';
@@ -70,7 +71,7 @@ class Login extends React.Component<{}, LoginState> {
 
             <Form.Field className="membership-field">
               <p className="membership">Not a member?</p>
-              <a>Create an Account</a>
+              <Link to="/register">Create an Account</Link>
             </Form.Field>
           </Form.Group>
         </Form>

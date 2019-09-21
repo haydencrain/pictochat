@@ -17,7 +17,6 @@ const PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;
 // Default path is relative to the compiled app.js file's location in the build directory
 const WEB_CONTENT_DIR = process.env.PICTOCHAT_FRONTEND_DIR || path.join(__dirname, '../pictochat-fe');
 const FRONTEND_REQUEST_ORIGIN = process.env.PICTOCHAT_FRONTEND_REQUEST_ORIGIN || 'http://localhost:3000';
-console.log('WEB_CONTENT_DIR: ' + WEB_CONTENT_DIR);
 const API_PATH = '/api';
 
 // Database Connection
