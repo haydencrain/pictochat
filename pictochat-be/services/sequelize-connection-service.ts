@@ -1,3 +1,4 @@
+import { createNamespace } from 'continuation-local-storage';
 import { Sequelize, Dialect } from 'sequelize';
 
 // Config
@@ -24,6 +25,11 @@ export class SequelizeConnectionService {
   ): Sequelize {
     if (SequelizeConnectionService.instance === null) {
       console.log('Creating Sequelize instance');
+      // Setting the CLS allows transactions to auto passed through to all queries within
+      // a sequelize.transaction(...) callback
+      const namespace = createNamespace('pictochat');
+      Sequelize.useCLS(namespace);
+
       SequelizeConnectionService.instance = new Sequelize(databaseName, user, password, {
         dialect: dialect,
         host: host,

@@ -56,7 +56,7 @@ export class DiscussionService {
         { transaction }
       );
       await transaction.commit();
-      return new DiscussionThread({ discussionId, rootPost, replyCount: 0 });;
+      return new DiscussionThread({ discussionId, rootPost, replyCount: 0 });
     } catch (error) {
       if (transaction !== undefined) {
         transaction.rollback();
@@ -105,30 +105,48 @@ export class DiscussionService {
 
   static async updatePost(postUpdate: PostUpdate): Promise<DiscussionPost> {
     let sequelize = SequelizeConnectionService.getInstance();
-    let transaction: Transaction;
-    try {
-      transaction = await sequelize.transaction();
+    return await sequelize.transaction(async transaction => {
       let post: DiscussionPost = await DiscussionPost.getDiscussionPost(postUpdate.postId);
-      if (!post) throw new NotFoundError();
+      if (post === null) throw new NotFoundError(`Post with postId: ${postUpdate.postId} does not exist`);
+
       // Can't update another user's post
       if (post.authorId !== postUpdate.userId) throw new ForbiddenError();
-      if ( !(await post.isUpdatable()) ) {
-        throw new UnprocessableError('A post cannot be editted if its has been replied too or has active reactions');
+      if (!(await post.isUpdatable())) {
+        throw new UnprocessableError('A post cannot be editted if it has been replied too or has active reactions');
       }
 
-      let image: Image = await ImageService.saveImage(postUpdate.image, transaction);
+      let image: Image = await ImageService.saveImage(postUpdate.image);
 
       post.imageId = image.imageId;
-      post.save({ transaction });
+      post.save();
 
-      await transaction.commit();
       return post;
-    } catch (error) {
-      if (transaction !== undefined) {
-        transaction.rollback();
-      }
-      throw error;
-    }
+    });
+    // let transaction: Transaction;
+    // try {
+    //   transaction = await sequelize.transaction();
+    //   let post: DiscussionPost = await DiscussionPost.getDiscussionPost(postUpdate.postId, { transaction });
+    //   if (post === null) throw new NotFoundError(`Post with postId: ${postUpdate.postId} does not exist`);
+
+    //   // Can't update another user's post
+    //   if (post.authorId !== postUpdate.userId) throw new ForbiddenError();
+    //   if (!(await post.isUpdatable({ transaction }))) {
+    //     throw new UnprocessableError('A post cannot be editted if it has been replied too or has active reactions');
+    //   }
+
+    //   let image: Image = await ImageService.saveImage(postUpdate.image, transaction);
+
+    //   post.imageId = image.imageId;
+    //   post.save({ transaction });
+
+    //   await transaction.commit();
+    //   return post;
+    // } catch (error) {
+    //   if (transaction !== undefined) {
+    //     transaction.rollback();
+    //   }
+    //   throw error;
+    // }
   }
 
   /** Creates a list of summaries for each thread containing the rootPost

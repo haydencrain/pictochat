@@ -1,4 +1,4 @@
-import { Sequelize, Model, DataTypes, Op, FindOptions } from 'sequelize';
+import { Sequelize, Model, DataTypes, Op, FindOptions, CountOptions } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { ImageService } from '../services/image-service';
 import { User } from './user';
@@ -32,11 +32,10 @@ export class DiscussionPost extends Model {
   // Attributes for associations
   author?: User;
 
-
   //// INSTANCE METHODS ////
 
-  async isUpdatable(): Promise<boolean> {
-    let replyCount: number = await this.getDirectReplyCount();
+  async isUpdatable(options?: CountOptions): Promise<boolean> {
+    let replyCount: number = await this.getDirectReplyCount(options);
     // TODO: Check if the post has any reactions
     return replyCount === 0;
   }
@@ -53,15 +52,16 @@ export class DiscussionPost extends Model {
     });
   }
 
-  async getDirectReplyCount(): Promise<number> {
-    return await DiscussionPost.count({ where: { parentPostId: this.getDataValue('postId') }});
+  async getDirectReplyCount(options: CountOptions = {}): Promise<number> {
+    const filter = { where: { parentPostId: this.getDataValue('postId') } };
+    options = { ...options, ...filter };
+    return await DiscussionPost.count(options);
   }
 
   private getReplyPathPrefix(): string {
     const replyTreePath = this.getDataValue('replyTreePath');
     return `${replyTreePath || ''}${this.getDataValue('postId')}`;
   }
-
 
   //// STATIC/COLLECTION METHODS ////
 
@@ -134,7 +134,6 @@ export class DiscussionPost extends Model {
   }
 }
 
-
 //// SCHEMA DEFINITION ////
 
 DiscussionPost.init(
@@ -159,18 +158,17 @@ DiscussionPost.init(
     modelName: 'discussionPost',
     tableName: 'discussion_posts',
     freezeTableName: true,
-    indexes: [
-      { fields: ['discussionId'], using: 'BTREE' }
-    ]
+    indexes: [{ fields: ['discussionId'], using: 'BTREE' }]
   }
 );
 
-
 //// ASSOCIATIONS ////
 
-DiscussionPost.belongsTo(DiscussionPost,
-  { as: 'parentPost', foreignKey: 'parentPostId', targetKey: 'postId', constraints: false });
+DiscussionPost.belongsTo(DiscussionPost, {
+  as: 'parentPost',
+  foreignKey: 'parentPostId',
+  targetKey: 'postId',
+  constraints: false
+});
 
-DiscussionPost.belongsTo(User,
-  { targetKey: 'userId', foreignKey: 'authorId', constraints: true, as: 'author' });
-
+DiscussionPost.belongsTo(User, { targetKey: 'userId', foreignKey: 'authorId', constraints: true, as: 'author' });
