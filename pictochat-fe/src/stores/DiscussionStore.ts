@@ -62,6 +62,20 @@ export default class DiscussionStore {
   }
 
   @action.bound
+  async updatePostImage(postId: number, image: File) {
+    this.isLoadingActiveDiscussion = true;
+    try {
+      const postJson = await DiscussionService.updatePost({ postId, image });
+      const post = new DiscussionPost(postJson);
+      runInAction(() => {
+        this.activeDiscussionPosts.set(post.postId, post);
+      });
+    } finally {
+      runInAction(() => (this.isLoadingActiveDiscussion = false));
+    }
+  }
+
+  @action.bound
   async createPost(post: NewPostPayload): Promise<DiscussionPost> {
     const postCreationStrategy = (post.parentPostId) ? this.createReply : this.createThread;
     let newPost = await postCreationStrategy(post);
@@ -103,7 +117,7 @@ export default class DiscussionStore {
   }
 
   @action.bound
-  async updatePost(data: {postId: number, image: File}): Promise<DiscussionPost> {
+  async updatePost(data: { postId: number, image: File }): Promise<DiscussionPost> {
     let postJson: IDiscussionPost = await DiscussionService.updatePost(data);
     let post: DiscussionPost = await this.parseJsonTree(postJson, true);
     return post;
