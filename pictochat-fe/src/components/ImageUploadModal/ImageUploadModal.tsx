@@ -5,7 +5,6 @@ import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
 import ImageDropzone from '../ImageDropzone';
 import { useImage } from '../../hooks/ImageHooks';
 import { useToggleModal } from '../../hooks/ModalHooks';
-import { User } from '../../models/User';
 import './ImageUploadModal.less';
 
 export type TriggerTypes = 'button' | 'link';
@@ -74,9 +73,9 @@ function ImageUploadModal(props: ImageUploadModalProps) {
         );
       case 'link':
         return (
-          <div className="link" onClick={handleOpen} role="button">
+          <button className="link" onClick={handleOpen}>
             {content}
-          </div>
+          </button>
         );
     }
   };
@@ -106,5 +105,4 @@ function ImageUploadModal(props: ImageUploadModalProps) {
   );
 }
 
-export default ImageUploadModal;
-// export default observer(ImageUploadModal);
+export default observer(ImageUploadModal);

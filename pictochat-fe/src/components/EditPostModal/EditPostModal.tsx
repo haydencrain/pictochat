@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
 import ImageUploadModal from '../ImageUploadModal';
 import { TriggerTypes } from '../ImageUploadModal/ImageUploadModal';
-import { DiscussionPost } from '../../models/DiscussionPost';
 import ValidationException from '../../models/ValidationException';
 
 interface EditPostModalProps {
@@ -42,5 +41,4 @@ function EditPostModal(props: EditPostModalProps) {
   );
 }
 
-export default EditPostModal;
-// export default observer(EditPostModal);
+export default observer(EditPostModal);

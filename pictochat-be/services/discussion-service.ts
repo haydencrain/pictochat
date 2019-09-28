@@ -10,6 +10,8 @@ import { NotFoundError } from '../exceptions/not-found-error';
 import { ForbiddenError } from '../exceptions/forbidden-error';
 import { UnprocessableError } from '../exceptions/unprocessable-error';
 
+let sequelize = SequelizeConnectionService.getInstance();
+
 // HELPER INTERFACES
 
 export interface NewThread {
@@ -29,20 +31,31 @@ export interface PostUpdate {
   image: NewImage;
 }
 
+export enum ArchiveType {
+  DELETED,
+  HIDDEN
+}
+
 // SERVICE
 
 export class DiscussionService {
+  static async getPost(postId: number): Promise<DiscussionPost> {
+    const post = await DiscussionPost.getDiscussionPost(postId);
+    if (post === null) {
+      throw new NotFoundError(`Post with postId: ${postId} does not exist`);
+    }
+    return post;
+  }
+
   /**
    * Creates and persists a new thread
    * @param NewThread Object of structure {image, userId}, where userId is the id for the root post's author
    * @returns DiscussionThread instance created with the specified newThread data */
   static async createThread(newThread: NewThread): Promise<DiscussionThread> {
-    let sequelize = SequelizeConnectionService.getInstance();
     // FIXME: Move transaction management into model/data-access layer
     let transaction: Transaction;
     try {
       transaction = await sequelize.transaction();
-
       let image: Image = await ImageService.saveImage(newThread.image, transaction);
       let discussionId: string = uuid();
       let rootPost: DiscussionPost = await DiscussionPost.create(
@@ -70,7 +83,6 @@ export class DiscussionService {
    * @param NewThread Object of structure {image, userId, parentPostId}, where userId is the id for the root post's author
    * @returns DiscussionPost instance created with the specified newPost data */
   static async createReply(newPost: NewReply) {
-    let sequelize = SequelizeConnectionService.getInstance();
     let transaction: Transaction;
     try {
       transaction = await sequelize.transaction();
@@ -104,10 +116,9 @@ export class DiscussionService {
   }
 
   static async updatePost(postUpdate: PostUpdate): Promise<DiscussionPost> {
-    let sequelize = SequelizeConnectionService.getInstance();
     return await sequelize.transaction(async transaction => {
-      let post: DiscussionPost = await DiscussionPost.getDiscussionPost(postUpdate.postId);
-      if (post === null) throw new NotFoundError(`Post with postId: ${postUpdate.postId} does not exist`);
+      let post: DiscussionPost = await DiscussionService.getPost(postUpdate.postId);
+      // let post: DiscussionPost = await DiscussionPost.getDiscussionPost(postUpdate.postId);
 
       // Can't update another user's post
       if (post.authorId !== postUpdate.userId) throw new ForbiddenError();
@@ -122,31 +133,32 @@ export class DiscussionService {
 
       return post;
     });
-    // let transaction: Transaction;
-    // try {
-    //   transaction = await sequelize.transaction();
-    //   let post: DiscussionPost = await DiscussionPost.getDiscussionPost(postUpdate.postId, { transaction });
-    //   if (post === null) throw new NotFoundError(`Post with postId: ${postUpdate.postId} does not exist`);
+  }
 
-    //   // Can't update another user's post
-    //   if (post.authorId !== postUpdate.userId) throw new ForbiddenError();
-    //   if (!(await post.isUpdatable({ transaction }))) {
-    //     throw new UnprocessableError('A post cannot be editted if it has been replied too or has active reactions');
-    //   }
+  /**
+   * Marks a post as deleted or hidden
+   */
+  static async archivePost(postId: number, requestingUserId: number): Promise<ArchiveType> {
+    return await sequelize.transaction(async transaction => {
+      const post = await DiscussionService.getPost(postId);
 
-    //   let image: Image = await ImageService.saveImage(postUpdate.image, transaction);
+      // Posts can only be deleted by their author
+      if (post.authorId !== requestingUserId) throw new ForbiddenError();
 
-    //   post.imageId = image.imageId;
-    //   post.save({ transaction });
+      let archiveType: ArchiveType;
+      if (await post.isDeleteable()) {
+        post.setDeleted();
+        archiveType = ArchiveType.DELETED;
+      } else {
+        post.hide();
+        archiveType = ArchiveType.HIDDEN;
+        console.log('hidding');
+      }
 
-    //   await transaction.commit();
-    //   return post;
-    // } catch (error) {
-    //   if (transaction !== undefined) {
-    //     transaction.rollback();
-    //   }
-    //   throw error;
-    // }
+      await post.save();
+
+      return archiveType;
+    });
   }
 
   /** Creates a list of summaries for each thread containing the rootPost

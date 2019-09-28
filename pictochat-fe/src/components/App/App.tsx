@@ -9,7 +9,6 @@ import DiscussionPage from '../../pages/DiscussionPage';
 import RegisterPage from '../../pages/RegisterPage';
 import LoginPage from '../../pages/LoginPage';
 import NotFoundPage from '../../pages/NotFoundPage';
-import { useFetchCurrentUser } from '../../hooks/UsersHooks';
 import ProfileCard from '../ProfileCard';
 import { Loader } from 'semantic-ui-react';
 import Login from '../Login';
@@ -53,13 +52,6 @@ const AppBody = observer(function AppBody() {
 
 const UserSection = observer(function UserSection() {
   const stores = React.useContext(StoresContext);
-  console.log('UserSection$currentUser: ', stores.user.currentUser);
-  // const [user, isLoading] = useFetchCurrentUser();
-  // const getCard = () => {
-  //   if (stores.user.isLoading) return <Loader active />;
-  //   if (!stores.user.isLoggedIn) return <Login />;
-  //   return <ProfileCard user={stores.user.currentUser} />;
-  // };
 
   let card;
   if (stores.user.isLoading) {
@@ -73,7 +65,7 @@ const UserSection = observer(function UserSection() {
   return (
     <div>
       <h1>My Profile</h1>
-      {/*getCard()*/ card}
+      {card}
     </div>
   );
 });

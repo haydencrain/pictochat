@@ -22,11 +22,6 @@ export default class DiscussionStore {
     this.loadThreadSummaries().catch(error => {
       console.error('Error occured when fetching thread summaries:', error);
     });
-    // spy(change => {
-    //   if (change.type !== undefined) {
-    //     console.log('CHANGE: ', change);
-    //   }
-    // });
   }
 
   @computed
@@ -70,6 +65,35 @@ export default class DiscussionStore {
   }
 
   @action.bound
+  async deletePost(postId: number) {
+    this.isLoadingActiveDiscussion = true;
+    try {
+      let postJson: IDiscussionPost = await DiscussionService.deletePost(postId);
+      // FIXME: Find more explicit way of detecting if post should be deleted
+      if (!!postJson) {
+        // Post was hidden
+        let post = new DiscussionPost(postJson);
+        this.putPostInActiveMap(post);
+      } else {
+        // Post was deleted
+        const post = this.activeDiscussionPosts.get(postId);
+        if (this.activeDiscussionPosts.has(post.parentPostId)) {
+          const parent = this.activeDiscussionPosts.get(post.parentPostId);
+          parent.removeReply(post);
+        }
+
+        this.activeDiscussionPosts.delete(post.postId);
+
+        if (parseInt(this.activeDiscussionRoot.postId) === postId) {
+          this.activeDiscussionRoot.clear();
+        }
+      }
+    } finally {
+      runInAction(() => (this.isLoadingActiveDiscussion = false));
+    }
+  }
+
+  @action.bound
   async updatePostImage(postId: number, image: File) {
     this.isLoadingActiveDiscussion = true;
     try {
@@ -77,7 +101,6 @@ export default class DiscussionStore {
       const post = new DiscussionPost(postJson);
       runInAction(() => {
         this.putPostInActiveMap(post);
-        // this.activeDiscussionPosts.set(post.postId, post);
       });
     } finally {
       runInAction(() => (this.isLoadingActiveDiscussion = false));
@@ -97,7 +120,6 @@ export default class DiscussionStore {
     let reply = new DiscussionPost(await DiscussionService.createPost(post));
     runInAction(() => {
       this.putPostInActiveMap(reply);
-      // this.activeDiscussionPosts.set(reply.postId, reply);
 
       // Update thread summary
       if (this.threadSummariesMap.has(reply.discussionId)) {
@@ -128,13 +150,6 @@ export default class DiscussionStore {
     return threadRoot;
   }
 
-  // @action.bound
-  // async updatePost(data: { postId: number; image: File }): Promise<DiscussionPost> {
-  //   let postJson: IDiscussionPost = await DiscussionService.updatePost(data);
-  //   let post: DiscussionPost = await this.parseJsonTree(postJson, true);
-  //   return post;
-  // }
-
   @action.bound
   private parseJsonTree(postJson: IDiscussionPost, shouldBuildPostMap: boolean = false): DiscussionPost {
     let repliesJson: IDiscussionPost[] = postJson.replies || [];
@@ -142,12 +157,6 @@ export default class DiscussionStore {
     let post = new DiscussionPost({ ...postJson, ...{ replies } });
     if (shouldBuildPostMap) {
       this.putPostInActiveMap(post);
-      // if (this.activeDiscussionPosts.has(post.postId)) {
-      //   // Using replace to avoid breaking any existing observer dependencies
-      //   this.activeDiscussionPosts.get(post.postId).replace(post);
-      // } else {
-      //   this.activeDiscussionPosts.set(post.postId, post);
-      // }
     }
     return post;
   }

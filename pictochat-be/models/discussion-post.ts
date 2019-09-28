@@ -15,7 +15,9 @@ export class DiscussionPost extends Model {
     'authorId',
     'postedDate',
     'parentPostId',
-    'replyTreePath'
+    'replyTreePath',
+    'isHidden',
+    'isDeleted'
   ];
   private static readonly USER_JOIN = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
 
@@ -28,16 +30,31 @@ export class DiscussionPost extends Model {
   imageId!: string;
   authorId!: number;
   replyTreePath!: string;
+  isHidden!: boolean;
+  isDeleted!: boolean;
 
   // Attributes for associations
   author?: User;
 
   //// INSTANCE METHODS ////
 
-  async isUpdatable(options?: CountOptions): Promise<boolean> {
-    let replyCount: number = await this.getDirectReplyCount(options);
+  async isUpdatable(): Promise<boolean> {
+    let replyCount: number = await this.getDirectReplyCount();
     // TODO: Check if the post has any reactions
     return replyCount === 0;
+  }
+
+  async isDeleteable(): Promise<boolean> {
+    let replyCount: number = await this.getDirectReplyCount();
+    return replyCount === 0;
+  }
+
+  hide() {
+    this.isHidden = true;
+  }
+
+  setDeleted() {
+    this.isDeleted = true;
   }
 
   /**
@@ -52,12 +69,13 @@ export class DiscussionPost extends Model {
     });
   }
 
-  async getDirectReplyCount(options: CountOptions = {}): Promise<number> {
+  async getDirectReplyCount(): Promise<number> {
     const filter = { where: { parentPostId: this.getDataValue('postId') } };
-    options = { ...options, ...filter };
-    return await DiscussionPost.count(options);
+    return await DiscussionPost.count(filter);
   }
 
+  /**
+   * @returns A prefix for the replyTreePath values of all descendants of the current node. */
   private getReplyPathPrefix(): string {
     const replyTreePath = this.getDataValue('replyTreePath');
     return `${replyTreePath || ''}${this.getDataValue('postId')}`;
@@ -69,10 +87,12 @@ export class DiscussionPost extends Model {
    * Wrapper for Sequelize Model.findAll that ensures author data is included in the result
    * and only returns PUBLIC_ATTRIBUTES by default. */
   static async getDiscussionPosts(options: FindOptions = {}): Promise<DiscussionPost[]> {
+    const filters = { isDeleted: false };
     const optionDefaults = {
       include: [DiscussionPost.USER_JOIN],
       attributes: DiscussionPost.PUBLIC_ATTRIBUTES
     };
+    options['where'] = { ...(options['where'] || {}), ...filters };
     options = { ...optionDefaults, ...options };
     return await DiscussionPost.findAll(options);
   }
@@ -125,10 +145,12 @@ export class DiscussionPost extends Model {
    * Wrapper for Model.findOne that ensures author data is included in result
    * and only returns PUBLIC_ATTRIBUTES by default. */
   private static async _findOne(options: FindOptions = {}) {
+    const filterDefaults = { isDeleted: false };
     const optionDefaults = {
       include: [DiscussionPost.USER_JOIN],
       attributes: DiscussionPost.PUBLIC_ATTRIBUTES
     };
+    options['where'] = { ...(options['where'] || {}), ...filterDefaults };
     options = { ...optionDefaults, ...options };
     return await DiscussionPost.findOne(options);
   }
@@ -146,6 +168,8 @@ DiscussionPost.init(
     postedDate: { type: DataTypes.DATE, allowNull: false },
     parentPostId: { type: DataTypes.INTEGER },
     replyTreePath: { type: DataTypes.STRING },
+    isHidden: { type: DataTypes.BOOLEAN, defaultValue: false },
+    isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
     imageSrc: {
       type: DataTypes.VIRTUAL,
       get() {

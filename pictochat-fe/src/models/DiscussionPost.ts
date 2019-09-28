@@ -9,6 +9,7 @@ export interface IDiscussionPost {
   author: PostAuthor;
   imageSrc: string;
   postedDate: string;
+  isHidden: boolean;
   commentCount?: number;
   replies?: IDiscussionPost[];
 }
@@ -25,6 +26,7 @@ export class DiscussionPost implements IDiscussionPost {
   @observable postedDate: string;
   // @observable createdAt: string;
   // @observable updatedAt: string;
+  @observable isHidden: boolean;
   @observable commentCount?: number = 0;
   @observable replies?: IObservableArray<DiscussionPost> = observable.array();
 
@@ -37,6 +39,7 @@ export class DiscussionPost implements IDiscussionPost {
       this.author = data.author;
       this.imageSrc = data.imageSrc;
       this.postedDate = data.postedDate;
+      this.isHidden = data.isHidden;
       if (data.commentCount) {
         this.commentCount = data.commentCount;
       }
@@ -44,6 +47,12 @@ export class DiscussionPost implements IDiscussionPost {
         this.replies.replace(data.replies as DiscussionPost[]);
       }
     }
+  }
+
+  @action.bound
+  removeReply(reply: DiscussionPost) {
+    let idx = this.replies.findIndex(p => p.postId === reply.postId);
+    this.replies.splice(idx, 1);
   }
 
   @action.bound
@@ -55,8 +64,14 @@ export class DiscussionPost implements IDiscussionPost {
     this.author = other.author;
     this.imageSrc = other.imageSrc;
     this.postedDate = other.postedDate;
+    this.isHidden = other.isHidden;
     this.commentCount = other.commentCount;
     this.replies.replace(other.replies.toJS());
+  }
+
+  @action.bound
+  clear() {
+    this.replace(new DiscussionPost());
   }
 
   static fromJSON(post: IDiscussionPost): DiscussionPost {

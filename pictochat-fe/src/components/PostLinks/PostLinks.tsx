@@ -8,6 +8,7 @@ import { User } from '../../models/User';
 import { DiscussionPost } from '../../models/DiscussionPost';
 import './PostLinks.less';
 import EditPostModal from '../EditPostModal';
+import DeletePostButton from '../DeletePostButton';
 
 interface PostLinksProps {
   postType: PostTypes;
@@ -53,15 +54,18 @@ function PostLinks(props: PostLinksProps) {
       <CreatePostModal triggerType="link" triggerContent="reply" parentPostId={post.postId} />
     ];
     if (shouldShowEditLink(currentUser, post)) {
-      const model = <EditPostModal triggerType="link" triggerContent="edit" postId={post.postId} />;
-      replyPostLinks.push(model);
+      replyPostLinks.push(<EditPostModal triggerType="link" triggerContent="edit" postId={post.postId} />);
+      replyPostLinks.push(<DeletePostButton postId={post.postId} />);
     }
     return mapLinks(replyPostLinks);
   };
 
   const renderMainPostLinks = (): JSX.Element[] => {
     if (shouldShowEditLink(currentUser, post)) {
-      const replyPostLinks = [<EditPostModal triggerType="link" triggerContent="edit" postId={post.postId} />];
+      const replyPostLinks = [
+        <EditPostModal triggerType="link" triggerContent="edit" postId={post.postId} />,
+        <DeletePostButton postId={post.postId} />
+      ];
       return mapLinks(replyPostLinks);
     }
     return null;

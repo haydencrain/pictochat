@@ -4,7 +4,7 @@ import express from 'express';
 import multer from 'multer';
 import passport from 'passport';
 import { strategies } from '../middleware/passport-middleware';
-import { DiscussionService, NewReply, NewThread } from '../services/discussion-service';
+import { DiscussionService, NewReply, NewThread, ArchiveType } from '../services/discussion-service';
 import { MIMETYPE_TO_ENCODING } from '../utils/encoding-content-types';
 import { DiscussionTreeNode } from '../models/discussion-tree-node';
 import config from '../utils/config';
@@ -57,8 +57,6 @@ postRouter.patch(
   passport.authenticate(strategies.JWT, { session: false }),
   imageStager.single('image'),
   async (req: any, res, next) => {
-    console.log('HANDLING ', req.url);
-    console.log(req.body);
     try {
       let newImageSpec = await makeNewImageSpec(req.file);
       let postUpdateSpec = {
@@ -80,6 +78,30 @@ postRouter.patch(
   }
 );
 
+postRouter.delete(
+  '/:postId',
+  passport.authenticate(strategies.JWT, { session: false }),
+  async (req: any, res, next) => {
+    try {
+      let requestingUserId: number = req.user.userId;
+      let archiveType: ArchiveType = await DiscussionService.archivePost(req.params.postId, requestingUserId);
+
+      if (archiveType === ArchiveType.DELETED) {
+        res.status(204); // Successful, no content
+        res.end();
+        return;
+      }
+
+      // If Post was hidden
+      let post: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(req.params.postId);
+      res.status(200);
+      res.json(post.toJSON());
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 //// HELPER FUNCTIONS ////
 
 // TODO: Move into module in project utils folder (or maybe see if a promise-based library for fs already exists?)
@@ -92,10 +114,8 @@ async function makeNewImageSpec(file): Promise<{ data: Buffer; encoding: string 
   return { data, encoding };
 }
 
-function assertIsPostAuthor(body: NewReply | NewThread, user: User) {
-  console.log('User: ', user);
-  console.log('Body:', body);
-  if (body.userId != user.userId) {
+function assertIsPostAuthor(body: { userId: string }, user: User) {
+  if (parseInt(body.userId) !== user.userId) {
     throw new ForbiddenError("Post's userId and/or supplied JWT token is incorrect or are for different users");
   }
 }

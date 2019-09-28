@@ -8,6 +8,7 @@ import StoresContext from '../../contexts/StoresContext';
 import { DiscussionPost } from '../../models/DiscussionPost';
 import { PostTypes, getPostTypeName } from '../../models/PostTypes';
 import './Post.less';
+import deletedPlaceholderImg from '../../images/deleted-placeholder.jpg';
 
 interface PostProps {
   post: DiscussionPost;
@@ -16,7 +17,23 @@ interface PostProps {
 
 function Post(props: PostProps) {
   const { post, postType } = props;
-  const stores = React.useContext(StoresContext);
+
+  const getImageSrc = () => {
+    if (post.isHidden) {
+      return deletedPlaceholderImg;
+    }
+    return post.imageSrc;
+  };
+
+  const renderLinks = () => {
+    console.log('Post: ', post);
+    console.log('PostType: ', postType, postType !== PostTypes.Root);
+    if (post.isHidden && postType !== PostTypes.Root) {
+      return null;
+    }
+    return <PostLinks postType={postType} post={post} />;
+  };
+
   return (
     <section className={classNames('thread-post', getPostTypeName(postType))}>
       <div className="post-sidebar">
@@ -28,9 +45,9 @@ function Post(props: PostProps) {
           <div className="post-date">{moment(post.postedDate).fromNow()}</div>
         </div>
         <div className="post-body">
-          <Image src={post.imageSrc} />
+          <Image src={getImageSrc()} />
         </div>
-        <PostLinks postType={postType} post={post} />
+        {renderLinks()}
       </div>
     </section>
   );

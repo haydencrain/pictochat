@@ -46,6 +46,10 @@ export class DiscussionService {
       }
     }
   }
+
+  static async deletePost(postId: number): Promise<IDiscussionPost> {
+    return await ApiService.sendDelete(`/post/${postId}`);
+  }
 }
 
 export default DiscussionService;
