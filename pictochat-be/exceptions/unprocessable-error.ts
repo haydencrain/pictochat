@@ -1,11 +1,12 @@
-export class UnprocessableError extends Error {
-  static readonly ERROR_TYPE = 'NOT_FOUND_ERROR';
+export class UnprocessableError {
+  static readonly ERROR_TYPE = 'UNPROCESSABLE_ERROR';
   static readonly DEFAULT_MESSAGE = 'Unable to process request';
   message: string;
   errorType: string;
   constructor(message: string = UnprocessableError.DEFAULT_MESSAGE) {
-    super(message);
-    Object.setPrototypeOf(this, new.target.prototype);
+    // super(message);
+    // Object.setPrototypeOf(this, new.target.prototype);
     this.errorType = UnprocessableError.ERROR_TYPE;
+    this.message = message;
   }
 }
