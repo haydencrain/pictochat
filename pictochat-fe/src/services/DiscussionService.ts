@@ -1,6 +1,7 @@
 import { DiscussionPost, IDiscussionPost } from '../models/DiscussionPost';
 import ApiService from './ApiService';
 import NewPostPayload from '../models/NewPostPayload';
+import ValidationException from '../models/ValidationException';
 
 export class DiscussionService {
   static async getDiscussions(): Promise<DiscussionPost[]> {
@@ -31,12 +32,19 @@ export class DiscussionService {
     return await DiscussionService.getPost(response.postId || response.rootPostId);
   }
 
-  static async updatePost(data: {postId: number, image: File}): Promise<IDiscussionPost> {
-    const formData = new FormData();
-    formData.append('postId', data.postId.toString());
-    formData.append('image', data.image);
-    const updatedPost: IDiscussionPost = await ApiService.patch(`/post/${data.postId}`, formData, null);
-    return updatedPost;
+  static async updatePost(data: { postId: number; image: File }): Promise<IDiscussionPost> {
+    try {
+      const formData = new FormData();
+      // IMPORTANT: Image must be the last field appended to form data or the server will not see the other fields
+      formData.append('postId', data.postId.toString());
+      formData.append('image', data.image);
+      const updatedPost: IDiscussionPost = await ApiService.patch(`/post/${data.postId}`, formData, null);
+      return updatedPost;
+    } catch (error) {
+      if (error.status === 422) {
+        throw new ValidationException();
+      }
+    }
   }
 }
 

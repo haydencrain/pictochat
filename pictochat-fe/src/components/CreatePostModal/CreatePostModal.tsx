@@ -21,6 +21,7 @@ function CreatePostModal(props: CreatePostModalProps) {
       return true;
     }
     alert('You must be logged in to post');
+    return false;
   };
 
   const handleSubmit = async (image: File) => {

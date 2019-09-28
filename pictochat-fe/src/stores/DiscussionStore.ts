@@ -8,20 +8,25 @@ import NewPostPayload from '../models/NewPostPayload';
  * Coordinates updates to discussion data
  */
 export default class DiscussionStore {
-  @observable threadSummariesMap: ObservableIntMap<DiscussionPost> = new ObservableIntMap(observable.map(undefined, { name: "threadSummariesMap" }));
+  @observable threadSummariesMap: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
+    observable.map(undefined, { name: 'threadSummariesMap' })
+  );
   @observable activeDiscussionRoot: DiscussionPost = new DiscussionPost();
-  @observable activeDiscussionPosts: ObservableIntMap<DiscussionPost> = new ObservableIntMap(observable.map(undefined, { name: "activeDiscussionPosts" }));
+  @observable activeDiscussionPosts: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
+    observable.map(undefined, { name: 'activeDiscussionPosts' })
+  );
   @observable isLoadingThreads = true;
   @observable isLoadingActiveDiscussion = true;
 
   constructor() {
-    this.loadThreadSummaries()
-      .catch((error) => { console.error('Error occured when fetching thread summaries:', error) });
-    spy((change) => {
-      if (change.type !== undefined) {
-        console.log('CHANGE: ', change)
-      }
+    this.loadThreadSummaries().catch(error => {
+      console.error('Error occured when fetching thread summaries:', error);
     });
+    // spy(change => {
+    //   if (change.type !== undefined) {
+    //     console.log('CHANGE: ', change);
+    //   }
+    // });
   }
 
   @computed
@@ -38,12 +43,12 @@ export default class DiscussionStore {
     runInAction(() => {
       this.isLoadingThreads = true;
       this.threadSummariesMap.clear();
-      jsonPosts.forEach((postJson) => {
+      jsonPosts.forEach(postJson => {
         this.threadSummariesMap.set(postJson.discussionId, this.parseJsonTree(postJson));
       });
       this.isLoadingThreads = false;
     });
-  };
+  }
 
   @computed
   get threadSummaries(): DiscussionPost[] {
@@ -53,12 +58,15 @@ export default class DiscussionStore {
   @action.bound
   async setActiveDiscussion(postId: string) {
     this.isLoadingActiveDiscussion = true;
-    let postJson = await DiscussionService.getPost(postId);
-    runInAction(() => {
-      let post = this.parseJsonTree(postJson, true);
-      this.activeDiscussionRoot.replace(post);
-      this.isLoadingActiveDiscussion = false;
-    });
+    try {
+      let postJson = await DiscussionService.getPost(postId);
+      runInAction(() => {
+        let post = this.parseJsonTree(postJson, true);
+        this.activeDiscussionRoot.replace(post);
+      });
+    } finally {
+      runInAction(() => (this.isLoadingActiveDiscussion = false));
+    }
   }
 
   @action.bound
@@ -68,7 +76,8 @@ export default class DiscussionStore {
       const postJson = await DiscussionService.updatePost({ postId, image });
       const post = new DiscussionPost(postJson);
       runInAction(() => {
-        this.activeDiscussionPosts.set(post.postId, post);
+        this.putPostInActiveMap(post);
+        // this.activeDiscussionPosts.set(post.postId, post);
       });
     } finally {
       runInAction(() => (this.isLoadingActiveDiscussion = false));
@@ -77,7 +86,7 @@ export default class DiscussionStore {
 
   @action.bound
   async createPost(post: NewPostPayload): Promise<DiscussionPost> {
-    const postCreationStrategy = (post.parentPostId) ? this.createReply : this.createThread;
+    const postCreationStrategy = post.parentPostId ? this.createReply : this.createThread;
     let newPost = await postCreationStrategy(post);
     return new DiscussionPost(newPost);
   }
@@ -85,9 +94,10 @@ export default class DiscussionStore {
   @action.bound
   async createReply(post: NewPostPayload): Promise<DiscussionPost> {
     this.isLoadingActiveDiscussion = true;
-    let reply = new DiscussionPost(await DiscussionService.createPost(post))
+    let reply = new DiscussionPost(await DiscussionService.createPost(post));
     runInAction(() => {
-      this.activeDiscussionPosts.set(reply.postId, reply);
+      this.putPostInActiveMap(reply);
+      // this.activeDiscussionPosts.set(reply.postId, reply);
 
       // Update thread summary
       if (this.threadSummariesMap.has(reply.discussionId)) {
@@ -96,7 +106,9 @@ export default class DiscussionStore {
         this.threadSummariesMap.get(reply.discussionId).commentCount = commentCount;
       } else {
         // This isn't an error if users have been linked directly to a discussion page without accessing the main threads lists
-        console.log(`Post reply (postId=${reply.postId}) created for a discusion (discussionId=${reply.discussionId}) thread that doesn't exist in DiscussionService`);
+        console.log(
+          `Post reply (postId=${reply.postId}) created for a discusion (discussionId=${reply.discussionId}) thread that doesn't exist in DiscussionService`
+        );
       }
       // Update local copy of parent
       if (this.activeDiscussionPosts.has(reply.parentPostId)) {
@@ -116,12 +128,12 @@ export default class DiscussionStore {
     return threadRoot;
   }
 
-  @action.bound
-  async updatePost(data: { postId: number, image: File }): Promise<DiscussionPost> {
-    let postJson: IDiscussionPost = await DiscussionService.updatePost(data);
-    let post: DiscussionPost = await this.parseJsonTree(postJson, true);
-    return post;
-  }
+  // @action.bound
+  // async updatePost(data: { postId: number; image: File }): Promise<DiscussionPost> {
+  //   let postJson: IDiscussionPost = await DiscussionService.updatePost(data);
+  //   let post: DiscussionPost = await this.parseJsonTree(postJson, true);
+  //   return post;
+  // }
 
   @action.bound
   private parseJsonTree(postJson: IDiscussionPost, shouldBuildPostMap: boolean = false): DiscussionPost {
@@ -129,13 +141,23 @@ export default class DiscussionStore {
     let replies: DiscussionPost[] = repliesJson.map(post => this.parseJsonTree(post, shouldBuildPostMap));
     let post = new DiscussionPost({ ...postJson, ...{ replies } });
     if (shouldBuildPostMap) {
-      if (this.activeDiscussionPosts.has(post.postId)) {
-        // Using replace to avoid breaking any existing observer dependencies
-        this.activeDiscussionPosts.get(post.postId).replace(post);
-      } else {
-        this.activeDiscussionPosts.set(post.postId, post);
-      }
+      this.putPostInActiveMap(post);
+      // if (this.activeDiscussionPosts.has(post.postId)) {
+      //   // Using replace to avoid breaking any existing observer dependencies
+      //   this.activeDiscussionPosts.get(post.postId).replace(post);
+      // } else {
+      //   this.activeDiscussionPosts.set(post.postId, post);
+      // }
     }
     return post;
+  }
+
+  @action.bound
+  private putPostInActiveMap(post: DiscussionPost) {
+    if (this.activeDiscussionPosts.has(post.postId)) {
+      this.activeDiscussionPosts.get(post.postId).replace(post);
+    } else {
+      this.activeDiscussionPosts.set(post.postId, post);
+    }
   }
 }

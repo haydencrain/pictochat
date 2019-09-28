@@ -7,24 +7,75 @@ import { PostTypes } from '../../models/PostTypes';
 import { User } from '../../models/User';
 import { DiscussionPost } from '../../models/DiscussionPost';
 import './PostLinks.less';
+import EditPostModal from '../EditPostModal';
 
 interface PostLinksProps {
   postType: PostTypes;
   post: DiscussionPost;
 }
 
-//// COMPONENT ////
-
 function PostLinks(props: PostLinksProps) {
+  //// DATA ////
   const { post, postType } = props;
   const stores = React.useContext(StoresContext);
   const currentUser = stores.user.currentUser;
 
+  //// HELPERS ////
+
+  const shouldShowEditLink = (currentUser: User, post: DiscussionPost): boolean => {
+    return currentUser.username === post.author.username;
+  };
+
+  const mapLinks = (links: JSX.Element[]): JSX.Element[] => {
+    return links.map((link, index) => (
+      <li key={`link_${index}`} className="links-list-item">
+        {link}
+      </li>
+    ));
+  };
+
+  //// POST TYPE RENDER FUNCTIONS ////
+
+  const renderRootPostLinks = (): JSX.Element[] => {
+    const rootPostLinks = [
+      <Link className="link" to={`/discussion?id=${post.postId}`}>
+        {post.commentCount} comments
+      </Link>
+    ];
+    return mapLinks(rootPostLinks);
+  };
+
+  const renderReplyPostLinks = (): JSX.Element[] => {
+    const replyPostLinks = [
+      <Link className="link" to={`/discussion?id=${post.postId}`}>
+        permalink
+      </Link>,
+      <CreatePostModal triggerType="link" triggerContent="reply" parentPostId={post.postId} />
+    ];
+    if (shouldShowEditLink(currentUser, post)) {
+      const model = <EditPostModal triggerType="link" triggerContent="edit" postId={post.postId} />;
+      replyPostLinks.push(model);
+    }
+    return mapLinks(replyPostLinks);
+  };
+
+  const renderMainPostLinks = (): JSX.Element[] => {
+    if (shouldShowEditLink(currentUser, post)) {
+      const replyPostLinks = [<EditPostModal triggerType="link" triggerContent="edit" postId={post.postId} />];
+      return mapLinks(replyPostLinks);
+    }
+    return null;
+  };
+
+  //// MAIN RENDERING ////
+
   let links: JSX.Element[] = null; // no links shown on the Main Post
   if (postType === PostTypes.Root) {
-    links = renderRootPostLinks(post);
+    links = renderRootPostLinks();
   } else if (postType === PostTypes.Reply) {
-    links = renderReplyPostLinks(post, currentUser);
+    links = renderReplyPostLinks();
+  } else if (postType === PostTypes.Main) {
+    links = renderMainPostLinks();
   }
 
   return (
@@ -35,42 +86,3 @@ function PostLinks(props: PostLinksProps) {
 }
 
 export default observer(PostLinks);
-
-//// POST TYPE RENDER FUNCTIONS ////
-
-function renderRootPostLinks(post: DiscussionPost): JSX.Element[] {
-  const rootPostLinks = [
-    <Link className="link" to={`/discussion?id=${post.postId}`}>
-      {post.commentCount} comments
-    </Link>
-  ];
-  return mapLinks(rootPostLinks);
-}
-
-function renderReplyPostLinks(post: DiscussionPost, currentUser: User): JSX.Element[] {
-  let replyPostLinks = [
-    <Link className="link" to={`/discussion?id=${post.postId}`}>
-      permalink
-    </Link>,
-    <CreatePostModal triggerType="link" triggerContent="reply" parentPostId={post.postId} />
-  ];
-  if (shouldShowEditLink(currentUser, post)) {
-    const model = <CreatePostModal triggerType="link" triggerContent="reply" parentPostId={post.postId} />;
-    replyPostLinks.push(model);
-  }
-  return mapLinks(replyPostLinks);
-}
-
-//// HELPERS ////
-
-function shouldShowEditLink(currentUser: User, post: DiscussionPost): boolean {
-  return currentUser.username === post.author.username;
-}
-
-function mapLinks(links: JSX.Element[]): JSX.Element[] {
-  return links.map((link, index) => (
-    <li key={`link_${index}`} className="links-list-item">
-      {link}
-    </li>
-  ));
-}

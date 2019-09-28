@@ -2,12 +2,12 @@ import * as React from 'react';
 import * as moment from 'moment-mini';
 import * as classNames from 'classnames';
 import { observer } from 'mobx-react';
-import PostLinks from '../PostLinks';
 import { Image } from 'semantic-ui-react';
+import PostLinks from '../PostLinks';
+import StoresContext from '../../contexts/StoresContext';
 import { DiscussionPost } from '../../models/DiscussionPost';
 import { PostTypes, getPostTypeName } from '../../models/PostTypes';
 import './Post.less';
-import StoresContext from '../../contexts/StoresContext';
 
 interface PostProps {
   post: DiscussionPost;
@@ -15,24 +15,24 @@ interface PostProps {
 }
 
 function Post(props: PostProps) {
+  const { post, postType } = props;
   const stores = React.useContext(StoresContext);
-  // NOTE: Destructuring breaks binding to mobx observables
   return (
-    <section className={classNames('thread-post', getPostTypeName(props.postType))}>
+    <section className={classNames('thread-post', getPostTypeName(postType))}>
       <div className="post-sidebar">
-        <Image src={props.post.author.userAvatarURI} avatar size="mini" />
+        <Image src={post.author.userAvatarURI} avatar size="mini" />
       </div>
       <div className="post-content">
         <div className="post-header">
-          <div className="post-author">{props.post.author.username}</div>
-          <div className="post-date">{moment(props.post.postedDate).fromNow()}</div>
+          <div className="post-author">{post.author.username}</div>
+          <div className="post-date">{moment(post.postedDate).fromNow()}</div>
         </div>
         <div className="post-body">
-          <Image src={props.post.imageSrc} />
+          <Image src={post.imageSrc} />
         </div>
-        <PostLinks postType={props.postType} post={props.post} />
+        <PostLinks postType={postType} post={post} />
       </div>
-    </section >
+    </section>
   );
 }
 

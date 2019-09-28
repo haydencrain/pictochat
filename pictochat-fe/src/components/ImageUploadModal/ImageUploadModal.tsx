@@ -16,12 +16,11 @@ export interface ImageUploadModalProps {
   // Use this to display an alert before preventing the model from openning if the user is not logged in (for example)
   shouldOpen: (stores: IStoresContext) => Promise<boolean>;
   onSubmit: (image: File) => Promise<void>;
-};
+}
 
 function ImageUploadModal(props: ImageUploadModalProps) {
   //// DATA ////
   const stores = React.useContext(StoresContext);
-  const currentUser: User = stores.user.currentUser;
 
   //// HOOKS ////
 
@@ -97,7 +96,7 @@ function ImageUploadModal(props: ImageUploadModalProps) {
         <Button onClick={handleClose}>Cancel</Button>
         <Button primary onClick={handleSubmit}>
           Submit
-      </Button>
+        </Button>
       </Modal.Actions>
 
       <Dimmer inverted active={isLoading}>
@@ -107,4 +106,5 @@ function ImageUploadModal(props: ImageUploadModalProps) {
   );
 }
 
-export default observer(ImageUploadModal);
+export default ImageUploadModal;
+// export default observer(ImageUploadModal);
