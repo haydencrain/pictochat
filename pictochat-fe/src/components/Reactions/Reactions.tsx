@@ -17,7 +17,7 @@ const AddReaction = () => {
   return (
     <Popup
       content="👍 👎 😂 😍 😡"
-      // eventEnabled={eventEnabled}
+      eventEnabled={eventEnabled}
       on="click"
       onOpen={() => setOpen(true)}
       // open={open}
@@ -28,7 +28,7 @@ const AddReaction = () => {
 
 const CurrentReactions = reactions.map((react, index) => (
   <Label key={index}>
-    <p className="icon">{react.icon}</p> <p> 1</p>
+    <p className="icon">{react.icon}</p> <p>1</p>
   </Label>
 ));
 
