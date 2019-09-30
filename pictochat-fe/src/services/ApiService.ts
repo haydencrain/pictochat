@@ -12,22 +12,27 @@ export class ApiService {
   }
 
   static async post(path: string, data: any, contentType: string = 'application/json'): Promise<any> {
-    return ApiService.ajax('post', path, data, null, contentType);
+    return ApiService.ajax('post', path, data, contentType);
+    // return ApiService.ajax('post', path, data, null, contentType);
   }
 
   static async put(path: string, data: any, query: any = null, contentType: string = 'application/json'): Promise<any> {
-    if (!query) return ApiService.ajax('put', path, data, null, contentType);
+    if (!query) return ApiService.ajax('put', path, data, contentType);
+    // if (!query) return ApiService.ajax('put', path, data, null, contentType);
     const queryString = stringify(query);
-    return ApiService.ajax('put', `${path}?${queryString}`, data, null, contentType);
+    return ApiService.ajax('put', `${path}?${queryString}`, data, contentType);
+    // return ApiService.ajax('put', `${path}?${queryString}`, data, null, contentType);
   }
 
   static async patch(path: string, data: any, contentType: string = 'application/json'): Promise<any> {
-    return ApiService.ajax('patch', path, data, null, contentType);
+    return ApiService.ajax('PATCH', path, data, contentType);
+    // return ApiService.ajax('patch', path, data, null, contentType);
   }
 
   // naming inconsistency is due to delete being a reserved JS word
-  async sendDelete(path: string): Promise<any> {
-    return ApiService.ajax('delete', path, null);
+  static async sendDelete(path: string): Promise<any> {
+    return ApiService.ajax('delete', path);
+    // return ApiService.ajax('delete', path, null);
   }
 
   /**
@@ -42,12 +47,15 @@ export class ApiService {
     method: string,
     path: string,
     data: any = null,
-    accessToken: string = cookies.get('pictochatJWT'),
+    // accessToken: string = cookies.get('pictochatJWT'),
     contentType: string = 'application/json'
   ): Promise<any> {
     const headers: any = { accept: 'application/json' };
     if (contentType !== null) headers['Content-Type'] = contentType;
-    if (accessToken !== null) headers['Authorization'] = `JWT ${accessToken}`;
+
+    let accessToken: string = cookies.get('pictochatJWT');
+    if (!!accessToken) headers['Authorization'] = `JWT ${accessToken}`;
+    // if (accessToken !== null) headers['Authorization'] = `JWT ${accessToken}`;
 
     const request: RequestInit = {
       headers,
@@ -62,7 +70,7 @@ export class ApiService {
           let responseBody: any = await response.text();
           try {
             responseBody = JSON.parse(responseBody);
-          } catch { }
+          } catch {}
           if (response.ok) {
             resolve(responseBody);
           } else {

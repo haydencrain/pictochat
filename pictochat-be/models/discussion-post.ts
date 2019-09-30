@@ -1,4 +1,4 @@
-import { Sequelize, Model, DataTypes, Op, FindOptions } from 'sequelize';
+import { Sequelize, Model, DataTypes, Op, FindOptions, CountOptions } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { ImageService } from '../services/image-service';
 import { User } from './user';
@@ -15,7 +15,9 @@ export class DiscussionPost extends Model {
     'authorId',
     'postedDate',
     'parentPostId',
-    'replyTreePath'
+    'replyTreePath',
+    'isHidden',
+    'isDeleted'
   ];
   private static readonly USER_JOIN = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
 
@@ -28,12 +30,32 @@ export class DiscussionPost extends Model {
   imageId!: string;
   authorId!: number;
   replyTreePath!: string;
+  isHidden!: boolean;
+  isDeleted!: boolean;
 
   // Attributes for associations
   author?: User;
 
-
   //// INSTANCE METHODS ////
+
+  async isUpdatable(): Promise<boolean> {
+    let replyCount: number = await this.getDirectReplyCount();
+    // TODO: Check if the post has any reactions
+    return replyCount === 0;
+  }
+
+  async isDeleteable(): Promise<boolean> {
+    let replyCount: number = await this.getDirectReplyCount();
+    return replyCount === 0;
+  }
+
+  hide() {
+    this.isHidden = true;
+  }
+
+  setDeleted() {
+    this.isDeleted = true;
+  }
 
   /**
    * Number of replies made to this post or to replies of this post and so on
@@ -47,11 +69,17 @@ export class DiscussionPost extends Model {
     });
   }
 
+  async getDirectReplyCount(): Promise<number> {
+    const filter = { where: { parentPostId: this.getDataValue('postId') } };
+    return await DiscussionPost.count(filter);
+  }
+
+  /**
+   * @returns A prefix for the replyTreePath values of all descendants of the current node. */
   private getReplyPathPrefix(): string {
     const replyTreePath = this.getDataValue('replyTreePath');
     return `${replyTreePath || ''}${this.getDataValue('postId')}`;
   }
-
 
   //// STATIC/COLLECTION METHODS ////
 
@@ -59,10 +87,12 @@ export class DiscussionPost extends Model {
    * Wrapper for Sequelize Model.findAll that ensures author data is included in the result
    * and only returns PUBLIC_ATTRIBUTES by default. */
   static async getDiscussionPosts(options: FindOptions = {}): Promise<DiscussionPost[]> {
+    const filters = { isDeleted: false };
     const optionDefaults = {
       include: [DiscussionPost.USER_JOIN],
       attributes: DiscussionPost.PUBLIC_ATTRIBUTES
     };
+    options['where'] = { ...(options['where'] || {}), ...filters };
     options = { ...optionDefaults, ...options };
     return await DiscussionPost.findAll(options);
   }
@@ -115,15 +145,16 @@ export class DiscussionPost extends Model {
    * Wrapper for Model.findOne that ensures author data is included in result
    * and only returns PUBLIC_ATTRIBUTES by default. */
   private static async _findOne(options: FindOptions = {}) {
+    const filterDefaults = { isDeleted: false };
     const optionDefaults = {
       include: [DiscussionPost.USER_JOIN],
       attributes: DiscussionPost.PUBLIC_ATTRIBUTES
     };
+    options['where'] = { ...(options['where'] || {}), ...filterDefaults };
     options = { ...optionDefaults, ...options };
     return await DiscussionPost.findOne(options);
   }
 }
-
 
 //// SCHEMA DEFINITION ////
 
@@ -137,6 +168,8 @@ DiscussionPost.init(
     postedDate: { type: DataTypes.DATE, allowNull: false },
     parentPostId: { type: DataTypes.INTEGER },
     replyTreePath: { type: DataTypes.STRING },
+    isHidden: { type: DataTypes.BOOLEAN, defaultValue: false },
+    isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
     imageSrc: {
       type: DataTypes.VIRTUAL,
       get() {
@@ -149,18 +182,17 @@ DiscussionPost.init(
     modelName: 'discussionPost',
     tableName: 'discussion_posts',
     freezeTableName: true,
-    indexes: [
-      { fields: ['discussionId'], using: 'BTREE' }
-    ]
+    indexes: [{ fields: ['discussionId'], using: 'BTREE' }]
   }
 );
 
-
 //// ASSOCIATIONS ////
 
-DiscussionPost.belongsTo(DiscussionPost,
-  { as: 'parentPost', foreignKey: 'parentPostId', targetKey: 'postId', constraints: false });
+DiscussionPost.belongsTo(DiscussionPost, {
+  as: 'parentPost',
+  foreignKey: 'parentPostId',
+  targetKey: 'postId',
+  constraints: false
+});
 
-DiscussionPost.belongsTo(User,
-  { targetKey: 'userId', foreignKey: 'authorId', constraints: true, as: 'author' });
-
+DiscussionPost.belongsTo(User, { targetKey: 'userId', foreignKey: 'authorId', constraints: true, as: 'author' });

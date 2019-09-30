@@ -3,7 +3,7 @@ import RegisterForm from '../../components/RegisterForm';
 import './RegisterPage.less';
 import { RouteComponentProps } from 'react-router';
 
-interface RegisterPageProps extends RouteComponentProps<any> { }
+interface RegisterPageProps extends RouteComponentProps<any> {}
 
 export default function RegisterPage(props: RegisterPageProps) {
   const handleCancelClick = React.useCallback(() => {
@@ -11,7 +11,6 @@ export default function RegisterPage(props: RegisterPageProps) {
   }, []);
 
   const handleSubmitSuccess = React.useCallback(() => {
-    console.log(props.history);
     props.history.goBack();
   }, []);
 

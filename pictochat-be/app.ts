@@ -11,6 +11,10 @@ import { makeCORSMiddleware } from './middleware/cors-middleware';
 import { SequelizeConnectionService } from './services/sequelize-connection-service';
 import { loadTestData } from './utils/load-test-data';
 import { initialisePassport } from './middleware/passport-middleware';
+import * as ErrorUtils from './exceptions/error-utils';
+import { ForbiddenError } from './exceptions/forbidden-error';
+import { NotFoundError } from './exceptions/not-found-error';
+import { UnprocessableError } from './exceptions/unprocessable-error';
 
 // CONSTANTS
 const PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;
@@ -64,11 +68,25 @@ app.use('*', (req, res, next) => {
 });
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   next(createError(404));
 });
 
 /// ERROR HANDLERS ///
+
+app.use((error, req, res, next) => {
+  if (!!error.errorType) {
+    switch (error.errorType) {
+      case ForbiddenError.ERROR_TYPE:
+        return res.status(403).json(error);
+      case NotFoundError.ERROR_TYPE:
+        return res.status(404).json(error);
+      case UnprocessableError.ERROR_TYPE:
+        return res.status(422).json(error);
+    }
+  }
+  next(error);
+});
 
 // app.use(function (err, req, res, next) {
 //   // set locals, only providing error in development

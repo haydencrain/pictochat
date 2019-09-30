@@ -2,9 +2,7 @@ import * as React from 'react';
 import { Form, Button } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import StoresContext from '../../contexts/StoresContext';
-import UserService from '../../services/UserService';
-import { IUser, User } from '../../models/User';
-import APIException from '../../models/ApiException';
+import { User } from '../../models/User';
 import './RegisterForm.less';
 import UnauthenticatedUser from '../../models/UnauthenticatedUser';
 
