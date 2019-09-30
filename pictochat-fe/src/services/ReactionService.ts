@@ -35,3 +35,5 @@ class ReactionService {
     return await ApiService.sendDelete(`/reaction?reactionId=${reactionId}`);
   }
 }
+
+export default ReactionService;

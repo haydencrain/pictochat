@@ -1,20 +1,17 @@
-import { observable, action } from 'mobx';
-import { useAsObservableSource } from 'mobx-react';
-
-export interface IReaction {
+export interface Reaction {
   reactionId: number;
   reactionName: string;
   postId: number;
   userId: number;
 }
 
-export class Reaction implements IReaction {
-  @observable reactionId: number;
-  @observable reactionName: string;
-  @observable postId: number;
-  @observable userId: number;
+export class Reaction implements Reaction {
+  reactionId: number;
+  reactionName: string;
+  postId: number;
+  userId: number;
 
-  constructor(data?: IReaction) {
+  constructor(data?: Reaction) {
     if (data) {
       this.reactionId = data.reactionId;
       this.reactionName = data.reactionName;
@@ -23,15 +20,12 @@ export class Reaction implements IReaction {
     }
   }
 
-  @action.bound
   replace(other: Reaction) {
     this.reactionId = other.reactionId;
     this.reactionName = other.reactionName;
     this.postId = other.postId;
     this.userId = other.userId;
   }
-
-  @action.bound
   clear() {
     this.replace(new Reaction());
   }

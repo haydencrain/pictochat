@@ -1,10 +1,14 @@
 import * as React from 'react';
 import { Button, Popup, Label } from 'semantic-ui-react';
 import { useBooleanKnob } from '@stardust-ui/docs-components';
-
+import { useFetchReactions } from '../../hooks/ReactionHooks';
+import reactionService from '../../services/ReactionService';
 import './Reactions.less';
+import StoresContext from '../../contexts/StoresContext';
 
 const reactions = [{ icon: '👍' }, { icon: '👎' }, { icon: '😂' }, { icon: '😍' }, { icon: '😡' }];
+const stores = React.useContext(StoresContext);
+const currentUser = stores.user.currentUser;
 
 const AddReaction = () => {
   const [eventEnabled] = useBooleanKnob({
@@ -20,7 +24,6 @@ const AddReaction = () => {
       eventEnabled={eventEnabled}
       on="click"
       onOpen={() => setOpen(true)}
-      // open={open}
       trigger={<Button icon="add" />}
     />
   );
