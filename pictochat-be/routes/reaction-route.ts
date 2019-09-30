@@ -27,7 +27,12 @@ reactionRouter.get('/', async (req, res, next) => {
 //POST reaction
 reactionRouter.post('/', async (req: any, res, next) => {
   try {
-    let createReaction = await ReactionService.createReaction(req.query.postId, req.query.userId, req.query.reactionId);
+    let createReaction = await ReactionService.createReaction(
+      req.query.reactionId,
+      req.query.reactionName,
+      req.query.postId,
+      req.query.userId
+    );
     return res.json(createReaction);
   } catch (error) {
     next(error);
@@ -37,7 +42,7 @@ reactionRouter.post('/', async (req: any, res, next) => {
 //DELETE reaction
 reactionRouter.delete('/', async (req: any, res, next) => {
   try {
-    let removeReaction = await ReactionService.removeReaction(req.query.postId, req.query.UserId, req.query.reactionId);
+    let removeReaction = await ReactionService.removeReaction(req.query.reactionId);
     return res.json(removeReaction);
   } catch (error) {
     next(error);

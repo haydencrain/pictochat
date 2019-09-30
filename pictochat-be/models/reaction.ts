@@ -5,11 +5,12 @@ import { User } from './user';
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
 export class Reaction extends Model {
-  static readonly PUBLIC_ATTRIBUTES = ['postId', 'userId', 'reactionId'];
+  static readonly PUBLIC_ATTRIBUTES = ['reactionId', 'reactionName', 'postId', 'userId'];
 
+  reactionId!: number;
+  reactionName!: string;
   postId!: number;
   userId!: number;
-  reactionId!: number;
 
   getPublicJSON(): any {
     let json = {};
@@ -47,15 +48,18 @@ export class Reaction extends Model {
     });
   }
 
-  static async createReaction(postId: number, userId: number, reactionId: number): Promise<Reaction> {
-    return await Reaction.create({ postId, userId, reactionId });
+  static async createReaction(
+    reactionId: number,
+    reactionName: string,
+    postId: number,
+    userId: number
+  ): Promise<Reaction> {
+    return await Reaction.create({ reactionId, reactionName, postId, userId });
   }
 
-  static async removeReaction(postId: number, userId: number, reactionId: number) {
+  static async removeReaction(reactionId: number) {
     return Reaction.destroy({
       where: {
-        postId,
-        userId,
         reactionId
       }
     });
@@ -64,9 +68,10 @@ export class Reaction extends Model {
 
 Reaction.init(
   {
+    reactionId: { type: DataTypes.INTEGER, primaryKey: true },
+    reactionName: { type: DataTypes.STRING },
     postId: { type: DataTypes.INTEGER },
-    userId: { type: DataTypes.INTEGER },
-    reactionId: { type: DataTypes.INTEGER }
+    userId: { type: DataTypes.INTEGER }
   },
   {
     sequelize: sequelize,

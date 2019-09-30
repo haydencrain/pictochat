@@ -15,13 +15,23 @@ class ReactionService {
     return await ApiService.get(`/reaction?userId=${userId}`);
   }
 
-  static async addReaction(postId: number, userId: number, reactionId: number): Promise<IReaction> {
+  static async addReaction(
+    reactionId: number,
+    reactionName: string,
+    postId: number,
+    userId: number
+  ): Promise<IReaction> {
     const data = {
+      reactionId: reactionId,
+      reactionName: reactionName,
       postId: postId,
-      userId: userId,
-      reactionId: reactionId
+      userId: userId
     };
     let res = await ApiService.post('/reaction', data);
     return res.reaction;
+  }
+
+  static async removeReaction(reactionId: number) {
+    return await ApiService.sendDelete(`/reaction?reactionId=${reactionId}`);
   }
 }

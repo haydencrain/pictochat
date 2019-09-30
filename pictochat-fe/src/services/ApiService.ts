@@ -26,7 +26,7 @@ export class ApiService {
   }
 
   // naming inconsistency is due to delete being a reserved JS word
-  async sendDelete(path: string): Promise<any> {
+  static async sendDelete(path: string): Promise<any> {
     return ApiService.ajax('delete', path, null);
   }
 
@@ -62,7 +62,7 @@ export class ApiService {
           let responseBody: any = await response.text();
           try {
             responseBody = JSON.parse(responseBody);
-          } catch { }
+          } catch {}
           if (response.ok) {
             resolve(responseBody);
           } else {
