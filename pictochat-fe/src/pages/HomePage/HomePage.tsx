@@ -14,7 +14,6 @@ function HomePage(props: HomePage) {
         noPostsMessage="No posts have been added yet! Be the first to add a post!"
         addPostButtonMessage="Create Post"
       />
-      <Reactions />
     </section>
   );
 }
