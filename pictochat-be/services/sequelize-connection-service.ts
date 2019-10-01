@@ -2,7 +2,7 @@ import { createNamespace } from 'continuation-local-storage';
 import { Sequelize, Dialect } from 'sequelize';
 
 // Config
-const DB_HOST = process.env.PICTOCHAT_DB_HOST || 'localhost';
+const DB_HOST = process.env.PICTOCHAT_DB_HOST || '192.168.99.100';
 const DB_PORT = parseInt(process.env.PICTOCHAT_DB_PORT) || 5432;
 const DB_USER = process.env.PICTOCHAT_DB_USER || 'postgres';
 const DB_PASSWORD = process.env.PICTOCHAT_DB_PASSWORD || 'postgres';
