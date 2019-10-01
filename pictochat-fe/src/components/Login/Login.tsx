@@ -52,30 +52,28 @@ class Login extends React.Component<{}, LoginState> {
 
   render() {
     return (
-      <Container id="login-container">
-        <Form id="login-form" className="ui raised segment" onSubmit={this.handleSubmit} method="POST">
-          <Form.Field className="login-field">
-            <label>Username or Email</label>
-            <input type="text" placeholder="username" value={this.state.email} onChange={this.handleEmailChange} />
+      <Form id="login-form" className="ui raised segment" onSubmit={this.handleSubmit} method="POST">
+        <Form.Field className="login-field">
+          <label>Username or Email</label>
+          <input type="text" placeholder="username" value={this.state.email} onChange={this.handleEmailChange} />
+        </Form.Field>
+        <Form.Field className="login-field">
+          <label>Password</label>
+          <input type="password" value={this.state.password} onChange={this.handlePasswordChange} />
+        </Form.Field>
+        <Form.Group widths="equal">
+          <Form.Field>
+            <Button primary className="login-button">
+              Log in
+            </Button>
           </Form.Field>
-          <Form.Field className="login-field">
-            <label>Password</label>
-            <input type="password" value={this.state.password} onChange={this.handlePasswordChange} />
-          </Form.Field>
-          <Form.Group widths="equal">
-            <Form.Field>
-              <Button primary className="login-button">
-                Log in
-              </Button>
-            </Form.Field>
 
-            <Form.Field className="membership-field">
-              <p className="membership">Not a member?</p>
-              <Link to="/register">Create an Account</Link>
-            </Form.Field>
-          </Form.Group>
-        </Form>
-      </Container>
+          <Form.Field className="membership-field">
+            <p className="membership">Not a member?</p>
+            <Link to="/register">Create an Account</Link>
+          </Form.Field>
+        </Form.Group>
+      </Form>
     );
   }
 }
