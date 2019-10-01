@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm run start-dev-remote",
     "build": "npm run build-backend-prod && npm run build-frontend-prod",
-    "build-backend-prod": "echo \"ERROR: pictochat backend build script not implemented\" && exit 1",
+    "build-backend-prod": "tsc",
     "build-frontend-prod": "webpack --config ./pictochat-fe/webpack.prod.js",
     "start-dev": "concurrently \"npm run start-frontend-dev\" \"npm run start-backend-dev\"",
     "start-dev-remote": "concurrently \"npm run start-frontend-dev-remote\" \"npm run start-backend-dev\"",
