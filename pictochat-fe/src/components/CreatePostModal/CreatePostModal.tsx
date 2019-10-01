@@ -37,6 +37,7 @@ function CreatePostModal(props: CreatePostModalProps) {
 
   return (
     // ts complains that className isn't a property of ImageUploadModal
+    // FIXME: configure ImageUploadModal to allow classNames to be added
     // @ts-ignore
     <ImageUploadModal
       className="create-post-modal"
