@@ -6,6 +6,7 @@ import { DiscussionThread } from '../models/discussion-thread';
 import { Image } from '../models/image';
 import { syncModels } from './sync-models';
 import { User } from '../models/user';
+import { LeaderboardRank } from '../models/leaderboard-rank';
 
 /**
  * Promise-returning wrapper for fs.readFile
@@ -206,4 +207,8 @@ export async function loadTestData() {
   // let sampleThreads = [];
   // let threadCreationPromises = sampleThreads.map(threadData => DiscussionThread.create(threadData));
   // await Promise.all(threadCreationPromises);
+
+  console.log('LEADERBOARD RANK QUERY TEST');
+  const test1 = await LeaderboardRank.getTop(10);
+  console.log(test1);
 }

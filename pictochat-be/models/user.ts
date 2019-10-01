@@ -1,4 +1,4 @@
-import { Sequelize, Model, DataTypes } from 'sequelize';
+import { Sequelize, Model, DataTypes, WhereOptions } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { ImageService } from '../services/image-service';
 
@@ -6,6 +6,7 @@ const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
 export class User extends Model {
   static readonly PUBLIC_ATTRIBUTES = ['userId', 'email', 'username', 'userAvatarURI'];
+  static readonly PUBLIC_TABLE_COLUMNS = ['userId', 'email', 'username']; // Everything from PUBLIC_ATTRIBUTES excluding virtual columns
 
   userId!: number;
   username!: string;
@@ -56,7 +57,7 @@ export class User extends Model {
   /**
    * @param onlyIncludePublicAttrs When true, only fields in User.PUBLIC_ATTRIBUTES will be
    *    included in the returned object. */
-  static async getUsers(onlyIncludePublicAttrs: boolean = true): Promise<User[]> {
+  static async getUsers(onlyIncludePublicAttrs: boolean = true, filter?: WhereOptions): Promise<User[]> {
     let queryParams = { order: ['userId'] };
     if (onlyIncludePublicAttrs) {
       queryParams['attributes'] = { include: User.PUBLIC_ATTRIBUTES };
@@ -86,6 +87,10 @@ User.init(
     sequelize: sequelize,
     modelName: 'user',
     tableName: 'users',
-    freezeTableName: true
+    freezeTableName: true,
+    indexes: [
+      { fields: ['userId'], using: 'BTREE' },
+      { fields: ['username'], using: 'BTREE' }
+    ]
   }
 );

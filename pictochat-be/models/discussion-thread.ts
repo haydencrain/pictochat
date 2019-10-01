@@ -64,6 +64,7 @@ export class DiscussionThread {
     let records: { discussionId: number, replyCount: number }[] = await sequelize.query(
       `SELECT "discussionId", COUNT(*) - 1 as "replyCount"
        FROM discussion_posts
+       WHERE "isDeleted" = FALSE
        GROUP BY "discussionId"`,
       { raw: true, type: QueryTypes.SELECT }
     );

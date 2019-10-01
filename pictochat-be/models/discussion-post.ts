@@ -64,14 +64,14 @@ export class DiscussionPost extends Model {
    * NOTE: This isn't a virtual column because its expensive to compute and best not
    *   included in every toJSON call. */
   async getDeepReplyCount(): Promise<number> {
-    return DiscussionPost.count({
+    return DiscussionPost._count({
       where: { replyTreePath: { [Op.like]: this.getReplyPathPrefix() + '/%' } }
     });
   }
 
   async getDirectReplyCount(): Promise<number> {
     const filter = { where: { parentPostId: this.getDataValue('postId') } };
-    return await DiscussionPost.count(filter);
+    return await DiscussionPost._count(filter);
   }
 
   /**
@@ -87,12 +87,12 @@ export class DiscussionPost extends Model {
    * Wrapper for Sequelize Model.findAll that ensures author data is included in the result
    * and only returns PUBLIC_ATTRIBUTES by default. */
   static async getDiscussionPosts(options: FindOptions = {}): Promise<DiscussionPost[]> {
-    const filters = { isDeleted: false };
+    const defaultFilters = DiscussionPost.defaultFilter();
     const optionDefaults = {
       include: [DiscussionPost.USER_JOIN],
       attributes: DiscussionPost.PUBLIC_ATTRIBUTES
     };
-    options['where'] = { ...(options['where'] || {}), ...filters };
+    options['where'] = { ...(options['where'] || {}), ...defaultFilters };
     options = { ...optionDefaults, ...options };
     return await DiscussionPost.findAll(options);
   }
@@ -120,7 +120,7 @@ export class DiscussionPost extends Model {
 
     const replyPathPrefix: string = rootPost.getReplyPathPrefix();
     let posts: DiscussionPost[] = await DiscussionPost.getDiscussionPosts({
-      where: DiscussionPost.replyTreePathFilter(replyPathPrefix),
+      where: { ...DiscussionPost.replyTreePathFilter(replyPathPrefix), ...DiscussionPost.defaultFilter() },
       order: [['replyTreePath', 'ASC'], ['postId', 'ASC']]
     });
 
@@ -135,6 +135,11 @@ export class DiscussionPost extends Model {
     return { isRootPost: true };
   }
 
+  /** @returns Default WHERE condition applied to all queries */
+  static defaultFilter() {
+    return { isDeleted: false };
+  }
+
   /**
    * @returns Sequelize where clause condition for finding posts under the specified path prefix */
   private static replyTreePathFilter(prefix: string) {
@@ -145,7 +150,7 @@ export class DiscussionPost extends Model {
    * Wrapper for Model.findOne that ensures author data is included in result
    * and only returns PUBLIC_ATTRIBUTES by default. */
   private static async _findOne(options: FindOptions = {}) {
-    const filterDefaults = { isDeleted: false };
+    const filterDefaults = DiscussionPost.defaultFilter();
     const optionDefaults = {
       include: [DiscussionPost.USER_JOIN],
       attributes: DiscussionPost.PUBLIC_ATTRIBUTES
@@ -153,6 +158,11 @@ export class DiscussionPost extends Model {
     options['where'] = { ...(options['where'] || {}), ...filterDefaults };
     options = { ...optionDefaults, ...options };
     return await DiscussionPost.findOne(options);
+  }
+
+  private static async _count(options?: CountOptions) {
+    options['where'] = {...(options['where'] || {}), ...DiscussionPost.defaultFilter()};
+    return await DiscussionPost.count(options);
   }
 }
 
@@ -182,7 +192,7 @@ DiscussionPost.init(
     modelName: 'discussionPost',
     tableName: 'discussion_posts',
     freezeTableName: true,
-    indexes: [{ fields: ['discussionId'], using: 'BTREE' }]
+    indexes: [{ fields: ['discussionId', 'postId'], using: 'BTREE' }]
   }
 );
 

@@ -10,18 +10,15 @@ interface UpdateUserData {
 
 export class UserService {
   static async getUserByUsername(username: string): Promise<User> {
-    let user: User = await User.getUserByUsername(username);
-    return user;
+    return await User.getUserByUsername(username);
   }
 
   static async getUser(userId: number): Promise<User> {
-    let user: User = await User.getUser(userId);
-    return user;
+    return await User.getUser(userId);
   }
 
   static async getUsers(): Promise<User[]> {
-    let user: User[] = await User.getUsers();
-    return user;
+    return await User.getUsers();
   }
 
   static async createUser(username: string, password: string): Promise<User> {
@@ -37,7 +34,6 @@ export class UserService {
   }
 
   static async assertPasswordMatch(userToCheck: User, password): Promise<boolean> {
-    const result: boolean = await bcrypt.compare(password, userToCheck.password);
-    return result;
+    return await bcrypt.compare(password, userToCheck.password);
   }
 }
