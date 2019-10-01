@@ -28,10 +28,10 @@ reactionRouter.get('/', async (req, res, next) => {
 reactionRouter.post('/', async (req: any, res, next) => {
   try {
     let createReaction = await ReactionService.createReaction(
-      req.query.reactionId,
-      req.query.reactionName,
-      req.query.postId,
-      req.query.userId
+      req.body.reactionId,
+      req.body.reactionName,
+      req.body.postId,
+      req.body.userId
     );
     return res.json(createReaction);
   } catch (error) {

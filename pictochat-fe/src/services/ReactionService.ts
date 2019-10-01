@@ -1,17 +1,17 @@
 import ApiService from './ApiService';
-import { IReaction } from '../models/Reaction';
+import { Reaction } from '../models/Reaction';
 import { reaction } from 'mobx';
 
 class ReactionService {
-  static async getReactions(postId: number, userId: number): Promise<IReaction[]> {
+  static async getReactions(postId: number, userId: number): Promise<Reaction[]> {
     return await ApiService.get(`/reaction?postId=${postId}?userId=${userId}`);
   }
 
-  static async getReactionsPost(postId: number): Promise<IReaction[]> {
+  static async getReactionsPost(postId: number): Promise<Reaction[]> {
     return await ApiService.get(`/reaction?postId=${postId}`);
   }
 
-  static async getReactionsUser(userId: number): Promise<IReaction[]> {
+  static async getReactionsUser(userId: number): Promise<Reaction[]> {
     return await ApiService.get(`/reaction?userId=${userId}`);
   }
 
@@ -20,7 +20,7 @@ class ReactionService {
     reactionName: string,
     postId: number,
     userId: number
-  ): Promise<IReaction> {
+  ): Promise<Reaction> {
     const data = {
       reactionId: reactionId,
       reactionName: reactionName,

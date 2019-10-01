@@ -20,10 +20,12 @@ function Reactions(props: ReactionsProps) {
 
   //TODO: arrange by reaction and then get the subsequent counts
 
-  const addReaction = (reactionName: string) => {};
+  const addReaction = (reactionName: string) => {
+    console.log('reactionName');
+  };
 
   const currentReactions = REACTIONS.map((react, index) => (
-    <Label key={index} onClick={() => addReaction('name')}>
+    <Label as="a" key={index} onClick={() => addReaction('name')}>
       <p className="icon"> {react.icon}</p> <p>1</p>
     </Label>
   ));
@@ -45,15 +47,26 @@ function PopupReactions(props: ReactionPopUpProps) {
 
   const handleClickedReaction = (reactionName: string) => {
     props.increaseReactionCount(reactionName);
+    console.log('hello');
   };
 
   const content = (
-    <ul>
-      <li onClick={() => handleClickedReaction('thumbs-up')}>REACTIONS.icon[0]</li>
-      <li onClick={() => handleClickedReaction('thumbs-down')}>REACTIONS.icon[1]</li>
-      <li onClick={() => handleClickedReaction('laugh')}>REACTIONS.icon[2]</li>
-      <li onClick={() => handleClickedReaction('heart')}>REACTIONS.icon[3]</li>
-      <li onClick={() => handleClickedReaction('angry')}>REACTIONS.icon[4]</li>
+    <ul className="react-content">
+      <li className="reaction-icon" onClick={() => handleClickedReaction('thumbs-up')}>
+        👍
+      </li>
+      <li className="reaction-icon" onClick={() => handleClickedReaction('thumbs-down')}>
+        👎
+      </li>
+      <li className="reaction-icon" onClick={() => handleClickedReaction('laugh')}>
+        😂
+      </li>
+      <li className="reaction-icon" onClick={() => handleClickedReaction('heart')}>
+        😍
+      </li>
+      <li className="reaction-icon" onClick={() => handleClickedReaction('angry')}>
+        😡
+      </li>
     </ul>
   );
 
