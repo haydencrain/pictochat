@@ -51,6 +51,16 @@ export default class DiscussionStore {
   }
 
   @action.bound
+  async getMoreThreadSummaries() {
+    this.isLoadingThreads = true;
+    const paginationResult = await DiscussionService.getDiscussions(PAGINATION_LIMIT, this.threadSummariesNextStart);
+    runInAction(() => {
+      this.setThreadSummaries(paginationResult);
+      this.isLoadingThreads = false;
+    });
+  }
+
+  @action.bound
   setThreadSummaries(paginationResult: PaginationResult<IDiscussionPost>) {
     paginationResult.results.forEach(postJson => {
       this.threadSummariesMap.set(postJson.discussionId, this.parseJsonTree(postJson));
