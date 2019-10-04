@@ -27,7 +27,10 @@ export const postRouter = express.Router();
  */
 postRouter.get('/:postId', async (req, res, next) => {
   try {
-    let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(req.params.postId);
+    let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(
+      req.params.postId,
+      req.query.limit
+    );
     res.json(replyTree.toJSON());
   } catch (error) {
     next(error);

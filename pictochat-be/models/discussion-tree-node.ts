@@ -6,6 +6,7 @@ import { DiscussionPost } from './discussion-post';
 export class DiscussionTreeNode extends DiscussionPost {
   replies: DiscussionTreeNode[];
   commentCount?: number; // Only populated for the root node
+  hasMore: boolean;
 
   /**
    * For internal use only!
@@ -13,6 +14,7 @@ export class DiscussionTreeNode extends DiscussionPost {
   private constructor(post: DiscussionPost, commentCount?: number) {
     super(post.toJSON());
     this.replies = [];
+    this.hasMore = false;
     if (post.author) {
       this.author = post.author;
     }
@@ -28,7 +30,12 @@ export class DiscussionTreeNode extends DiscussionPost {
   toJSON(): object {
     let baseJSON = super.toJSON();
     let repliesJSON = this.replies.map(reply => reply.toJSON());
-    baseJSON = { ...baseJSON, ...{ replies: repliesJSON }, author: this.author.toJSON() };
+    baseJSON = {
+      ...baseJSON,
+      ...{ replies: repliesJSON },
+      author: this.author.toJSON(),
+      hasMore: this.hasMore
+    };
     if (this.commentCount !== null && this.commentCount !== undefined) {
       baseJSON['commentCount'] = this.commentCount;
     }
