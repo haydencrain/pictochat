@@ -13,7 +13,7 @@ const PAGINATION_LIMIT = 10;
  */
 export default class DiscussionStore {
   // pagination variables
-  @observable threadSummariesHasMorePages = true;
+  @observable threadSummariesHasMore = true;
   @observable threadSummariesNextStart = 0;
   @observable threadSummariesMap: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
     observable.map(undefined, { name: 'threadSummariesMap' })
@@ -65,7 +65,7 @@ export default class DiscussionStore {
     paginationResult.results.forEach(postJson => {
       this.threadSummariesMap.set(postJson.discussionId, this.parseJsonTree(postJson));
     });
-    this.threadSummariesHasMorePages = paginationResult.hasNextPage;
+    this.threadSummariesHasMore = paginationResult.hasNextPage;
     this.threadSummariesNextStart = paginationResult.nextStart;
   }
 

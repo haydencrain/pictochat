@@ -92,7 +92,7 @@ const ThreadsSummaryList = observer(function ThreadsSummaryList(props: {
   }, []);
 
   const shouldLoadMore = computed((): boolean => {
-    return props.store.threadSummariesHasMorePages;
+    return props.store.threadSummariesHasMore;
   });
 
   const handleLoadMore = React.useCallback(() => {
