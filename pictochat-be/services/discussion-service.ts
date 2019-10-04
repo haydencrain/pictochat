@@ -168,22 +168,39 @@ export class DiscussionService {
     return await DiscussionThread.getDiscussionThreads();
   }
 
-  static async getReplyTreeUnderPost(postId: number, limit: number): Promise<DiscussionTreeNode> {
-    const posts = await DiscussionService.getPostReplies(postId);
+  static async getReplyTreeUnderPost(
+    postId: number,
+    limit?: number,
+    startAfterPostId?: number
+  ): Promise<DiscussionTreeNode> {
+    let posts = await DiscussionService.getPostReplies(postId, startAfterPostId);
     return await DiscussionService.makeReplyTree(posts, limit);
   }
 
-  static async getPostReplies(postId: number, includePost = true): Promise<DiscussionPost[]> {
+  static async getPostReplies(postId: number, startAfterPostId?: number): Promise<DiscussionPost[]> {
     const rootPost = await DiscussionPost.getDiscussionPost(postId);
-    const posts: DiscussionPost[] = await DiscussionPost.getPathOrderedSubTreeUnder(rootPost);
-    if (includePost) posts.unshift(rootPost);
+    let posts: DiscussionPost[] = await DiscussionPost.getPathOrderedSubTreeUnder(rootPost);
+    if (!isNullOrUndefined(startAfterPostId)) posts = DiscussionService.getFilteredReplies(posts, startAfterPostId);
+    posts.unshift(rootPost);
     return posts;
+  }
+
+  static getFilteredReplies(orderedPosts: DiscussionPost[], startAfterPostId: number): DiscussionPost[] {
+    console.log(startAfterPostId);
+    for (let i = 0; i < orderedPosts.length; i++) {
+      console.log(orderedPosts[i].postId === startAfterPostId);
+      if (orderedPosts[i].postId === startAfterPostId) {
+        console.log(i);
+        return orderedPosts.slice(i + 1);
+      }
+    }
+    return orderedPosts;
   }
 
   /**
    * @param posts Array of posts ordered by replyTreePath such that the root is the first post
    * @returns Nested tree-like representation of the specified posts array */
-  private static async makeReplyTree(posts: DiscussionPost[], limit: number): Promise<DiscussionTreeNode> {
+  private static async makeReplyTree(posts: DiscussionPost[], limit?: number): Promise<DiscussionTreeNode> {
     // Create reply tree
     let nodes: { [postId: number]: DiscussionTreeNode } = {};
     let rootPostId: number = posts[0].getDataValue('postId');
