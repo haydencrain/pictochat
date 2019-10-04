@@ -14,10 +14,10 @@ interface PostListItemProps {
 }
 
 function PostsListItem(props: PostListItemProps) {
-  // const { post, postType, showReplies } = props;
-
   const renderPostReplies = () => {
-    if (props.post.replies.length === 0) { return null; }
+    if (props.post.replies.length === 0) {
+      return null;
+    }
     return (
       <div className="post-replies">
         <PostsList postsType={PostTypes.Reply} posts={props.post.replies} raised={false} showReplies />

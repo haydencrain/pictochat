@@ -20,8 +20,6 @@ function Post(props: PostProps) {
   const { post, postType } = props;
 
   const renderLinks = () => {
-    console.log('Post: ', post);
-    console.log('PostType: ', postType, postType !== PostTypes.Root);
     if (post.isHidden && postType !== PostTypes.Root) {
       return null;
     }

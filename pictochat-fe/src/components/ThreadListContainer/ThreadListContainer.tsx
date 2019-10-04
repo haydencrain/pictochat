@@ -87,6 +87,18 @@ const ThreadsSummaryList = observer(function ThreadsSummaryList(props: {
   showReplies: boolean;
   noPostsMessage: string;
 }) {
+  React.useEffect(() => {
+    props.store.getNewThreadSummaries();
+  }, []);
+
+  const shouldLoadMore = computed((): boolean => {
+    return props.store.threadSummariesHasMorePages;
+  });
+
+  const handleLoadMore = React.useCallback(() => {
+    props.store.getMoreThreadSummaries();
+  }, []);
+
   return (
     <PostsList
       isLoading={props.store.isLoadingThreads}
@@ -95,6 +107,8 @@ const ThreadsSummaryList = observer(function ThreadsSummaryList(props: {
       noPostsMessage={props.noPostsMessage}
       raised
       showReplies={props.showReplies}
+      shouldLoadMore={shouldLoadMore.get()}
+      onLoadMore={handleLoadMore}
     />
   );
 });
