@@ -42,11 +42,13 @@ export class ApiService {
     method: string,
     path: string,
     data: any = null,
-    accessToken: string = cookies.get('pictochatJWT'),
+    // accessToken: string = cookies.get('pictochatJWT'),
     contentType: string = 'application/json'
   ): Promise<any> {
     const headers: any = { accept: 'application/json' };
     if (contentType !== null) headers['Content-Type'] = contentType;
+
+    const accessToken = cookies.get('pictochatJWT');
     if (accessToken !== null) headers['Authorization'] = `JWT ${accessToken}`;
 
     const request: RequestInit = {
