@@ -24,6 +24,7 @@ export default class DiscussionStore {
   );
   @observable isLoadingThreads = false;
   @observable isLoadingActiveDiscussion = false;
+  @observable isLoadingReplies = false;
 
   constructor() {
     // this.getNewThreadSummaries().catch(error => {
@@ -77,20 +78,41 @@ export default class DiscussionStore {
   @action.bound
   async setActiveDiscussion(postId: string) {
     this.isLoadingActiveDiscussion = true;
+    this.isLoadingReplies = true;
     try {
-      let postJson = await DiscussionService.getPost(postId);
+      let postJson = await DiscussionService.getPost(postId, PAGINATION_LIMIT);
       runInAction(() => {
         let post = this.parseJsonTree(postJson, true);
         this.activeDiscussionRoot.replace(post);
       });
     } finally {
-      runInAction(() => (this.isLoadingActiveDiscussion = false));
+      runInAction(() => {
+        this.isLoadingActiveDiscussion = false;
+        this.isLoadingReplies = false;
+      });
+    }
+  }
+
+  @action.bound
+  async getExtraReplies(parentPostId: string, after?: string) {
+    this.isLoadingReplies = true;
+    try {
+      const postJson = await DiscussionService.getPost(parentPostId, PAGINATION_LIMIT, after);
+      runInAction(() => {
+        let replies: DiscussionPost[] = postJson.replies.map(post => this.parseJsonTree(post, true));
+        const post = this.activeDiscussionPosts.get(postJson.postId);
+        post.hasMore = postJson.hasMore;
+        post.addReplies(replies);
+      });
+    } finally {
+      runInAction(() => (this.isLoadingReplies = false));
     }
   }
 
   @action.bound
   async deletePost(postId: number) {
     this.isLoadingActiveDiscussion = true;
+    this.isLoadingReplies = true;
     try {
       let postJson: IDiscussionPost = await DiscussionService.deletePost(postId);
       // FIXME: Find more explicit way of detecting if post should be deleted
@@ -113,7 +135,10 @@ export default class DiscussionStore {
         }
       }
     } finally {
-      runInAction(() => (this.isLoadingActiveDiscussion = false));
+      runInAction(() => {
+        this.isLoadingActiveDiscussion = false;
+        this.isLoadingReplies = true;
+      });
     }
   }
 

@@ -9,8 +9,9 @@ export class DiscussionService {
     return await ApiService.get('/discussion', { limit, start });
   }
 
-  static async getPost(postId: string): Promise<DiscussionPost> {
-    return await ApiService.get(`/post/${postId}`);
+  // 'after' is the id of the post before the new replies that you want
+  static async getPost(postId: string, limit = 10, after?: string): Promise<DiscussionPost> {
+    return await ApiService.get(`/post/${postId}`, { limit, after });
   }
 
   static async getPostReplies(discussionId: string): Promise<DiscussionPost[]> {
