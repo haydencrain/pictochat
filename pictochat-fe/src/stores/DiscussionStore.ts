@@ -3,11 +3,18 @@ import ObservableIntMap from '../utils/ObserableIntMap';
 import { DiscussionPost, IDiscussionPost } from '../models/DiscussionPost';
 import DiscussionService from '../services/DiscussionService';
 import NewPostPayload from '../models/NewPostPayload';
+import PaginationResult from '../models/PaginationResult';
+
+// TODO: Move to env variable
+const PAGINATION_LIMIT = 10;
 
 /**
  * Coordinates updates to discussion data
  */
 export default class DiscussionStore {
+  // pagination variables
+  @observable threadSummariesHasMorePages = true;
+  @observable threadSummariesNextStart = 0;
   @observable threadSummariesMap: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
     observable.map(undefined, { name: 'threadSummariesMap' })
   );
@@ -15,13 +22,13 @@ export default class DiscussionStore {
   @observable activeDiscussionPosts: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
     observable.map(undefined, { name: 'activeDiscussionPosts' })
   );
-  @observable isLoadingThreads = true;
-  @observable isLoadingActiveDiscussion = true;
+  @observable isLoadingThreads = false;
+  @observable isLoadingActiveDiscussion = false;
 
   constructor() {
-    this.loadThreadSummaries().catch(error => {
-      console.error('Error occured when fetching thread summaries:', error);
-    });
+    // this.getNewThreadSummaries().catch(error => {
+    //   console.error('Error occured when fetching thread summaries:', error);
+    // });
   }
 
   @computed
@@ -30,19 +37,26 @@ export default class DiscussionStore {
   }
 
   @action.bound
-  async loadThreadSummaries() {
-    let jsonPosts: IDiscussionPost[] = await DiscussionService.getDiscussions();
+  async getNewThreadSummaries() {
+    this.isLoadingThreads = true;
+    const paginationResult = await DiscussionService.getDiscussions(PAGINATION_LIMIT);
     // Mobx @action will only track changes up to the first use of await in an an async function
     // so we need to run the rest in runInAction() to ensure anything observing the modified obserables
     // is updated
     runInAction(() => {
-      this.isLoadingThreads = true;
       this.threadSummariesMap.clear();
-      jsonPosts.forEach(postJson => {
-        this.threadSummariesMap.set(postJson.discussionId, this.parseJsonTree(postJson));
-      });
+      this.setThreadSummaries(paginationResult);
       this.isLoadingThreads = false;
     });
+  }
+
+  @action.bound
+  setThreadSummaries(paginationResult: PaginationResult<IDiscussionPost>) {
+    paginationResult.results.forEach(postJson => {
+      this.threadSummariesMap.set(postJson.discussionId, this.parseJsonTree(postJson));
+    });
+    this.threadSummariesHasMorePages = paginationResult.hasNextPage;
+    this.threadSummariesNextStart = paginationResult.nextStart;
   }
 
   @computed

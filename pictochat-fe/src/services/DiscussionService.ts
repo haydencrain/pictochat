@@ -2,10 +2,11 @@ import { DiscussionPost, IDiscussionPost } from '../models/DiscussionPost';
 import ApiService from './ApiService';
 import NewPostPayload from '../models/NewPostPayload';
 import ValidationException from '../models/ValidationException';
+import PaginationResult from '../models/PaginationResult';
 
 export class DiscussionService {
-  static async getDiscussions(): Promise<DiscussionPost[]> {
-    return await ApiService.get(`/discussion`);
+  static async getDiscussions(limit = 10, start?: number): Promise<PaginationResult<IDiscussionPost>> {
+    return await ApiService.get('/discussion', { limit, start });
   }
 
   static async getPost(postId: string): Promise<DiscussionPost> {

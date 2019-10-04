@@ -87,6 +87,10 @@ const ThreadsSummaryList = observer(function ThreadsSummaryList(props: {
   showReplies: boolean;
   noPostsMessage: string;
 }) {
+  React.useEffect(() => {
+    props.store.getNewThreadSummaries();
+  }, []);
+
   return (
     <PostsList
       isLoading={props.store.isLoadingThreads}
