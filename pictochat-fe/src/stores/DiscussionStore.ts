@@ -43,7 +43,7 @@ export default class DiscussionStore {
     const paginationResult = await DiscussionService.getDiscussions(PAGINATION_LIMIT);
     // Mobx @action will only track changes up to the first use of await in an an async function
     // so we need to run the rest in runInAction() to ensure anything observing the modified obserables
-    // is updated
+    // isLoadingReplies updated
     runInAction(() => {
       this.threadSummariesMap.clear();
       this.setThreadSummaries(paginationResult);
@@ -165,7 +165,7 @@ export default class DiscussionStore {
 
   @action.bound
   async createReply(post: NewPostPayload): Promise<DiscussionPost> {
-    this.isLoadingActiveDiscussion = true;
+    this.isLoadingReplies = true;
     let reply = new DiscussionPost(await DiscussionService.createPost(post));
     runInAction(() => {
       this.putPostInActiveMap(reply);
@@ -185,7 +185,7 @@ export default class DiscussionStore {
       if (this.activeDiscussionPosts.has(reply.parentPostId)) {
         this.activeDiscussionPosts.get(reply.parentPostId).replies.push(reply);
       }
-      this.isLoadingActiveDiscussion = false;
+      this.isLoadingReplies = false;
     });
     return reply;
   }
