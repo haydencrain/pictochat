@@ -153,7 +153,6 @@ export class DiscussionService {
       } else {
         post.hide();
         archiveType = ArchiveType.HIDDEN;
-        console.log('hidding');
       }
 
       await post.save();
@@ -186,11 +185,8 @@ export class DiscussionService {
   }
 
   static getFilteredReplies(orderedPosts: DiscussionPost[], startAfterPostId: number): DiscussionPost[] {
-    console.log(startAfterPostId);
     for (let i = 0; i < orderedPosts.length; i++) {
-      console.log(orderedPosts[i].postId === startAfterPostId);
       if (orderedPosts[i].postId === startAfterPostId) {
-        console.log(i);
         return orderedPosts.slice(i + 1);
       }
     }
