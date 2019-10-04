@@ -12,17 +12,18 @@ export class ApiService {
   }
 
   static async post(path: string, data: any, contentType: string = 'application/json'): Promise<any> {
-    return ApiService.ajax('post', path, data, null, contentType);
+    return ApiService.ajax('post', path, data, contentType);
   }
 
   static async put(path: string, data: any, query: any = null, contentType: string = 'application/json'): Promise<any> {
-    if (!query) return ApiService.ajax('put', path, data, null, contentType);
+    if (!query) return ApiService.ajax('put', path, data, contentType);
     const queryString = stringify(query);
-    return ApiService.ajax('put', `${path}?${queryString}`, data, null, contentType);
+    return ApiService.ajax('put', `${path}?${queryString}`, data, contentType);
   }
 
   static async patch(path: string, data: any, contentType: string = 'application/json'): Promise<any> {
-    return ApiService.ajax('patch', path, data, null, contentType);
+    // NOTE: Case of method name matters for PATCH but not others (no idea why) - Jordan
+    return ApiService.ajax('PATCH', path, data, contentType);
   }
 
   // naming inconsistency is due to delete being a reserved JS word
@@ -42,11 +43,12 @@ export class ApiService {
     method: string,
     path: string,
     data: any = null,
-    accessToken: string = cookies.get('pictochatJWT'),
     contentType: string = 'application/json'
   ): Promise<any> {
     const headers: any = { accept: 'application/json' };
     if (contentType !== null) headers['Content-Type'] = contentType;
+
+    const accessToken = cookies.get('pictochatJWT');
     if (accessToken !== null) headers['Authorization'] = `JWT ${accessToken}`;
 
     const request: RequestInit = {
@@ -92,4 +94,3 @@ export class ApiService {
 }
 
 export default ApiService;
-//export default new ApiService();
