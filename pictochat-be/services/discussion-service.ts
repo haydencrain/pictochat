@@ -9,6 +9,7 @@ import { Image } from '../models/image';
 import { NotFoundError } from '../exceptions/not-found-error';
 import { ForbiddenError } from '../exceptions/forbidden-error';
 import { UnprocessableError } from '../exceptions/unprocessable-error';
+import { isNullOrUndefined } from 'util';
 
 let sequelize = SequelizeConnectionService.getInstance();
 
@@ -152,7 +153,6 @@ export class DiscussionService {
       } else {
         post.hide();
         archiveType = ArchiveType.HIDDEN;
-        console.log('hidding');
       }
 
       await post.save();
@@ -167,28 +167,55 @@ export class DiscussionService {
     return await DiscussionThread.getDiscussionThreads();
   }
 
-  static async getReplyTreeUnderPost(postId: number): Promise<DiscussionTreeNode> {
-    const posts: DiscussionPost[] = await DiscussionPost.getPathOrderedSubTreeUnder(postId);
-    return await DiscussionService.makeReplyTree(posts);
+  static async getReplyTreeUnderPost(
+    postId: number,
+    limit?: number,
+    startAfterPostId?: number
+  ): Promise<DiscussionTreeNode> {
+    let posts = await DiscussionService.getPostReplies(postId, startAfterPostId);
+    return await DiscussionService.makeReplyTree(posts, limit);
+  }
+
+  static async getPostReplies(postId: number, startAfterPostId?: number): Promise<DiscussionPost[]> {
+    const rootPost = await DiscussionPost.getDiscussionPost(postId);
+    let posts: DiscussionPost[] = await DiscussionPost.getPathOrderedSubTreeUnder(rootPost);
+    if (!isNullOrUndefined(startAfterPostId)) posts = DiscussionService.getFilteredReplies(posts, startAfterPostId);
+    posts.unshift(rootPost);
+    return posts;
+  }
+
+  static getFilteredReplies(orderedPosts: DiscussionPost[], startAfterPostId: number): DiscussionPost[] {
+    for (let i = 0; i < orderedPosts.length; i++) {
+      if (orderedPosts[i].postId === startAfterPostId) {
+        return orderedPosts.slice(i + 1);
+      }
+    }
+    return orderedPosts;
   }
 
   /**
    * @param posts Array of posts ordered by replyTreePath such that the root is the first post
    * @returns Nested tree-like representation of the specified posts array */
-  private static async makeReplyTree(posts: DiscussionPost[]): Promise<DiscussionTreeNode> {
+  private static async makeReplyTree(posts: DiscussionPost[], limit?: number): Promise<DiscussionTreeNode> {
     // Create reply tree
     let nodes: { [postId: number]: DiscussionTreeNode } = {};
     let rootPostId: number = posts[0].getDataValue('postId');
 
-    for (let post of posts) {
+    for (let i = 0; i < posts.length; i++) {
+      const post = posts[i];
+      const isUnderLimit = isNullOrUndefined(limit) ? true : i < limit;
       let treeNode = await DiscussionTreeNode.makeInstance(post);
-      nodes[treeNode.getDataValue('postId')] = treeNode;
+      if (isUnderLimit) nodes[treeNode.getDataValue('postId')] = treeNode;
 
       const parentPostId: number = treeNode.getDataValue('parentPostId');
       if (parentPostId !== null) {
         const parentNode = nodes[parentPostId];
         if (!!parentNode) {
-          parentNode.addReply(treeNode);
+          if (isUnderLimit) {
+            parentNode.addReply(treeNode);
+          } else {
+            parentNode.hasMore = true;
+          }
         }
       }
     }

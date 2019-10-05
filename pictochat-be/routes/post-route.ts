@@ -10,7 +10,6 @@ import { DiscussionTreeNode } from '../models/discussion-tree-node';
 import config from '../utils/config';
 import { User } from '../models/user';
 import { ForbiddenError } from '../exceptions/forbidden-error';
-import * as ErrorUtils from '../exceptions/error-utils';
 import { DiscussionPost } from '../models/discussion-post';
 
 const AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR';
@@ -27,7 +26,11 @@ export const postRouter = express.Router();
  */
 postRouter.get('/:postId', async (req, res, next) => {
   try {
-    let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(req.params.postId);
+    let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(
+      req.params.postId,
+      req.query.limit,
+      parseInt(req.query.after)
+    );
     res.json(replyTree.toJSON());
   } catch (error) {
     next(error);

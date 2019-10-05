@@ -12,6 +12,7 @@ export interface IDiscussionPost {
   isHidden: boolean;
   commentCount?: number;
   replies?: IDiscussionPost[];
+  hasMore?: boolean;
 }
 
 export class DiscussionPost implements IDiscussionPost {
@@ -29,6 +30,7 @@ export class DiscussionPost implements IDiscussionPost {
   @observable isHidden: boolean;
   @observable commentCount?: number = 0;
   @observable replies?: IObservableArray<DiscussionPost> = observable.array();
+  @observable hasMore?: boolean = false;
 
   constructor(data?: IDiscussionPost) {
     if (data) {
@@ -46,6 +48,9 @@ export class DiscussionPost implements IDiscussionPost {
       if (data.replies) {
         this.replies.replace(data.replies as DiscussionPost[]);
       }
+      if (data.hasMore) {
+        this.hasMore = data.hasMore;
+      }
     }
   }
 
@@ -53,6 +58,11 @@ export class DiscussionPost implements IDiscussionPost {
   removeReply(reply: DiscussionPost) {
     let idx = this.replies.findIndex(p => p.postId === reply.postId);
     this.replies.splice(idx, 1);
+  }
+
+  @action.bound
+  addReplies(replies: DiscussionPost[]) {
+    this.replies.push(...replies);
   }
 
   @action.bound
@@ -67,6 +77,7 @@ export class DiscussionPost implements IDiscussionPost {
     this.isHidden = other.isHidden;
     this.commentCount = other.commentCount;
     this.replies.replace(other.replies.toJS());
+    this.hasMore = other.hasMore;
   }
 
   @action.bound

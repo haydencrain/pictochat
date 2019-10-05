@@ -26,12 +26,10 @@ class Login extends React.Component<{}, LoginState> {
   }
 
   handleEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
-    console.log(event.target.value);
     this.setState({ email: event.target.value });
   }
 
   handlePasswordChange(event: React.ChangeEvent<HTMLInputElement>) {
-    console.log(event.target.value);
     this.setState({ password: event.target.value });
   }
 

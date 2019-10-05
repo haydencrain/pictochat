@@ -19,7 +19,7 @@ interface PostListsProps {
 
 function PostsList(props: PostListsProps) {
   const renderPosts = () => {
-    if (!props.isLoading && props.posts.length === 0) {
+    if (!props.isLoading && props.posts.length === 0 && !props.shouldLoadMore) {
       return (
         <Segment>
           <p>{props.noPostsMessage || 'Nothing to display'}</p>

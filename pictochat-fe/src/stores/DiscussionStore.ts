@@ -13,7 +13,7 @@ const PAGINATION_LIMIT = 10;
  */
 export default class DiscussionStore {
   // pagination variables
-  @observable threadSummariesHasMorePages = true;
+  @observable threadSummariesHasMore = true;
   @observable threadSummariesNextStart = 0;
   @observable threadSummariesMap: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
     observable.map(undefined, { name: 'threadSummariesMap' })
@@ -24,6 +24,7 @@ export default class DiscussionStore {
   );
   @observable isLoadingThreads = false;
   @observable isLoadingActiveDiscussion = false;
+  @observable isLoadingReplies = false;
 
   constructor() {
     // this.getNewThreadSummaries().catch(error => {
@@ -42,7 +43,7 @@ export default class DiscussionStore {
     const paginationResult = await DiscussionService.getDiscussions(PAGINATION_LIMIT);
     // Mobx @action will only track changes up to the first use of await in an an async function
     // so we need to run the rest in runInAction() to ensure anything observing the modified obserables
-    // is updated
+    // isLoadingReplies updated
     runInAction(() => {
       this.threadSummariesMap.clear();
       this.setThreadSummaries(paginationResult);
@@ -65,7 +66,7 @@ export default class DiscussionStore {
     paginationResult.results.forEach(postJson => {
       this.threadSummariesMap.set(postJson.discussionId, this.parseJsonTree(postJson));
     });
-    this.threadSummariesHasMorePages = paginationResult.hasNextPage;
+    this.threadSummariesHasMore = paginationResult.hasNextPage;
     this.threadSummariesNextStart = paginationResult.nextStart;
   }
 
@@ -77,20 +78,41 @@ export default class DiscussionStore {
   @action.bound
   async setActiveDiscussion(postId: string) {
     this.isLoadingActiveDiscussion = true;
+    this.isLoadingReplies = true;
     try {
-      let postJson = await DiscussionService.getPost(postId);
+      let postJson = await DiscussionService.getPost(postId, PAGINATION_LIMIT);
       runInAction(() => {
         let post = this.parseJsonTree(postJson, true);
         this.activeDiscussionRoot.replace(post);
       });
     } finally {
-      runInAction(() => (this.isLoadingActiveDiscussion = false));
+      runInAction(() => {
+        this.isLoadingActiveDiscussion = false;
+        this.isLoadingReplies = false;
+      });
+    }
+  }
+
+  @action.bound
+  async getExtraReplies(parentPostId: string, after?: string) {
+    this.isLoadingReplies = true;
+    try {
+      const postJson = await DiscussionService.getPost(parentPostId, PAGINATION_LIMIT, after);
+      runInAction(() => {
+        let replies: DiscussionPost[] = postJson.replies.map(post => this.parseJsonTree(post, true));
+        const post = this.activeDiscussionPosts.get(postJson.postId);
+        post.hasMore = postJson.hasMore;
+        post.addReplies(replies);
+      });
+    } finally {
+      runInAction(() => (this.isLoadingReplies = false));
     }
   }
 
   @action.bound
   async deletePost(postId: number) {
     this.isLoadingActiveDiscussion = true;
+    this.isLoadingReplies = true;
     try {
       let postJson: IDiscussionPost = await DiscussionService.deletePost(postId);
       // FIXME: Find more explicit way of detecting if post should be deleted
@@ -113,7 +135,10 @@ export default class DiscussionStore {
         }
       }
     } finally {
-      runInAction(() => (this.isLoadingActiveDiscussion = false));
+      runInAction(() => {
+        this.isLoadingActiveDiscussion = false;
+        this.isLoadingReplies = true;
+      });
     }
   }
 
@@ -140,7 +165,7 @@ export default class DiscussionStore {
 
   @action.bound
   async createReply(post: NewPostPayload): Promise<DiscussionPost> {
-    this.isLoadingActiveDiscussion = true;
+    this.isLoadingReplies = true;
     let reply = new DiscussionPost(await DiscussionService.createPost(post));
     runInAction(() => {
       this.putPostInActiveMap(reply);
@@ -160,7 +185,7 @@ export default class DiscussionStore {
       if (this.activeDiscussionPosts.has(reply.parentPostId)) {
         this.activeDiscussionPosts.get(reply.parentPostId).replies.push(reply);
       }
-      this.isLoadingActiveDiscussion = false;
+      this.isLoadingReplies = false;
     });
     return reply;
   }

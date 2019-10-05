@@ -50,7 +50,6 @@ userRouter.post('/', async (req: any, res, next) => {
   passport.authenticate(strategies.REGISTER, (err, user: boolean | User, info) => {
     if (err) return next(err);
     if (!user && !!info) {
-      console.log('INFO: ', info);
       return res.status(400).json(info);
     }
     if (!!info) return res.json(info);
