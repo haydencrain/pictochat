@@ -4,7 +4,6 @@ import { Image } from '../models/image';
 
 export async function syncModels() {
   try {
-    // await DiscussionThread.sync({ force: true });
     await Image.sync({ force: true });
     await User.sync({ force: true });
     await DiscussionPost.sync({ force: true });

@@ -12,6 +12,7 @@ export class User extends Model {
   username!: string;
   password!: string;
   email: string;
+  hasAdminRole: boolean;
   //temp pre authentication
   resetPasswordToken: string;
   resetPasswordExpiry: Date;
@@ -71,6 +72,9 @@ User.init(
     userId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     email: { type: DataTypes.STRING },
     username: { type: DataTypes.STRING, unique: true },
+    // FIXME: Roles should be modelled as a seperate table or outsourced to something like Active Directory
+    // (that way additional roles can be added without updating the schema of this table)
+    hasAdminRole: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     //temp pre authentication
     password: { type: DataTypes.STRING },
     resetPasswordToken: { type: DataTypes.STRING },
@@ -88,9 +92,6 @@ User.init(
     modelName: 'user',
     tableName: 'users',
     freezeTableName: true,
-    indexes: [
-      { fields: ['userId'], using: 'BTREE' },
-      { fields: ['username'], using: 'BTREE' }
-    ]
+    indexes: [{ fields: ['userId'], using: 'BTREE' }, { fields: ['username'], using: 'BTREE' }]
   }
 );
