@@ -2,6 +2,7 @@ import { Sequelize, Model, DataTypes, Op, FindOptions, CountOptions } from 'sequ
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { ImageService } from '../services/image-service';
 import { User } from './user';
+import { Reaction } from './reaction';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
@@ -40,8 +41,8 @@ export class DiscussionPost extends Model {
 
   async isUpdatable(): Promise<boolean> {
     let replyCount: number = await this.getDirectReplyCount();
-    // TODO: Check if the post has any reactions
-    return replyCount === 0;
+    let reactionCount: number = await Reaction.countReactionsForPost(this.postId);
+    return replyCount === 0 && reactionCount === 0;
   }
 
   async isDeleteable(): Promise<boolean> {

@@ -272,13 +272,4 @@ export async function loadTestData() {
   for (let postData of samplePosts) {
     await DiscussionPost.create(postData);
   }
-
-  console.log('Creating test instances for DiscussionThreads');
-  // let sampleThreads = [];
-  // let threadCreationPromises = sampleThreads.map(threadData => DiscussionThread.create(threadData));
-  // await Promise.all(threadCreationPromises);
-
-  console.log('LEADERBOARD RANK QUERY TEST');
-  const test1 = await LeaderboardRank.getTop(10);
-  console.log(test1);
 }

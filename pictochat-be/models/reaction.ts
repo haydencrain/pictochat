@@ -1,5 +1,6 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
+import { DiscussionPost } from './discussion-post';
 import { User } from './user';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
@@ -48,6 +49,10 @@ export class Reaction extends Model {
     });
   }
 
+  static async countReactionsForPost(postId: number): Promise<number> {
+    return await Reaction.count({ where: { postId } });
+  }
+
   static async createReaction(
     reactionId: number,
     reactionName: string,
@@ -80,3 +85,6 @@ Reaction.init(
     freezeTableName: true
   }
 );
+
+Reaction.belongsTo(DiscussionPost, { targetKey: 'postId', foreignKey: 'postId', as: 'post' });
+Reaction.belongsTo(User, { targetKey: 'userId', foreignKey: 'userId', as: 'user' });
