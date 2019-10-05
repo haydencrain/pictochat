@@ -47,8 +47,12 @@ const loginStrategy = new passportLocal.Strategy(
   async (username, password, done) => {
     try {
       // check if correct username
-      const user = await UserService.getUserByUsername(username);
+      const user = await UserService.getUserByUsername(username, true);
       if (user === null) return done(null, false, { message: 'incorrect username' });
+
+      if (user.isDisabled) {
+        return done(null, false, { message: 'This account has been disabled due to suspicious activity' });
+      }
 
       // check if correct password
       const isCorrectPassword = await UserService.assertPasswordMatch(user, password);

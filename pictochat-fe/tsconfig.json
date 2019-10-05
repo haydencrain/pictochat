@@ -4,7 +4,7 @@
     "lib": ["es2015", "es2017", "dom"],
     "module": "es6",
     "moduleResolution": "node",
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "outDir": "./wwwroot/dist/",
     "sourceMap": true,
     "target": "es5",

@@ -86,10 +86,11 @@ export class SockPuppertAlert {
         ON "loginLogs"."deviceId" = "deviceUserCounts"."deviceId"
         INNER JOIN ${User.tableName} AS "user"
         ON "loginLogs"."userId" = "user"."userId"
-      WHERE "user"."hasAdminRole" = FALSE
+      WHERE "user"."hasAdminRole" = FALSE AND "user"."isDisabled" = FALSE
       `,
       queryOptions
     );
+
     return suspiciousDeviceUserPairs as DeviceUserPair[];
   }
 }

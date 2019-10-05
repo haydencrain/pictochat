@@ -292,6 +292,7 @@ export async function loadTestData() {
   await LoginLog.bulkCreate([
     { userId: 1, deviceId: 'device1', loginTimestamp: new Date() },
     { userId: 2, deviceId: 'device1', loginTimestamp: new Date() },
+    { userId: 3, deviceId: 'device1', loginTimestamp: new Date() },
     { userId: 3, deviceId: 'device1', loginTimestamp: new Date() }
   ]);
 }

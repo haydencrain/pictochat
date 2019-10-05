@@ -19,11 +19,14 @@ import * as cookies from 'js-cookie';
 
 import { setDeviceIdCookie } from '../../utils/DeviceId';
 import SockPuppetsDashboardPage from '../../pages/SockPuppetsDashboardPage';
+import * as mobx from 'mobx';
 
 const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
 
 function App() {
   const [stores, setStores] = React.useState(initStores());
+
+  mobx.configure({ enforceActions: 'observed' });
 
   React.useEffect(() => {
     setDeviceIdCookie();
