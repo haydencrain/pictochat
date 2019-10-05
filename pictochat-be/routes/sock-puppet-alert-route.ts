@@ -7,7 +7,8 @@ import { SockPuppertAlert } from '../models/sock-puppet-alert';
 
 export const sockPuppetAlertRouter = express.Router();
 
-sockPuppetAlertRouter.get('/',
+sockPuppetAlertRouter.get(
+  '/',
   // passport.authenticate(strategies.JWT, { session: false }),
   async (req: any, res, next) => {
     try {
@@ -18,8 +19,10 @@ sockPuppetAlertRouter.get('/',
       //   throw new ForbiddenError();
       // }
 
-      const alerts = await SockPuppertAlert.getSockPuppetAlerts();
+      const alerts = await SockPuppertAlert.getSockPuppetAlerts(req.query.userLimit);
       const alertsJson = alerts.map(alert => alert.toJSON());
+      console.log('alertsJson: ', JSON.stringify(alertsJson));
+
       res.send(alertsJson);
     } catch (error) {
       next(error);

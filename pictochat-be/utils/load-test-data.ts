@@ -285,15 +285,13 @@ export async function loadTestData() {
   // let threadCreationPromises = sampleThreads.map(threadData => DiscussionThread.create(threadData));
   // await Promise.all(threadCreationPromises);
 
-  console.log('LEADERBOARD RANK QUERY TEST');
-  const test1 = await LeaderboardRank.getTop(10);
-  console.log(test1);
+  // console.log('LEADERBOARD RANK QUERY TEST');
+  // const test1 = await LeaderboardRank.getTop(10);
+  // console.log(test1);
 
   await LoginLog.bulkCreate([
     { userId: 1, deviceId: 'device1', loginTimestamp: new Date() },
     { userId: 2, deviceId: 'device1', loginTimestamp: new Date() },
     { userId: 3, deviceId: 'device1', loginTimestamp: new Date() }
   ]);
-
-  SockPuppertAlert.getSockPuppetAlerts();
 }

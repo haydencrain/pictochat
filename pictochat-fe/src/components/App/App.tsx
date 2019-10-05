@@ -18,6 +18,7 @@ import * as fingerprint from 'fingerprintjs2';
 import * as cookies from 'js-cookie';
 
 import { setDeviceIdCookie } from '../../utils/DeviceId';
+import SockPuppetsDashboardPage from '../../pages/SockPuppetsDashboardPage';
 
 const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
 
@@ -50,6 +51,7 @@ const AppBody = observer(function AppBody() {
           <Route exact path={`${FRONTEND_URL_ROOT}discussion`} component={DiscussionPage} />
           <Route exact path={`${FRONTEND_URL_ROOT}leaderboard`} component={LeaderboardPage} />
           <Route exact path={`${FRONTEND_URL_ROOT}login`} component={LoginPage} />
+          <Route exact path={`${FRONTEND_URL_ROOT}sock-puppets`} component={SockPuppetsDashboardPage} />
           <Route component={NotFoundPage} />
         </Switch>
       </main>
