@@ -9,15 +9,15 @@ export const sockPuppetAlertRouter = express.Router();
 
 sockPuppetAlertRouter.get(
   '/',
-  // passport.authenticate(strategies.JWT, { session: false }),
+  passport.authenticate(strategies.JWT, { session: false }),
   async (req: any, res, next) => {
     try {
-      // const userId = req.user.userId;
-      // const requestingUser = await User.findOne({where: { userId }});
+      const userId = req.user.userId;
+      const requestingUser = await User.findOne({ where: { userId } });
 
-      // if (!requestingUser.hasAdminRole) {
-      //   throw new ForbiddenError();
-      // }
+      if (!requestingUser.hasAdminRole) {
+        throw new ForbiddenError();
+      }
 
       const alerts = await SockPuppertAlert.getSockPuppetAlerts(req.query.userLimit);
       const alertsJson = alerts.map(alert => alert.toJSON());

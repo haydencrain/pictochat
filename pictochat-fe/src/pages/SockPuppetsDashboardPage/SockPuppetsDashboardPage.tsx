@@ -1,13 +1,11 @@
 import * as React from 'react';
-import User, { IUser } from '../../models/User';
-import ApiService from '../../services/ApiService';
-import { Loader, Item, Label, Button, Segment } from 'semantic-ui-react';
+import User from '../../models/User';
+import { Loader, Item, Button, Segment } from 'semantic-ui-react';
 import { observer, Observer } from 'mobx-react';
 import { RouteComponentProps } from 'react-router';
 import './SockPuppetsDashboardPage.less';
 import StoresContext from '../../contexts/StoresContext';
-import { ISockPuppetAlert, SockPuppetAlert } from '../../models/SockPuppetAlert';
-import { trace, runInAction } from 'mobx';
+import { SockPuppetAlert } from '../../models/SockPuppetAlert';
 
 const USER_LIMIT = 2;
 
@@ -15,8 +13,6 @@ interface PageProps extends RouteComponentProps<any> {}
 
 export function SockPuppetsDashboardPage(props: PageProps) {
   const stores = React.useContext(StoresContext);
-  // const [alerts, isLoading, shouldReFetch, setShouldReFetch] = useFetchSockPuppetAlerts([props.location]);
-  const handleDisableUser = () => {};
 
   useFetchSockPuppetAlerts([props.location]);
 
@@ -41,45 +37,20 @@ function useFetchSockPuppetAlerts(dependencies: any[]) {
   }, dependencies);
 }
 
-// function useFetchSockPuppetAlerts(
-//   dependencies: any[]
-// ): [ISockPuppetAlert[], boolean, boolean, React.Dispatch<React.SetStateAction<boolean>>] {
-//   const [alerts, setAlerts] = React.useState<ISockPuppetAlert[]>();
-//   const [isLoading, setLoading] = React.useState<boolean>(true);
-//   const [shouldReFetch, setShouldReFetch] = React.useState<boolean>(false);
-//   const store = React.useContext(StoresContext).user;
-
-//   React.useEffect(() => {
-//     setLoading(true);
-//     ApiService.get('/sock-puppet-alert', { userLimit: USER_LIMIT })
-//       .then((alerts: ISockPuppetAlert[]) => {
-//         // FIXME: Do this in a sock-puppet alert store
-//         alerts.forEach(alert => {});
-//         setAlerts(alerts);
-//       })
-//       .catch(error => {
-//         console.error('Error encountered during sock puppet alert fetch: ', error);
-//       })
-//       .finally(() => {
-//         setLoading(false);
-//       });
-//   }, [shouldReFetch, ...dependencies]);
-
-//   return [alerts, isLoading, shouldReFetch, setShouldReFetch];
-// }
-
 //// INNER COMPONENTS ////
 
 const SockPuppertsDashboard = observer(function SockPuppertsDashboard(props: { alerts: SockPuppetAlert[] }) {
+  const alertViews = props.alerts.map(alert => <SockPuppetAlertView alert={alert} key={alert.deviceId} />);
+  const placeholder = <div className="bold">No suspicious devices found</div>;
+  const content = props.alerts.length > 0 ? alertViews : placeholder;
+
   return (
     <Segment className="sock-puppets-dashboard">
       <h1>Sock Puppets</h1>
       <div>
         This page contains a list of devices that have been used to access more than {USER_LIMIT} users/accounts.
       </div>
-      {props.alerts.map(alert => (
-        <SockPuppetAlertView alert={alert} key={alert.deviceId} />
-      ))}
+      {content}
     </Segment>
   );
 });
@@ -107,14 +78,10 @@ const SockPuppetAlertView = observer(function SockPuppetAlert(props: { alert: So
 
 const UserView = observer(function UserView(props: { user: User }) {
   const stores = React.useContext(StoresContext);
-  const user = () => {
-    return props.user;
-    // return store.userMap.get(props.user.username);
-  };
+  const user = () => props.user;
   const handleDisableUser = async () => {
     try {
       await stores.user.disableUser(props.user);
-      // await stores.sockPuppetAlerts.loadAlerts(USER_LIMIT);
     } catch (error) {
       if (error.status && error.status === 404) {
         alert("This user either doesn't exist or is already disabled");
@@ -123,15 +90,6 @@ const UserView = observer(function UserView(props: { user: User }) {
       throw error;
     }
   };
-  trace();
-  console.log('RENDER UserView');
-  // // Use the store's copy of the user so we don't have to
-  // // something silly like window.refresh to update other UserView instances for the same user
-  // // when the disable button is pressed
-  // const user = () => store.userMap.get(props.user.username);
-  // if (!store.hasUser(props.user.username)) {
-  //   return null;
-  // }
   return (
     <Item>
       <Item.Header> User: {user().username}</Item.Header>
@@ -139,7 +97,6 @@ const UserView = observer(function UserView(props: { user: User }) {
       <Item.Extra>
         <Observer>
           {() => {
-            trace();
             return (
               <Button floated="right" disabled={user().isDisabled} onClick={handleDisableUser}>
                 Disable User

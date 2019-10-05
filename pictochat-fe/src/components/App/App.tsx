@@ -72,7 +72,13 @@ const UserSection = observer(function UserSection() {
   if (stores.user.isLoading) {
     card = <Loader active />;
   } else if (!stores.user.isLoggedIn) {
-    card = <Login />;
+    card = (
+      <Login
+        onLogin={async () => {
+          location.reload();
+        }}
+      />
+    );
   } else {
     card = <ProfileCard user={stores.user.currentUser} />;
   }

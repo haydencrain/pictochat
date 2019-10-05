@@ -13,6 +13,7 @@ interface Props {
 
 function handleLogout(userStore: UserStore) {
   userStore.logout();
+  location.reload();
 }
 
 function ProfileCard(props: Props) {

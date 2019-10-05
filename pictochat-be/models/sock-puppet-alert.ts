@@ -1,7 +1,6 @@
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { LoginLog } from './login-log';
 import { User } from './user';
-import { QueryTypes } from 'sequelize/types';
 
 const CONCURRNENT_USER_LIMIT = 2;
 
@@ -39,7 +38,6 @@ export class SockPuppertAlert {
    * and return an alert for them */
   static async getSockPuppetAlerts(userLimit: number = CONCURRNENT_USER_LIMIT): Promise<SockPuppetAlert[]> {
     const suspiciousDeviceUserPairs = await SockPuppertAlert.getSuspiciousDeviceUserPairs(userLimit);
-    // console.log('suspiciousDeviceUserPairs: ', suspiciousDeviceUserPairs);
 
     // Group <device, user> user pairs into alerts
     let deviceAlertMap: { [deviceId: string]: SockPuppertAlert } = {};
@@ -71,6 +69,7 @@ export class SockPuppertAlert {
   private static async getSuspiciousDeviceUserPairs(userLimit: number): Promise<DeviceUserPair[]> {
     const userColumns = User.PUBLIC_TABLE_COLUMNS.map(colName => `"user"."${colName}" AS "${colName}"`);
     const userSelectStmtList = userColumns.join(', ');
+    // NOTE: queryOptions.replacements will escape value of userLimit before passing it to the db
     const queryOptions = { model: User, replacements: { userLimit: userLimit } };
     // has format {deviceId, ...<User properties>}
     const suspiciousDeviceUserPairs: User[] = await sequelize.query(
