@@ -1,22 +1,15 @@
 {
   "compilerOptions": {
     "jsx": "react",
-    "lib": [
-      "es2015",
-      "es2017",
-      "dom"
-    ],
+    "lib": ["es2015", "es2017", "dom"],
     "module": "es6",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "outDir": "./wwwroot/dist/",
     "sourceMap": true,
     "target": "es5",
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true
   },
-  "exclude": [
-    "node_modules",
-    "typings",
-    "wwwroot"
-  ]
+  "exclude": ["node_modules", "typings", "wwwroot"]
 }

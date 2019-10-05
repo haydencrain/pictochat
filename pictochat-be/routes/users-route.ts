@@ -4,7 +4,9 @@ import jwt from 'jsonwebtoken';
 import config from '../utils/config';
 import { UserService } from '../services/user-service';
 import { strategies } from '../middleware/passport-middleware';
+import { deviceIdMiddleware } from '../middleware/device-id-middleware';
 import { User } from '../models/user';
+import { LoginLog } from '../models/login-log';
 
 //// HELPERS ////
 
@@ -69,18 +71,30 @@ userRouter.post('/', async (req: any, res, next) => {
 });
 
 // POST auth user
-userRouter.post('/login', (req, res, next) => {
-  passport.authenticate(strategies.LOGIN, (err, user, info) => {
-    if (err) return next(err);
-    if (!!info) return res.json(info);
-    try {
-      req.logIn(user, async err => {
-        let body = makeJWTPayload(user as User);
-        body['message'] = 'User logged in successfully';
-        res.status(200).json(body);
-      });
-    } catch (error) {
-      next(error);
-    }
-  })(req, res, next);
-});
+userRouter.post('/login',
+  deviceIdMiddleware,
+  (req: any, res, next) => {
+    passport.authenticate(strategies.LOGIN, (err, user, info) => {
+      if (err) return next(err);
+      if (!!info) return res.json(info);
+      try {
+        req.logIn(user, async err => {
+          let body = makeJWTPayload(user as User);
+          body['message'] = 'User logged in successfully';
+          res.status(200).json(body);
+
+          // TODO: Move this into dedicated service
+          const loginLogRecord = {
+            userId: user.userId,
+            loginTimestamp: new Date(),
+            deviceId: req.deviceId
+          };
+          console.log('loginLogRecord: ', loginLogRecord);
+          await LoginLog.create(loginLogRecord);
+        });
+      } catch (error) {
+        next(error);
+      }
+    })(req, res, next);
+  }
+);

@@ -14,10 +14,20 @@ import { Loader } from 'semantic-ui-react';
 import Login from '../Login';
 import './App.less';
 
+import * as fingerprint from 'fingerprintjs2';
+import * as cookies from 'js-cookie';
+
+import { setDeviceIdCookie } from '../../utils/DeviceId';
+
 const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
 
 function App() {
   const [stores, setStores] = React.useState(initStores());
+
+  React.useEffect(() => {
+    setDeviceIdCookie();
+  });
+
   return (
     <StoresContext.Provider value={stores}>
       <BrowserRouter>
