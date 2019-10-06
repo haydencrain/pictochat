@@ -10,7 +10,7 @@ import RegisterPage from '../../pages/RegisterPage';
 import LoginPage from '../../pages/LoginPage';
 import NotFoundPage from '../../pages/NotFoundPage';
 import ProfileCard from '../ProfileCard';
-import { Loader } from 'semantic-ui-react';
+import { Loader, Segment } from 'semantic-ui-react';
 import Login from '../Login';
 import './App.less';
 
@@ -68,25 +68,30 @@ const AppBody = observer(function AppBody() {
 const UserSection = observer(function UserSection() {
   const stores = React.useContext(StoresContext);
 
-  let card;
+  const isLoading = mobx.computed(() => stores.user.isLoading);
+
+  const getCard = () => {
+    if (!stores.user.isLoggedIn) {
+      return (
+        <Login
+          isLoading={isLoading.get()}
+          onLogin={async () => {
+            location.reload();
+          }}
+        />
+      );
+    }
+    return <ProfileCard user={stores.user.currentUser} />;
+  };
+
   if (stores.user.isLoading) {
-    card = <Loader active />;
-  } else if (!stores.user.isLoggedIn) {
-    card = (
-      <Login
-        onLogin={async () => {
-          location.reload();
-        }}
-      />
-    );
-  } else {
-    card = <ProfileCard user={stores.user.currentUser} />;
+    return <Loader active />;
   }
 
   return (
     <div>
       <h1>My Profile</h1>
-      {card}
+      {getCard()}
     </div>
   );
 });
