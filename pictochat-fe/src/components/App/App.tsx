@@ -1,7 +1,9 @@
 import * as React from 'react';
+import * as mobx from 'mobx';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import { StoresContext, initStores } from '../../contexts/StoresContext';
+import UserStore from '../../stores/UserStore';
 import Navbar from '../Navbar';
 import HomePage from '../../pages/HomePage';
 import LeaderboardPage from '../../pages/LeaderboardPage';
@@ -10,16 +12,11 @@ import RegisterPage from '../../pages/RegisterPage';
 import LoginPage from '../../pages/LoginPage';
 import NotFoundPage from '../../pages/NotFoundPage';
 import ProfileCard from '../ProfileCard';
-import { Loader, Segment } from 'semantic-ui-react';
+import { Loader } from 'semantic-ui-react';
 import Login from '../Login';
-import './App.less';
-
-import * as fingerprint from 'fingerprintjs2';
-import * as cookies from 'js-cookie';
-
 import { setDeviceIdCookie } from '../../utils/DeviceId';
 import SockPuppetsDashboardPage from '../../pages/SockPuppetsDashboardPage';
-import * as mobx from 'mobx';
+import './App.less';
 
 const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
 
@@ -70,6 +67,11 @@ const UserSection = observer(function UserSection() {
 
   const isLoading = mobx.computed(() => stores.user.isLoading);
 
+  const handleLogout = () => {
+    stores.user.logout();
+    location.reload();
+  };
+
   const getCard = () => {
     if (!stores.user.isLoggedIn) {
       return (
@@ -81,7 +83,7 @@ const UserSection = observer(function UserSection() {
         />
       );
     }
-    return <ProfileCard user={stores.user.currentUser} />;
+    return <ProfileCard user={stores.user.currentUser} onLogoutClick={handleLogout} />;
   };
 
   if (stores.user.isLoading) {
