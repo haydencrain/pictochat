@@ -6,15 +6,7 @@ import './UserPage.less';
 interface UserPageProps {}
 
 function UserPage(props: UserPageProps) {
-  return (
-    <section id="home-page">
-      <ThreadListContainer
-        sectionHeader="Threads"
-        noPostsMessage="No posts have been added yet! Be the first to add a post!"
-        addPostButtonMessage="Create Post"
-      />
-    </section>
-  );
+  return <section id="user-page">Hello world this is me life s hould be uh huh fun for everyone</section>;
 }
 
 export default observer(UserPage);
