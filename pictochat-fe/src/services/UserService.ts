@@ -61,6 +61,10 @@ class UserService {
     return res.user;
   }
 
+  static async disableUser(user: IUser): Promise<void> {
+    return await ApiService.sendDelete(`/user/${user.userId}`);
+  }
+
   private static maybeSetSessionToken(response: any) {
     if (response.auth && response.token) {
       cookies.set('pictochatJWT', response.token);

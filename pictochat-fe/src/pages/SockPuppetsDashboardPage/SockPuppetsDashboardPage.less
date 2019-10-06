@@ -1,0 +1,26 @@
+@import '../../styles/_constants.less';
+
+#sock-puppet-dashboard-page {
+  .sock-puppet-alert {
+    margin-bottom: 10px;
+    .sock-puppet-alert-header {
+      display: block;
+      > div:not(:last-child) {
+        display: inline-block;
+      }
+
+      .device-id {
+        font-weight: bold;
+      }
+
+      .user-count {
+        color: @gray;
+        margin-left: 5px;
+      }
+
+      .device-id-type {
+        margin-bottom: 10px;
+      }
+    }
+  }
+}

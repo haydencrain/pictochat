@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as moment from 'moment-mini';
 import * as classNames from 'classnames';
-import { observer } from 'mobx-react';
+import { observer, Observer } from 'mobx-react';
 import { Image } from 'semantic-ui-react';
 import PostLinks from '../PostLinks';
 import StoresContext from '../../contexts/StoresContext';
@@ -10,6 +10,7 @@ import { PostTypes, getPostTypeName } from '../../models/PostTypes';
 import './Post.less';
 import deletedPlaceholderImg from '../../images/deleted-placeholder.jpg';
 import ShowImageModal from '../ShowImageModal';
+import { computed } from 'mobx';
 
 interface PostProps {
   post: DiscussionPost;
@@ -19,14 +20,14 @@ interface PostProps {
 function Post(props: PostProps) {
   const { post, postType } = props;
 
-  const renderLinks = () => {
+  const renderLinks = computed(() => {
     if (post.isHidden && postType !== PostTypes.Root) {
       return null;
     }
     return <PostLinks postType={postType} post={post} />;
-  };
+  });
 
-  const imageSrc = post.isHidden ? deletedPlaceholderImg : post.imageSrc;
+  const imageSrc = computed(() => (post.isHidden ? deletedPlaceholderImg : post.imageSrc));
 
   return (
     <section className={classNames('thread-post', getPostTypeName(postType))}>
@@ -39,9 +40,12 @@ function Post(props: PostProps) {
           <div className="post-date">{moment(post.postedDate).fromNow()}</div>
         </div>
         <div className="post-body">
-          <ShowImageModal trigger={<Image src={imageSrc} />} imageSrc={imageSrc} />
+          <ShowImageModal
+            trigger={<Observer>{() => <Image src={imageSrc.get()} />}</Observer>}
+            imageSrc={imageSrc.get()}
+          />
         </div>
-        {renderLinks()}
+        {renderLinks.get()}
       </div>
     </section>
   );

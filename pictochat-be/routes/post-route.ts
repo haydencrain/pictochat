@@ -91,7 +91,7 @@ postRouter.delete(
 
       if (archiveType === ArchiveType.DELETED) {
         res.status(204); // Successful, no content
-        res.end();
+        res.send(null);
         return;
       }
 

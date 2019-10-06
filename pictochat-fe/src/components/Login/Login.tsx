@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Form, Button } from 'semantic-ui-react';
+import { Form, Button } from 'semantic-ui-react';
 import StoresContext from '../../contexts/StoresContext';
 import UnauthenticatedUser from '../../models/UnauthenticatedUser';
 import './Login.less';
@@ -10,10 +10,14 @@ interface LoginState {
   password: string;
 }
 
-class Login extends React.Component<{}, LoginState> {
+interface LoginProps {
+  onLogin?: () => Promise<void>;
+}
+
+class Login extends React.Component<LoginProps, LoginState> {
   static contextType = StoresContext;
 
-  constructor(props: any) {
+  constructor(props: LoginProps) {
     super(props);
     this.state = {
       email: '',
@@ -43,6 +47,10 @@ class Login extends React.Component<{}, LoginState> {
         password: this.state.password
       };
       await this.context.user.authAndLoadCurrentUser(user);
+
+      if (this.props.onLogin) {
+        await this.props.onLogin();
+      }
     } catch (error) {
       alert(error);
     }

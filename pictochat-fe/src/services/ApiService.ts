@@ -1,5 +1,6 @@
 import { stringify } from 'query-string';
 import ApiException from '../models/ApiException';
+import { DEVICE_ID_COOKIE_NAME } from '../utils/DeviceId';
 import * as cookies from 'js-cookie';
 
 const BACKEND_ENDPOINT = process.env.PICTOCHAT_API_ROOT || 'http://localhost:443/api';
@@ -49,7 +50,11 @@ export class ApiService {
     if (contentType !== null) headers['Content-Type'] = contentType;
 
     const accessToken = cookies.get('pictochatJWT');
-    if (accessToken !== null) headers['Authorization'] = `JWT ${accessToken}`;
+    if (!!accessToken) headers['Authorization'] = `JWT ${accessToken}`;
+
+    // FIXME: Send a HttpOnly cookie from server on login instead of using fingerprint and headers
+    const deviceId = cookies.get(DEVICE_ID_COOKIE_NAME);
+    if (!!deviceId) headers['X-Device-Id'] = deviceId;
 
     const request: RequestInit = {
       headers,

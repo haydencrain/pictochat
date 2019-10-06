@@ -7,6 +7,8 @@ import { Image } from '../models/image';
 import { syncModels } from './sync-models';
 import { User } from '../models/user';
 import { LeaderboardRank } from '../models/leaderboard-rank';
+import { SockPuppertAlert } from '../models/sock-puppet-alert';
+import { LoginLog } from '../models/login-log';
 
 /**
  * Promise-returning wrapper for fs.readFile
@@ -43,6 +45,11 @@ export async function loadTestData() {
   await User.create({
     email: 'test2@test.com',
     username: 'testuser2', // please avoid using Dosss as that's the name we've been hardcoding for mock data
+    password: hash
+  });
+  await User.create({
+    email: 'test3@test.com',
+    username: 'testuser3', // please avoid using Dosss as that's the name we've been hardcoding for mock data
     password: hash
   });
 
@@ -273,12 +280,10 @@ export async function loadTestData() {
     await DiscussionPost.create(postData);
   }
 
-  console.log('Creating test instances for DiscussionThreads');
-  // let sampleThreads = [];
-  // let threadCreationPromises = sampleThreads.map(threadData => DiscussionThread.create(threadData));
-  // await Promise.all(threadCreationPromises);
-
-  console.log('LEADERBOARD RANK QUERY TEST');
-  const test1 = await LeaderboardRank.getTop(10);
-  console.log(test1);
+  await LoginLog.bulkCreate([
+    { userId: 1, deviceId: 'device1', loginTimestamp: new Date() },
+    { userId: 2, deviceId: 'device1', loginTimestamp: new Date() },
+    { userId: 3, deviceId: 'device1', loginTimestamp: new Date() },
+    { userId: 3, deviceId: 'device1', loginTimestamp: new Date() }
+  ]);
 }

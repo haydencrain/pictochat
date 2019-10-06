@@ -14,10 +14,24 @@ import { Loader } from 'semantic-ui-react';
 import Login from '../Login';
 import './App.less';
 
+import * as fingerprint from 'fingerprintjs2';
+import * as cookies from 'js-cookie';
+
+import { setDeviceIdCookie } from '../../utils/DeviceId';
+import SockPuppetsDashboardPage from '../../pages/SockPuppetsDashboardPage';
+import * as mobx from 'mobx';
+
 const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
 
 function App() {
   const [stores, setStores] = React.useState(initStores());
+
+  mobx.configure({ enforceActions: 'observed' });
+
+  React.useEffect(() => {
+    setDeviceIdCookie();
+  });
+
   return (
     <StoresContext.Provider value={stores}>
       <BrowserRouter>
@@ -40,6 +54,7 @@ const AppBody = observer(function AppBody() {
           <Route exact path={`${FRONTEND_URL_ROOT}discussion`} component={DiscussionPage} />
           <Route exact path={`${FRONTEND_URL_ROOT}leaderboard`} component={LeaderboardPage} />
           <Route exact path={`${FRONTEND_URL_ROOT}login`} component={LoginPage} />
+          <Route exact path={`${FRONTEND_URL_ROOT}sock-puppets`} component={SockPuppetsDashboardPage} />
           <Route component={NotFoundPage} />
         </Switch>
       </main>
@@ -57,7 +72,13 @@ const UserSection = observer(function UserSection() {
   if (stores.user.isLoading) {
     card = <Loader active />;
   } else if (!stores.user.isLoggedIn) {
-    card = <Login />;
+    card = (
+      <Login
+        onLogin={async () => {
+          location.reload();
+        }}
+      />
+    );
   } else {
     card = <ProfileCard user={stores.user.currentUser} />;
   }

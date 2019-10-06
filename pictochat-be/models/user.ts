@@ -1,12 +1,13 @@
 import { Sequelize, Model, DataTypes, WhereOptions } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { ImageService } from '../services/image-service';
+import { NotFoundError } from '../exceptions/not-found-error';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
 export class User extends Model {
-  static readonly PUBLIC_ATTRIBUTES = ['userId', 'email', 'username', 'userAvatarURI'];
-  static readonly PUBLIC_TABLE_COLUMNS = ['userId', 'email', 'username']; // Everything from PUBLIC_ATTRIBUTES excluding virtual columns
+  static readonly PUBLIC_ATTRIBUTES = ['userId', 'email', 'username', 'userAvatarURI', 'hasAdminRole'];
+  static readonly PUBLIC_TABLE_COLUMNS = ['userId', 'email', 'username', 'hasAdminRole']; // Everything from PUBLIC_ATTRIBUTES excluding virtual columns
 
   userId!: number;
   username!: string;
@@ -16,6 +17,15 @@ export class User extends Model {
   //temp pre authentication
   resetPasswordToken: string;
   resetPasswordExpiry: Date;
+  isDisabled: boolean;
+
+  disable() {
+    this.isDisabled = true;
+  }
+
+  enable() {
+    this.isDisabled = true;
+  }
 
   /**
    * @returns JSON with only PUBLIC_ATTRIBUTES */
@@ -28,17 +38,29 @@ export class User extends Model {
     return json;
   }
 
+  static defaultFilter(includeDisabled: boolean = false) {
+    let filter = {};
+    if (!includeDisabled) {
+      filter['isDisabled'] = false;
+    }
+    return filter;
+  }
+
   static async createUser(username: string, hashedPassword: string): Promise<User> {
     return await User.create({ username, password: hashedPassword });
   }
 
-  static async getUserByUsername(username: string): Promise<User> {
-    return User.findOne({
+  static async getUserByUsername(username: string, includeDisabled: boolean = false): Promise<User> {
+    const user = await User.findOne({
       attributes: {
         include: User.PUBLIC_ATTRIBUTES
       },
-      where: { username }
+      where: { username, ...User.defaultFilter(includeDisabled) }
     });
+    // if (user === null || user === undefined) {
+    //   throw new NotFoundError();
+    // }
+    return user;
   }
 
   /**
@@ -47,23 +69,35 @@ export class User extends Model {
    *    included in the returned object.
    * @returns a User instance with the specified userId
    */
-  static async getUser(userId: number, onlyIncludePublicAttrs: boolean = true): Promise<User> {
-    let queryParams = { where: { userId } };
+  static async getUser(
+    userId: number,
+    onlyIncludePublicAttrs: boolean = true,
+    includeDisabled: boolean = false
+  ): Promise<User> {
+    let queryParams = { where: { userId, ...User.defaultFilter(includeDisabled) } };
     if (onlyIncludePublicAttrs) {
       queryParams['attributes'] = { include: User.PUBLIC_ATTRIBUTES };
     }
-    return await User.findOne(queryParams);
+    const user = await User.findOne(queryParams);
+    // if (user === null || user === undefined) {
+    //   throw new NotFoundError();
+    // }
+    return user;
   }
 
   /**
    * @param onlyIncludePublicAttrs When true, only fields in User.PUBLIC_ATTRIBUTES will be
    *    included in the returned object. */
   static async getUsers(onlyIncludePublicAttrs: boolean = true, filter?: WhereOptions): Promise<User[]> {
-    let queryParams = { order: ['userId'] };
+    let queryParams = { order: ['userId'], where: User.defaultFilter() };
     if (onlyIncludePublicAttrs) {
       queryParams['attributes'] = { include: User.PUBLIC_ATTRIBUTES };
     }
-    return User.findAll(queryParams);
+    const users = User.findAll(queryParams);
+    // if (users === null || users === undefined) {
+    //   throw new NotFoundError();
+    // }
+    return users;
   }
 }
 
@@ -72,6 +106,7 @@ User.init(
     userId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     email: { type: DataTypes.STRING },
     username: { type: DataTypes.STRING, unique: true },
+    isDisabled: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     // FIXME: Roles should be modelled as a seperate table or outsourced to something like Active Directory
     // (that way additional roles can be added without updating the schema of this table)
     hasAdminRole: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
@@ -92,6 +127,7 @@ User.init(
     modelName: 'user',
     tableName: 'users',
     freezeTableName: true,
+    // paranoid: true,
     indexes: [{ fields: ['userId'], using: 'BTREE' }, { fields: ['username'], using: 'BTREE' }]
   }
 );
