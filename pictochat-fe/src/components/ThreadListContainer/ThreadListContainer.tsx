@@ -54,6 +54,7 @@ function ThreadListContainer(props: ThreadListContainerProps) {
         createButtonMessage={props.addPostButtonMessage}
         activeSort={activeSort.get()}
         onSortSelect={handleSortSelect}
+        parentId={props.id}
       />
       {postList}
     </section>
