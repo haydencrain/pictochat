@@ -15,7 +15,7 @@ interface DeviceUserPair extends User {
   deviceId: string;
 }
 
-export class SockPuppertAlert {
+export class SockPuppetAlert {
   deviceId: string;
   users: User[];
 
@@ -37,17 +37,17 @@ export class SockPuppertAlert {
    * Find any devices that have been used to login as > CONCURRNENT_USER_LIMIT users
    * and return an alert for them */
   static async getSockPuppetAlerts(userLimit: number = CONCURRNENT_USER_LIMIT): Promise<SockPuppetAlert[]> {
-    const suspiciousDeviceUserPairs = await SockPuppertAlert.getSuspiciousDeviceUserPairs(userLimit);
+    const suspiciousDeviceUserPairs = await SockPuppetAlert.getSuspiciousDeviceUserPairs(userLimit);
 
     // Group <device, user> user pairs into alerts
-    let deviceAlertMap: { [deviceId: string]: SockPuppertAlert } = {};
-    let alerts = [];
+    let deviceAlertMap: { [deviceId: string]: SockPuppetAlert } = {};
+    let alerts: SockPuppetAlert[] = [];
     for (let deviceUserPair of suspiciousDeviceUserPairs) {
       const deviceId = deviceUserPair.getDataValue('deviceId');
       const user = deviceUserPair;
 
       if (!deviceAlertMap[deviceId]) {
-        const alert = new SockPuppertAlert(deviceId);
+        const alert = new SockPuppetAlert(deviceId);
         deviceAlertMap[deviceId] = alert;
         alerts.push(alert);
       }

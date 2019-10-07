@@ -1,13 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import { timestamp } from './date-utils';
 import { DiscussionPost } from '../models/discussion-post';
-import { DiscussionThread } from '../models/discussion-thread';
 import { Image } from '../models/image';
 import { syncModels } from './sync-models';
 import { User } from '../models/user';
-import { LeaderboardRank } from '../models/leaderboard-rank';
-import { SockPuppertAlert } from '../models/sock-puppet-alert';
 import { LoginLog } from '../models/login-log';
 
 /**
