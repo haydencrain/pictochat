@@ -6,6 +6,7 @@ import { PostTypes } from '../../models/PostTypes';
 import PostsList from '../PostsList';
 import Post from '../Post';
 import './PostsListItem.less';
+import RepliesList from '../RepliesList/RepliesList';
 
 interface PostListItemProps {
   post: DiscussionPost;
@@ -14,13 +15,14 @@ interface PostListItemProps {
 }
 
 function PostsListItem(props: PostListItemProps) {
-  // const { post, postType, showReplies } = props;
-
   const renderPostReplies = () => {
-    if (props.post.replies.length === 0) { return null; }
+    if (props.post.replies.length === 0 && !props.post.hasMore) {
+      return null;
+    }
+
     return (
       <div className="post-replies">
-        <PostsList postsType={PostTypes.Reply} posts={props.post.replies} raised={false} showReplies />
+        <RepliesList postId={props.post.postId} raised={false} showReplies />
       </div>
     );
   };

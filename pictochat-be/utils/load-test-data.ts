@@ -1,11 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { timestamp } from './date-utils';
 import { DiscussionPost } from '../models/discussion-post';
-import { DiscussionThread } from '../models/discussion-thread';
 import { Image } from '../models/image';
 import { syncModels } from './sync-models';
 import { User } from '../models/user';
+import { LoginLog } from '../models/login-log';
 
 /**
  * Promise-returning wrapper for fs.readFile
@@ -42,6 +41,11 @@ export async function loadTestData() {
   await User.create({
     email: 'test2@test.com',
     username: 'testuser2', // please avoid using Dosss as that's the name we've been hardcoding for mock data
+    password: hash
+  });
+  await User.create({
+    email: 'test3@test.com',
+    username: 'testuser3', // please avoid using Dosss as that's the name we've been hardcoding for mock data
     password: hash
   });
 
@@ -196,14 +200,86 @@ export async function loadTestData() {
       imageId: 'asdsdfsdfd0-20190101T010101000',
       authorId: 2,
       postedDate: new Date()
+    },
+    {
+      discussionId: 6,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date()
+    },
+    {
+      discussionId: 7,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date()
+    },
+    {
+      discussionId: 8,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date()
+    },
+    {
+      discussionId: 9,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date()
+    },
+    {
+      discussionId: 10,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date()
+    },
+    {
+      discussionId: 11,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date()
+    },
+    {
+      discussionId: 12,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date()
+    },
+    {
+      discussionId: 13,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date()
+    },
+    {
+      discussionId: 14,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date()
+    },
+    {
+      discussionId: 15,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 2,
+      postedDate: new Date()
     }
   ];
   for (let postData of samplePosts) {
     await DiscussionPost.create(postData);
   }
 
-  console.log('Creating test instances for DiscussionThreads');
-  // let sampleThreads = [];
-  // let threadCreationPromises = sampleThreads.map(threadData => DiscussionThread.create(threadData));
-  // await Promise.all(threadCreationPromises);
+  await LoginLog.bulkCreate([
+    { userId: 1, deviceId: 'device1', loginTimestamp: new Date() },
+    { userId: 2, deviceId: 'device1', loginTimestamp: new Date() },
+    { userId: 3, deviceId: 'device1', loginTimestamp: new Date() },
+    { userId: 3, deviceId: 'device1', loginTimestamp: new Date() }
+  ]);
 }

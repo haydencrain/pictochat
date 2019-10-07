@@ -4,9 +4,21 @@ body {
   background: @appBackground!important;
 }
 
+.segment {
+  min-height: 50px;
+}
+
 .link,
 .ui.button.link {
   background-color: transparent;
   color: @buttonPrimary;
   text-decoration: underline;
+  border: inherit;
+  font: inherit;
+  padding: inherit;
+  cursor: pointer;
+}
+
+.bold {
+  font-weight: bold;
 }

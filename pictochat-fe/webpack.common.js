@@ -8,7 +8,8 @@ module.exports = {
   entry: { main: path.resolve(__dirname, './src/index.tsx') },
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, '../build/pictochat-fe')
+    path: path.resolve(__dirname, '../build/pictochat-fe'),
+    publicPath: '/'
   },
   plugins: [
     new CleanWebpackPlugin(),

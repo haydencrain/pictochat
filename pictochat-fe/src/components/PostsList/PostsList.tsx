@@ -13,37 +13,45 @@ interface PostListsProps {
   isLoading?: boolean;
   showReplies: boolean;
   raised: boolean;
+  shouldLoadMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 function PostsList(props: PostListsProps) {
-  const renderLoading = () => (
-    <Segment className="post-list-loading">
-      <Loader active />
-    </Segment>
-  );
-
-  const renderNoPosts = () => (
-    <Segment>
-      <p>{props.noPostsMessage || 'Nothing to display'}</p>
-    </Segment>
-  );
-
   const renderPosts = () => {
-    return props.posts.map((post) => {
+    if (!props.isLoading && props.posts.length === 0 && !props.shouldLoadMore) {
+      return (
+        <Segment>
+          <p>{props.noPostsMessage || 'Nothing to display'}</p>
+        </Segment>
+      );
+    }
+
+    return props.posts.map(post => {
       return <PostsListItem key={post.postId} post={post} postType={props.postsType} showReplies={props.showReplies} />;
     });
   };
 
-  const renderContent = () => {
-    if (!!props.isLoading) return renderLoading();
-    if (props.posts.length > 0) return renderPosts();
-    return renderNoPosts();
-  };
+  const renderLoadMore = () =>
+    props.shouldLoadMore &&
+    !props.isLoading && (
+      <Segment className="post-list-load-more link" onClick={() => props.onLoadMore && props.onLoadMore()}>
+        Load More...
+      </Segment>
+    );
 
-  // const content = (props.posts.length > 0) ? renderPosts() : renderNoPosts();
+  const renderLoading = () =>
+    props.isLoading && (
+      <Segment className="post-list-loading">
+        <Loader active />
+      </Segment>
+    );
+
   return (
     <Segment.Group className="post-list" raised={props.raised}>
-      {renderContent()}
+      {renderPosts()}
+      {renderLoadMore()}
+      {renderLoading()}
     </Segment.Group>
   );
 }

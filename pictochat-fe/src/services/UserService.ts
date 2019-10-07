@@ -10,8 +10,15 @@ interface LoginResult {
 }
 
 class UserService {
+  static getUserUrl(username: string): string {
+    return `/user/${username}`;
+  }
+
   static async getUser(username: string): Promise<IUser> {
-    return await ApiService.get(`/user?username=${username}`);
+    const query = {
+      username
+    };
+    return await ApiService.get('/user', query);
   }
 
   static async getCurrentUser(): Promise<IUser> {
@@ -56,6 +63,10 @@ class UserService {
       UserService.maybeSetSessionToken(res);
     }
     return res.user;
+  }
+
+  static async disableUser(user: IUser): Promise<void> {
+    return await ApiService.sendDelete(`/user/${user.userId}`);
   }
 
   private static maybeSetSessionToken(response: any) {
