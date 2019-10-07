@@ -32,10 +32,8 @@ function Post(props: PostProps) {
 
   const imageSrc = computed(() => (post.isHidden ? deletedPlaceholderImg : post.imageSrc));
 
-  const handleCardClick = () => props.history.push(`/discussion/${post.postId}`);
-
   return (
-    <section className={classNames('thread-post', getPostTypeName(postType))} onClick={handleCardClick}>
+    <section className={classNames('thread-post', getPostTypeName(postType))}>
       <div className="post-sidebar">
         <Link to={UserService.getUserUrl(post.author.username)}>
           <Image src={post.author.userAvatarURI} avatar size="mini" />
