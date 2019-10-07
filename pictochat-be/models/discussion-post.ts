@@ -18,7 +18,8 @@ export class DiscussionPost extends Model {
     'parentPostId',
     'replyTreePath',
     'isHidden',
-    'isDeleted'
+    'isDeleted',
+    'reactionsCount'
   ];
   private static readonly USER_JOIN = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
 
@@ -33,6 +34,7 @@ export class DiscussionPost extends Model {
   replyTreePath!: string;
   isHidden!: boolean;
   isDeleted!: boolean;
+  reactionsCount!: number;
 
   // Attributes for associations
   author?: User;
@@ -41,8 +43,7 @@ export class DiscussionPost extends Model {
 
   async isUpdatable(): Promise<boolean> {
     let replyCount: number = await this.getDirectReplyCount();
-    // TODO: Check if the post has any reactions
-    return replyCount === 0;
+    return replyCount === 0 && this.reactionsCount === 0;
   }
 
   async isDeleteable(): Promise<boolean> {
@@ -80,6 +81,14 @@ export class DiscussionPost extends Model {
   private getReplyPathPrefix(): string {
     const replyTreePath = this.getDataValue('replyTreePath');
     return `${replyTreePath || ''}${this.getDataValue('postId')}`;
+  }
+
+  static async incrementReactionsCount(postId: number): Promise<DiscussionPost> {
+    return await DiscussionPost.increment({ reactionsCount: 1 }, { where: { postId } });
+  }
+
+  static async decrementReactionsCount(postId: number): Promise<DiscussionPost> {
+    return await DiscussionPost.increment({ reactionsCount: -1 }, { where: { postId } });
   }
 
   //// STATIC/COLLECTION METHODS ////
@@ -184,8 +193,7 @@ export class DiscussionPost extends Model {
     switch (sortType) {
       // Order by reactions Descending
       case SortTypes.REACTIONS:
-        // FIXME: order by reactionCount DESC when implemented
-        return ['postedDate', 'DESC'];
+        return ['reactionsCount', 'DESC'];
 
       case SortTypes.NEW:
       case SortTypes.NONE:
@@ -213,6 +221,7 @@ DiscussionPost.init(
     replyTreePath: { type: DataTypes.STRING },
     isHidden: { type: DataTypes.BOOLEAN, defaultValue: false },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
+    reactionsCount: { type: DataTypes.INTEGER, defaultValue: 0 },
     imageSrc: {
       type: DataTypes.VIRTUAL,
       get() {

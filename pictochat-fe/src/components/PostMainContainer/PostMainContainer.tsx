@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import { useFetchPost } from '../../hooks/PostsHooks';
 import { PostTypes } from '../../models/PostTypes';
 import { Segment, Loader } from 'semantic-ui-react';
 import Post from '../Post';

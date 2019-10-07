@@ -8,13 +8,14 @@ import StoresContext from '../../contexts/StoresContext';
 import { DiscussionPost } from '../../models/DiscussionPost';
 import { PostTypes, getPostTypeName } from '../../models/PostTypes';
 import './Post.less';
+import Reactions from '../Reactions';
 import deletedPlaceholderImg from '../../images/deleted-placeholder.jpg';
 import ShowImageModal from '../ShowImageModal';
 import { computed } from 'mobx';
-import { Link } from 'react-router-dom';
+import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import UserService from '../../services/UserService';
 
-interface PostProps {
+interface PostProps extends RouteComponentProps<any> {
   post: DiscussionPost;
   postType?: PostTypes;
 }
@@ -53,8 +54,9 @@ function Post(props: PostProps) {
         </div>
         {renderLinks.get()}
       </div>
+      <Reactions postId={Number(props.post.postId)} />
     </section>
   );
 }
 
-export default observer(Post);
+export default observer(withRouter(Post));

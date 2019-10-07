@@ -19,7 +19,7 @@ export default function ThreadListMenu(props: ThreadListMenuProps) {
     const handleClick = (e, { name }) => props.onSortSelect(name);
     return (
       <Menu.Item className="semantic-a" key={option.value} name={option.value} active={active} onClick={handleClick}>
-        {option.value}
+        {option.title}
       </Menu.Item>
     );
   });

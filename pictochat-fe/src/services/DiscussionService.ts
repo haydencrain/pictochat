@@ -3,7 +3,7 @@ import ApiService from './ApiService';
 import NewPostPayload from '../models/NewPostPayload';
 import ValidationException from '../models/ValidationException';
 import PaginationResult from '../models/PaginationResult';
-import { SortValue } from '../models/SortTypes';
+import { SortValue, SortTypes } from '../models/SortTypes';
 
 export class DiscussionService {
   static async getDiscussions(sort: SortValue, limit = 10, start?: number): Promise<PaginationResult<IDiscussionPost>> {
@@ -11,13 +11,13 @@ export class DiscussionService {
   }
 
   // 'after' is the id of the post before the new replies that you want
-  static async getPost(postId: string, limit = 10, after?: string): Promise<DiscussionPost> {
-    return new DiscussionPost(await ApiService.get(`/post/${postId}`, { limit, after }));
+  static async getPost(postId: string, sort: SortValue, limit = 10, after?: string): Promise<IDiscussionPost> {
+    return await ApiService.get(`/post/${postId}`, { limit, after, sort });
   }
 
-  static async getPostReplies(discussionId: string): Promise<DiscussionPost[]> {
-    const discussion = await this.getPost(discussionId);
-    return discussion.replies.toJS();
+  static async getPostReplies(discussionId: string, sort: SortValue): Promise<IDiscussionPost[]> {
+    const discussion = await this.getPost(discussionId, sort);
+    return discussion.replies;
   }
 
   static async createPost(post: NewPostPayload): Promise<IDiscussionPost> {
@@ -32,7 +32,7 @@ export class DiscussionService {
 
     let response = await ApiService.post('/post', formData, null);
     // TODO: Have backend return API URL path that can be used retireve newly created post resource
-    return await DiscussionService.getPost(response.postId || response.rootPostId);
+    return await DiscussionService.getPost(response.postId || response.rootPostId, SortTypes.NEW);
   }
 
   static async updatePost(data: { postId: number; image: File }): Promise<IDiscussionPost> {

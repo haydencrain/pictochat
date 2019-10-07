@@ -5,8 +5,15 @@ import reactionService from '../../services/ReactionService';
 import './Reactions.less';
 import StoresContext from '../../contexts/StoresContext';
 import { useToggleModal } from '../../hooks/ModalHooks';
+import { Reaction } from '../../models/Reaction';
 
-const REACTIONS = [{ icon: '👍' }, { icon: '👎' }, { icon: '😂' }, { icon: '😍' }, { icon: '😡' }];
+const REACTIONS = [
+  { icon: '👍', name: 'thumbs-up' },
+  { icon: '👎', name: 'thumbs-down' },
+  { icon: '😂', name: 'laugh' },
+  { icon: '😍', name: 'heart' },
+  { icon: '😡', name: 'angry' }
+];
 
 interface ReactionsProps {
   postId: number;
@@ -20,11 +27,25 @@ function Reactions(props: ReactionsProps) {
 
   //TODO: arrange by reaction and then get the subsequent counts
 
-  const addReaction = (reactionName: string) => {};
+  const addReaction = (reactionName: string) => {
+    return reactionService.addReaction(reactionName, props.postId, Number(currentUser.userId));
+  };
+
+  //TODO: Fix trash code that won't sort reactions
+  // let reactionCount = async (reactionName: string) => {
+  //   let rCount: Reaction[] = await reactionService.getReactionsPost(props.postId);
+  //   let r = rCount.filter(react => {
+  //     return react.reactionName === reactionName;
+  //   }).length;
+  //   console.log(r);
+  //   return r;
+  // };
+
+  // console.log('React ' + Number(reactionCount('thumbs-up')));
 
   const currentReactions = REACTIONS.map((react, index) => (
-    <Label key={index} onClick={() => addReaction('name')}>
-      <p className="icon"> {react.icon}</p> <p>1</p>
+    <Label as="a" key={index} onClick={() => addReaction(react.name)}>
+      <p className="icon"> {react.icon}</p> <p className="num">1</p>
     </Label>
   ));
 
@@ -48,12 +69,22 @@ function PopupReactions(props: ReactionPopUpProps) {
   };
 
   const content = (
-    <ul>
-      <li onClick={() => handleClickedReaction('thumbs-up')}>REACTIONS.icon[0]</li>
-      <li onClick={() => handleClickedReaction('thumbs-down')}>REACTIONS.icon[1]</li>
-      <li onClick={() => handleClickedReaction('laugh')}>REACTIONS.icon[2]</li>
-      <li onClick={() => handleClickedReaction('heart')}>REACTIONS.icon[3]</li>
-      <li onClick={() => handleClickedReaction('angry')}>REACTIONS.icon[4]</li>
+    <ul className="react-content">
+      <li className="reaction-icon" onClick={() => handleClickedReaction('thumbs-up')}>
+        👍
+      </li>
+      <li className="reaction-icon" onClick={() => handleClickedReaction('thumbs-down')}>
+        👎
+      </li>
+      <li className="reaction-icon" onClick={() => handleClickedReaction('laugh')}>
+        😂
+      </li>
+      <li className="reaction-icon" onClick={() => handleClickedReaction('heart')}>
+        😍
+      </li>
+      <li className="reaction-icon" onClick={() => handleClickedReaction('angry')}>
+        😡
+      </li>
     </ul>
   );
 

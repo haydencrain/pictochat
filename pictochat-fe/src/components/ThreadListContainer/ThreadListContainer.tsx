@@ -48,8 +48,9 @@ function ThreadListContainer(props: ThreadListContainerProps) {
   const handleSortSelect = (sort: SortValue) => {
     if (isThreadsSummary) {
       store.setThreadSummariesActiveSort(sort);
+    } else {
+      store.setActiveDiscussionSort(sort);
     }
-    store.setActiveDiscussionSort(sort);
   };
 
   const postListProps = {
