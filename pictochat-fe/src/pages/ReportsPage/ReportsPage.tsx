@@ -7,80 +7,109 @@ import { computed } from 'mobx';
 import ContentReportService from '../../services/ContentReportService';
 import moment from 'moment-mini';
 import { IDiscussionPost } from '../../models/DiscussionPost';
+import { Link } from 'react-router-dom';
+import Unauthorised from '../../components/Unauthorised';
 import './ReportsPage.less';
+import DiscussionService from '../../services/DiscussionService';
 
 interface PageProps extends RouteComponentProps<any> {}
 
 function ReportsPage(props: PageProps) {
   const stores = React.useContext(StoresContext);
   const canViewPage = computed(() => stores.user.isLoggedIn && stores.user.currentUser.hasAdminRole);
-
   const [reports, setReports] = React.useState<IDiscussionPost[]>();
   const [isLoading, setLoading] = React.useState(true);
 
+  const fetchReports = async () => {
+    setLoading(true);
+    const contentReports = await ContentReportService.getContentReports();
+    setReports(contentReports);
+    setLoading(false);
+  };
+
   React.useEffect(() => {
-    (async () => {
-      const contentReports = await ContentReportService.getContentReports();
-      setReports(contentReports);
-      setLoading(false);
-    })();
+    fetchReports();
   }, []);
 
-  let content;
   if (!canViewPage.get()) {
-    content = 'You are unauthorised to view this page';
-  } else if (isLoading) {
-    content = <Loader active />;
-  } else {
-    content = <ReportsDashboard reports={reports} />;
+    return <Unauthorised />;
   }
 
-  return <section id="reports-page">{content}</section>;
-}
+  const unflagReport = async (postId: string) => {
+    await ContentReportService.unflagReportedPost(postId);
+    fetchReports();
+  };
 
-export default observer(ReportsPage);
+  const deleteReport = async (postId: string) => {
+    await DiscussionService.deletePost(postId);
+    fetchReports();
+  };
 
-//// INNER COMPONENTS ////
+  const handleUnflagClick = (postId: string) => {
+    unflagReport(postId);
+  };
 
-const ReportsDashboard = observer(function ReportsDashboard(props: { reports: IDiscussionPost[] }) {
+  const handleDeleteClick = (postId: string) => {
+    deleteReport(postId);
+  };
+
   const getContent = () => {
-    if (props.reports.length > 0) {
-      return <ReportAlert reports={props.reports} />;
+    if (isLoading) return <Loader active />;
+    if (reports.length > 0) {
+      return <ReportPosts reports={reports} onUnflagClick={handleUnflagClick} onDeleteClick={handleDeleteClick} />;
     }
     return <div className="bold">No reports found</div>;
   };
 
   return (
-    <>
+    <section id="reports-page">
       <h1>Reports</h1>
       <p>This page contains a list of posts that have been flagged as offensive by users</p>
       <Segment raised className="reports-dashboard">
         {getContent()}
       </Segment>
-    </>
+    </section>
   );
-});
+}
 
-const ReportAlert = observer(function ReportAlert(props: { reports: IDiscussionPost[] }) {
-  const reportItems = props.reports.map(report => <ReportPost report={report} key={report.postId} />);
-  return <Item.Group divided>{reportItems}</Item.Group>;
-});
+function ReportPosts(props: {
+  reports: IDiscussionPost[];
+  onDeleteClick: (postId: string) => void;
+  onUnflagClick: (postId: string) => void;
+}) {
+  const reportPosts = props.reports.map(report => (
+    <ReportPost
+      report={report}
+      key={report.postId}
+      onUnflagClick={() => props.onUnflagClick(report.postId)}
+      onDeleteClick={() => props.onDeleteClick(report.postId)}
+    />
+  ));
+  return <Item.Group divided>{reportPosts}</Item.Group>;
+}
 
-const ReportPost = observer(function ReportPost(props: { report: IDiscussionPost }) {
+function ReportPost(props: { report: IDiscussionPost; onDeleteClick: () => void; onUnflagClick: () => void }) {
   const post = () => props.report;
-  const handleDisableUser = async () => {};
   return (
     <Item>
       <Item.Image src={post().imageSrc} />
       <Item.Content>
-        <Item.Header>PostId: {post().postId}</Item.Header>
-        <Item.Meta>Created At: {moment(post().postedDate).format()}</Item.Meta>
+        <Item.Header>
+          PostId: <Link to={`/discussion/${post().postId}`}>{post().postId}</Link>
+        </Item.Header>
+        <Item.Meta>{moment(post().postedDate).format()}</Item.Meta>
         <Item.Description>User: {post().author.username}</Item.Description>
         <Item.Extra>
-          <Button floated="right">Delete Post</Button>
-          <Button floated="right">Unflag Post</Button>
+          <Button floated="right" onClick={props.onDeleteClick}>
+            Delete Post
+          </Button>
+          <Button floated="right" onClick={props.onUnflagClick}>
+            Unflag Post
+          </Button>
         </Item.Extra>
       </Item.Content>
     </Item>
   );
-});
+}
+
+export default observer(ReportsPage);

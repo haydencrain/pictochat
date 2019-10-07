@@ -7,6 +7,7 @@ import './SockPuppetsDashboardPage.less';
 import StoresContext from '../../contexts/StoresContext';
 import { SockPuppetAlert } from '../../models/SockPuppetAlert';
 import { computed } from 'mobx';
+import Unauthorised from '../../components/Unauthorised';
 
 const USER_LIMIT = 2;
 
@@ -19,10 +20,12 @@ export function SockPuppetsDashboardPage(props: PageProps) {
 
   useFetchSockPuppetAlerts([props.location]);
 
-  let content;
   if (!canViewPage.get()) {
-    content = 'You are unauthorised to view this page';
-  } else if (stores.sockPuppetAlerts.isLoading) {
+    return <Unauthorised />;
+  }
+
+  let content;
+  if (stores.sockPuppetAlerts.isLoading) {
     content = <Loader active />;
   } else {
     content = <SockPuppertsDashboard alerts={stores.sockPuppetAlerts.alerts} />;
