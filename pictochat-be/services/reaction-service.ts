@@ -2,6 +2,7 @@ import { Reaction } from '../models/reaction';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { UniqueConstraintError } from 'sequelize';
 import { UnprocessableError } from '../exceptions/unprocessable-error';
+import { DiscussionPost } from '../models/discussion-post';
 
 const sequelize = SequelizeConnectionService.getInstance();
 
@@ -23,6 +24,7 @@ export class ReactionService {
   static async createReaction(reactionName: string, postId: number, userId: number): Promise<Reaction> {
     return await sequelize.transaction(async transaction => {
       try {
+        await DiscussionPost.incrementReactionsCount(postId);
         return await Reaction.createReaction(reactionName, postId, userId);
       } catch (error) {
         if (error instanceof UniqueConstraintError) {
@@ -30,7 +32,15 @@ export class ReactionService {
         }
       }
     });
+  }
 
+  /**
+   * TODO: Use this instead of inlining in router - Jordan
+   */
+  static async removeReaction(reactionName: string, postId: number, userId: number) {
+    // const numberRemoved = await Reaction.removeReaction(reactionName, postId, userId);
+    // await DiscussionPost.decrementReactionsCount(postId);
+    // return numberRemoved;
   }
 
   // static async removeReaction(reactionName: string, postId: number, userId: number) {

@@ -10,6 +10,7 @@ export interface IDiscussionPost {
   imageSrc: string;
   postedDate: string;
   isHidden: boolean;
+  reactionsCount: number;
   commentCount?: number;
   replies?: IDiscussionPost[];
   hasMore?: boolean;
@@ -28,6 +29,7 @@ export class DiscussionPost implements IDiscussionPost {
   // @observable createdAt: string;
   // @observable updatedAt: string;
   @observable isHidden: boolean;
+  @observable reactionsCount: number;
   @observable commentCount?: number = 0;
   @observable replies?: IObservableArray<DiscussionPost> = observable.array();
   @observable hasMore?: boolean = false;
@@ -42,6 +44,7 @@ export class DiscussionPost implements IDiscussionPost {
       this.imageSrc = data.imageSrc;
       this.postedDate = data.postedDate;
       this.isHidden = data.isHidden;
+      this.reactionsCount = data.reactionsCount;
       if (data.commentCount) {
         this.commentCount = data.commentCount;
       }
@@ -75,6 +78,7 @@ export class DiscussionPost implements IDiscussionPost {
     this.imageSrc = other.imageSrc;
     this.postedDate = other.postedDate;
     this.isHidden = other.isHidden;
+    this.reactionsCount = other.reactionsCount;
     this.commentCount = other.commentCount;
     this.replies.replace(other.replies.toJS());
     this.hasMore = other.hasMore;

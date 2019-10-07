@@ -12,11 +12,13 @@ body {
 .ui.button.link {
   background-color: transparent;
   color: @buttonPrimary;
-  text-decoration: underline;
   border: inherit;
   font: inherit;
   padding: inherit;
   cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .bold {

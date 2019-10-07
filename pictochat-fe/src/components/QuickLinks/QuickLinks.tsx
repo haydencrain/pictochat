@@ -23,7 +23,7 @@ function QuickLinks(props: RouteComponentProps<{}>) {
 
   return (
     <section id="quick-links">
-      <h1>Quick Links</h1>
+      <h2>Quick Links</h2>
       <Segment.Group raised className="links-list">
         {linkSegments}
       </Segment.Group>

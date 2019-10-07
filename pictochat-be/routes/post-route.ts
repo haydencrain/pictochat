@@ -4,13 +4,14 @@ import express from 'express';
 import multer from 'multer';
 import passport from 'passport';
 import { strategies } from '../middleware/passport-middleware';
-import { DiscussionService, NewReply, NewThread, ArchiveType } from '../services/discussion-service';
+import { DiscussionService, ArchiveType } from '../services/discussion-service';
 import { MIMETYPE_TO_ENCODING } from '../utils/encoding-content-types';
 import { DiscussionTreeNode } from '../models/discussion-tree-node';
 import config from '../utils/config';
 import { User } from '../models/user';
 import { ForbiddenError } from '../exceptions/forbidden-error';
 import { DiscussionPost } from '../models/discussion-post';
+import { PaginationOptions } from '../utils/pagination-types';
 
 const AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR';
 
@@ -26,10 +27,12 @@ export const postRouter = express.Router();
  */
 postRouter.get('/:postId', async (req, res, next) => {
   try {
+    const { sort, limit, after } = req.query;
+    const paginationOptions = new PaginationOptions(after, limit);
     let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(
       req.params.postId,
-      req.query.limit,
-      parseInt(req.query.after)
+      sort,
+      paginationOptions
     );
     res.json(replyTree.toJSON());
   } catch (error) {

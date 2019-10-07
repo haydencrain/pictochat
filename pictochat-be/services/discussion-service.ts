@@ -10,6 +10,9 @@ import { NotFoundError } from '../exceptions/not-found-error';
 import { ForbiddenError } from '../exceptions/forbidden-error';
 import { UnprocessableError } from '../exceptions/unprocessable-error';
 import { isNullOrUndefined } from 'util';
+import { SortValue } from '../utils/sort-types';
+import { PaginationOptions } from '../utils/pagination-types';
+import { PaginationService, PaginatedResults } from './pagination-service';
 
 let sequelize = SequelizeConnectionService.getInstance();
 
@@ -163,34 +166,34 @@ export class DiscussionService {
 
   /** Creates a list of summaries for each thread containing the rootPost
    *  and agggregate metrics (e.g. comment count). */
-  static async getThreadSummaries(): Promise<DiscussionThread[]> {
-    return await DiscussionThread.getDiscussionThreads();
+  static async getPaginatedSummaries(
+    sortType: SortValue = '',
+    paginationOptions: PaginationOptions
+  ): Promise<PaginatedResults<DiscussionThread>> {
+    let discussionThreads = await DiscussionThread.getDiscussionThreads(sortType);
+    let paginatedSummaries = PaginationService.getPaginatedResults(discussionThreads, paginationOptions);
+    return paginatedSummaries;
   }
 
   static async getReplyTreeUnderPost(
     postId: number,
-    limit?: number,
-    startAfterPostId?: number
+    sortType?: SortValue,
+    paginationOptions?: PaginationOptions
   ): Promise<DiscussionTreeNode> {
-    let posts = await DiscussionService.getPostReplies(postId, startAfterPostId);
-    return await DiscussionService.makeReplyTree(posts, limit);
+    let posts = await DiscussionService.getPostReplies(postId, sortType, paginationOptions.start);
+    return await DiscussionService.makeReplyTree(posts, paginationOptions.limit);
   }
 
-  static async getPostReplies(postId: number, startAfterPostId?: number): Promise<DiscussionPost[]> {
+  static async getPostReplies(
+    postId: number,
+    sortType?: SortValue,
+    startAfterPostId?: number
+  ): Promise<DiscussionPost[]> {
     const rootPost = await DiscussionPost.getDiscussionPost(postId);
-    let posts: DiscussionPost[] = await DiscussionPost.getPathOrderedSubTreeUnder(rootPost);
-    if (!isNullOrUndefined(startAfterPostId)) posts = DiscussionService.getFilteredReplies(posts, startAfterPostId);
+    let posts: DiscussionPost[] = await DiscussionPost.getPathOrderedSubTreeUnder(rootPost, sortType);
+    if (!isNullOrUndefined(startAfterPostId)) posts = PaginationService.getFilteredReplies(posts, startAfterPostId);
     posts.unshift(rootPost);
     return posts;
-  }
-
-  static getFilteredReplies(orderedPosts: DiscussionPost[], startAfterPostId: number): DiscussionPost[] {
-    for (let i = 0; i < orderedPosts.length; i++) {
-      if (orderedPosts[i].postId === startAfterPostId) {
-        return orderedPosts.slice(i + 1);
-      }
-    }
-    return orderedPosts;
   }
 
   /**
@@ -221,5 +224,9 @@ export class DiscussionService {
     }
 
     return nodes[rootPostId];
+  }
+
+  static flattenDiscussions(discussions: DiscussionThread[]): DiscussionThread[] {
+    return discussions.map(discussion => discussion.toFlatJSON());
   }
 }
