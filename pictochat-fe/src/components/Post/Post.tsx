@@ -11,10 +11,10 @@ import './Post.less';
 import deletedPlaceholderImg from '../../images/deleted-placeholder.jpg';
 import ShowImageModal from '../ShowImageModal';
 import { computed } from 'mobx';
-import { Link } from 'react-router-dom';
+import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import UserService from '../../services/UserService';
 
-interface PostProps {
+interface PostProps extends RouteComponentProps<any> {
   post: DiscussionPost;
   postType?: PostTypes;
 }
@@ -31,8 +31,10 @@ function Post(props: PostProps) {
 
   const imageSrc = computed(() => (post.isHidden ? deletedPlaceholderImg : post.imageSrc));
 
+  const handleCardClick = () => props.history.push(`/discussion/${post.postId}`);
+
   return (
-    <section className={classNames('thread-post', getPostTypeName(postType))}>
+    <section className={classNames('thread-post', getPostTypeName(postType))} onClick={handleCardClick}>
       <div className="post-sidebar">
         <Link to={UserService.getUserUrl(post.author.username)}>
           <Image src={post.author.userAvatarURI} avatar size="mini" />
@@ -57,4 +59,4 @@ function Post(props: PostProps) {
   );
 }
 
-export default observer(Post);
+export default observer(withRouter(Post));
