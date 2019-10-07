@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import { Segment } from 'semantic-ui-react';
 import { DiscussionPost } from '../../models/DiscussionPost';
 import { PostTypes } from '../../models/PostTypes';
-import PostsList from '../PostsList';
 import Post from '../Post';
 import './PostsListItem.less';
 import RepliesList from '../RepliesList/RepliesList';

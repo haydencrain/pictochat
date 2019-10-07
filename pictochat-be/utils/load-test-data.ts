@@ -90,7 +90,8 @@ export async function loadTestData() {
       imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
-      replyTreePath: '1/2/'
+      replyTreePath: '1/2/',
+      hasInappropriateFlag: true
     },
     {
       discussionId: '1',
@@ -108,7 +109,8 @@ export async function loadTestData() {
       imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 2,
       postedDate: new Date(),
-      replyTreePath: '1/2/3/'
+      replyTreePath: '1/2/3/',
+      hasInappropriateFlag: true
     },
     {
       discussionId: 1,
@@ -126,7 +128,8 @@ export async function loadTestData() {
       imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date(),
-      replyTreePath: '1/2/'
+      replyTreePath: '1/2/',
+      hasInappropriateFlag: true
     },
     {
       discussionId: 1,
@@ -178,7 +181,8 @@ export async function loadTestData() {
       isRootPost: true,
       imageId: 'asdsdfsdfd0-20190101T010101000',
       authorId: 1,
-      postedDate: new Date()
+      postedDate: new Date(),
+      hasInappropriateFlag: true
     },
     {
       discussionId: 3,

@@ -20,8 +20,8 @@ contentReportRouter.get(
         throw new ForbiddenError();
       }
 
-      const reports: any[] = await ContentReportService.getContentReports();
-      const reportsJson: any[] = reports.map(report => report.toJSON());
+      const reports = await ContentReportService.getContentReports();
+      const reportsJson = reports.map(report => report.toJSON());
       res.json(reportsJson);
     } catch (error) {
       next(error);

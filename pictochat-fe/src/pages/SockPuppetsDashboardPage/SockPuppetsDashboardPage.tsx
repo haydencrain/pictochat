@@ -15,15 +15,15 @@ interface PageProps extends RouteComponentProps<any> {}
 export function SockPuppetsDashboardPage(props: PageProps) {
   const stores = React.useContext(StoresContext);
 
-  const isAuthed = computed(() => stores.user.isLoggedIn);
+  const canViewPage = computed(() => stores.user.isLoggedIn && stores.user.currentUser.hasAdminRole);
 
   useFetchSockPuppetAlerts([props.location]);
 
   let content;
-  if (!isAuthed.get()) {
+  if (!canViewPage.get()) {
     content = 'You are unauthorised to view this page';
   } else if (stores.sockPuppetAlerts.isLoading) {
-    content = <Loader />;
+    content = <Loader active />;
   } else {
     content = <SockPuppertsDashboard alerts={stores.sockPuppetAlerts.alerts} />;
   }
@@ -46,16 +46,16 @@ function useFetchSockPuppetAlerts(dependencies: any[]) {
 
 const SockPuppertsDashboard = observer(function SockPuppertsDashboard(props: { alerts: SockPuppetAlert[] }) {
   const alertViews = props.alerts.map(alert => <SockPuppetAlertView alert={alert} key={alert.deviceId} />);
-  const placeholder = <div className="bold">No suspicious devices found</div>;
+  const placeholder = <Segment className="bold">No suspicious devices found</Segment>;
   const content = props.alerts.length > 0 ? alertViews : placeholder;
 
   return (
     <>
       <h1>Sock Puppets</h1>
       <p>This page contains a list of devices that have been used to access more than {USER_LIMIT} users/accounts.</p>
-      <Segment raised className="sock-puppets-dashboard">
+      <Segment.Group raised className="sock-puppets-dashboard">
         {content}
-      </Segment>
+      </Segment.Group>
     </>
   );
 });
