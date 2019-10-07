@@ -41,21 +41,6 @@ postRouter.get('/:postId', async (req, res, next) => {
   }
 });
 
-// TODO: Put in a a service (not sure which one)
-async function setPostInappropraiteContentFlag(postId: number, flagValue: boolean): Promise<DiscussionPost> {
-  const sequelize = SequelizeConnectionService.getInstance();
-  return await sequelize.transaction(async transaction => {
-    const post = await DiscussionService.getPost(postId);
-    post.setInappropriateContentFlag(flagValue);
-    await post.save();
-    return post;
-  });
-}
-
-function makeContentReport(post) {
-  return { postId: post.postId, hasInappropriateContentFlag: post.hasInappropriateContentFlag };
-}
-
 // POST Flag a post for inappropriate content
 postRouter.post(
   '/:postId/content-report',
@@ -162,6 +147,21 @@ postRouter.delete(
 // TODO: Move into module in project utils folder (or maybe see if a promise-based library for fs already exists?)
 const readFile = util.promisify(fs.readFile);
 const deleteFile = util.promisify(fs.unlink);
+
+// TODO: Put in a a service (not sure which one)
+async function setPostInappropraiteContentFlag(postId: number, flagValue: boolean): Promise<DiscussionPost> {
+  const sequelize = SequelizeConnectionService.getInstance();
+  return await sequelize.transaction(async transaction => {
+    const post = await DiscussionService.getPost(postId);
+    post.setInappropriateContentFlag(flagValue);
+    await post.save();
+    return post;
+  });
+}
+
+function makeContentReport(post) {
+  return { postId: post.postId, hasInappropriateContentFlag: post.hasInappropriateContentFlag };
+}
 
 async function makeNewImageSpec(file): Promise<{ data: Buffer; encoding: string }> {
   let data = await readFile(file.path);
