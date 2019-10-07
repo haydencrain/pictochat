@@ -39,7 +39,7 @@ function PostLinks(props: PostLinksProps) {
 
   const renderRootPostLinks = (): JSX.Element[] => {
     const rootPostLinks = [
-      <Link className="link" to={`/discussion?id=${post.postId}`}>
+      <Link className="link" to={`/discussion/${post.postId}`}>
         {post.commentCount} comments
       </Link>
     ];
@@ -48,7 +48,7 @@ function PostLinks(props: PostLinksProps) {
 
   const renderReplyPostLinks = (): JSX.Element[] => {
     const replyPostLinks = [
-      <Link className="link" to={`/discussion?id=${post.postId}`}>
+      <Link className="link" to={`/discussion/${post.postId}`}>
         permalink
       </Link>,
       <CreatePostModal triggerType="link" triggerContent="reply" parentPostId={post.postId} />

@@ -18,6 +18,7 @@ export default class DiscussionStore {
   @observable threadSummariesMap: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
     observable.map(undefined, { name: 'threadSummariesMap' })
   );
+  @observable activeDiscussionRootId: string;
   @observable activeDiscussionRoot: DiscussionPost = new DiscussionPost();
   @observable activeDiscussionPosts: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
     observable.map(undefined, { name: 'activeDiscussionPosts' })
@@ -83,6 +84,7 @@ export default class DiscussionStore {
       let postJson = await DiscussionService.getPost(postId, PAGINATION_LIMIT);
       runInAction(() => {
         let post = this.parseJsonTree(postJson, true);
+        this.activeDiscussionRootId = postId;
         this.activeDiscussionRoot.replace(post);
       });
     } finally {
