@@ -187,18 +187,9 @@ export class DiscussionService {
   static async getPostReplies(postId: number, startAfterPostId?: number): Promise<DiscussionPost[]> {
     const rootPost = await DiscussionPost.getDiscussionPost(postId);
     let posts: DiscussionPost[] = await DiscussionPost.getPathOrderedSubTreeUnder(rootPost);
-    if (!isNullOrUndefined(startAfterPostId)) posts = DiscussionService.getFilteredReplies(posts, startAfterPostId);
+    if (!isNullOrUndefined(startAfterPostId)) posts = PaginationService.getFilteredReplies(posts, startAfterPostId);
     posts.unshift(rootPost);
     return posts;
-  }
-
-  static getFilteredReplies(orderedPosts: DiscussionPost[], startAfterPostId: number): DiscussionPost[] {
-    for (let i = 0; i < orderedPosts.length; i++) {
-      if (orderedPosts[i].postId === startAfterPostId) {
-        return orderedPosts.slice(i + 1);
-      }
-    }
-    return orderedPosts;
   }
 
   /**

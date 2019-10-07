@@ -1,5 +1,6 @@
 import { isNullOrUndefined } from 'util';
 import { PaginationOptions } from '../utils/pagination-types';
+import { DiscussionPost } from '../models/discussion-post';
 
 export interface PaginatedResults<T> {
   start: number;
@@ -25,5 +26,14 @@ export class PaginationService {
       hasNextPage,
       nextStart
     };
+  }
+
+  static getFilteredReplies(orderedPosts: DiscussionPost[], startAfterPostId: number): DiscussionPost[] {
+    for (let i = 0; i < orderedPosts.length; i++) {
+      if (orderedPosts[i].postId === startAfterPostId) {
+        return orderedPosts.slice(i + 1);
+      }
+    }
+    return orderedPosts;
   }
 }
