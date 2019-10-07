@@ -97,7 +97,7 @@ export default class DiscussionStore {
     this.activeDiscussionRoot.clear();
     this.activeDiscussionPosts.clear();
     try {
-      let postJson = await DiscussionService.getPost(postId, PAGINATION_LIMIT);
+      let postJson = await DiscussionService.getPost(postId, this.activeDiscussionSort, PAGINATION_LIMIT);
       runInAction(() => {
         let post = this.parseJsonTree(postJson, true);
         this.activeDiscussionRootId = postId;
@@ -116,7 +116,7 @@ export default class DiscussionStore {
     this.isLoadingReplies = true;
     this.activeDiscussionPosts.clear();
     try {
-      let postJson = await DiscussionService.getPost(postId, PAGINATION_LIMIT);
+      let postJson = await DiscussionService.getPost(postId, this.activeDiscussionSort, PAGINATION_LIMIT);
       runInAction(() => {
         this.parseJsonTree(postJson, true);
       });
@@ -131,7 +131,12 @@ export default class DiscussionStore {
   async getExtraReplies(parentPostId: string, after?: string) {
     this.isLoadingReplies = true;
     try {
-      const postJson = await DiscussionService.getPost(parentPostId, PAGINATION_LIMIT, after);
+      const postJson = await DiscussionService.getPost(
+        parentPostId,
+        this.activeDiscussionSort,
+        PAGINATION_LIMIT,
+        after
+      );
       runInAction(() => {
         let replies: DiscussionPost[] = postJson.replies.map(post => this.parseJsonTree(post, true));
         const post = this.activeDiscussionPosts.get(postJson.postId);

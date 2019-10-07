@@ -193,8 +193,7 @@ export class DiscussionPost extends Model {
     switch (sortType) {
       // Order by reactions Descending
       case SortTypes.REACTIONS:
-        // FIXME: order by reactionCount DESC when implemented
-        return ['postedDate', 'DESC'];
+        return ['reactionsCount', 'DESC'];
 
       case SortTypes.NEW:
       case SortTypes.NONE:
@@ -222,7 +221,7 @@ DiscussionPost.init(
     replyTreePath: { type: DataTypes.STRING },
     isHidden: { type: DataTypes.BOOLEAN, defaultValue: false },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
-    reactionsCount: { type: DataTypes.NUMBER, defaultValue: 0 },
+    reactionsCount: { type: DataTypes.INTEGER, defaultValue: 0 },
     imageSrc: {
       type: DataTypes.VIRTUAL,
       get() {
