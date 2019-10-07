@@ -26,11 +26,13 @@ export function useFetchUser(username: string): [User, boolean] {
 
   useEffect(() => {
     const fetchData = async () => {
-      let user = undefined;
+      setLoading(true);
       try {
-        user = new User(await userService.getUser(username));
-      } catch (e) {}
-      setUser(user);
+        const user = new User(await userService.getUser(username));
+        setUser(user);
+      } catch (e) {
+        setUser(null);
+      }
       setLoading(false);
     };
     fetchData();

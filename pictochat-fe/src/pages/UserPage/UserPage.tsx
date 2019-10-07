@@ -18,18 +18,22 @@ function UserPage(props: UserPageProps) {
   const getContent = () => {
     if (isLoading) {
       return (
-        <Segment>
+        <Segment raised>
           <Loader active />
         </Segment>
       );
     }
 
-    return <ProfileCard user={user} isCurrentUser={false} />;
+    if (user) {
+      return <ProfileCard user={user} isCurrentUser={false} />;
+    }
+
+    return <Segment raised>User not found</Segment>;
   };
 
   return (
     <section id="user-page">
-      <h1>User{!!user ? ` - ${user.username}` : ''}</h1>
+      <h1>User - {props.match.params.username}</h1>
       {getContent()}
     </section>
   );
