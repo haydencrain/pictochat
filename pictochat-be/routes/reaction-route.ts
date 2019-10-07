@@ -69,7 +69,7 @@ reactionRouter.delete('/:reactionId',
         if (requestingUser.userId !== reaction.userId) throw new ForbiddenError();
 
         await reaction.destroy();
-        await DiscussionPost.decrementReactionsCount(postId);
+        await DiscussionPost.decrementReactionsCount(reaction.postId);
       });
       res.status(204);
       res.end();

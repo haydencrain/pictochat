@@ -21,8 +21,6 @@ interface ReactionsProps {
 }
 
 function Reactions(props: ReactionsProps) {
-  trace();
-  console.log(props);
   const shouldLoad = (props.shouldLoad !== undefined) ? props.shouldLoad : false;
   const stores = React.useContext(StoresContext);
   const userStore = stores.user;
