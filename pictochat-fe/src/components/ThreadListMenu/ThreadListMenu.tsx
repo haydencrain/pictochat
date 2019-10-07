@@ -2,25 +2,25 @@ import React from 'react';
 import CreatePostModal from '../CreatePostModal/CreatePostModal';
 import './ThreadListMenu.less';
 import { Menu, Input, Dropdown } from 'semantic-ui-react';
+import { SortTypes, SortValue } from '../../models/SortTypes';
 
 interface ThreadListMenuProps {
-  header: string;
   createButtonMessage: string;
   parentId?: string;
+  activeSort: SortValue;
+  onSortSelect: (name: SortValue) => void;
 }
 
 const sortOptions = [
-  { name: 'new', title: 'Newest' },
-  { name: 'comments', title: 'Most Comments' },
-  { name: 'reactions', title: 'Most Reactions' }
+  { name: SortTypes.NEW, title: 'Newest' },
+  { name: SortTypes.COMMENTS, title: 'Most Comments' },
+  { name: SortTypes.REACTIONS, title: 'Most Reactions' }
 ];
 
 export default function ThreadListMenu(props: ThreadListMenuProps) {
-  const [sort, setSort] = React.useState('new');
-
   const sortMenuItems = sortOptions.map(option => {
-    const active = sort === option.name;
-    const handleClick = (e, { name }) => setSort(name);
+    const active = props.activeSort === option.name;
+    const handleClick = (e, { name }) => props.onSortSelect(name);
     return (
       <Menu.Item className="semantic-a" key={option.name} name={option.name} active={active} onClick={handleClick}>
         {option.name}
@@ -30,7 +30,6 @@ export default function ThreadListMenu(props: ThreadListMenuProps) {
 
   return (
     <div className="thread-list-menu">
-      <h1>{props.header}</h1>
       <Menu text>
         <Menu.Item header>Sort By</Menu.Item>
         {sortMenuItems}

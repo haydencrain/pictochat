@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import DiscussionStore from '../../stores/DiscussionStore';
 import PostsList from '../PostsList';
 import { PostTypes } from '../../models/PostTypes';
 import StoresContext from '../../contexts/StoresContext';

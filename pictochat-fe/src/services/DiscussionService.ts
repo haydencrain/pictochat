@@ -3,10 +3,11 @@ import ApiService from './ApiService';
 import NewPostPayload from '../models/NewPostPayload';
 import ValidationException from '../models/ValidationException';
 import PaginationResult from '../models/PaginationResult';
+import { SortValue } from '../models/SortTypes';
 
 export class DiscussionService {
-  static async getDiscussions(limit = 10, start?: number): Promise<PaginationResult<IDiscussionPost>> {
-    return await ApiService.get('/discussion', { limit, start });
+  static async getDiscussions(sort: SortValue, limit = 10, start?: number): Promise<PaginationResult<IDiscussionPost>> {
+    return await ApiService.get('/discussion', { sort, limit, start });
   }
 
   // 'after' is the id of the post before the new replies that you want
