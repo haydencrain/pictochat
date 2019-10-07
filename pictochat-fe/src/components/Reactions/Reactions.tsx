@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { Button, Popup, Label, Loader } from 'semantic-ui-react';
-import { useFetchReactions } from '../../hooks/ReactionHooks';
-import reactionService from '../../services/ReactionService';
+// import { useFetchReactions } from '../../hooks/ReactionHooks';
 import './Reactions.less';
 import StoresContext from '../../contexts/StoresContext';
 import { useToggleModal } from '../../hooks/ModalHooks';
-import { Reaction } from '../../models/Reaction';
 import { observer } from 'mobx-react';
+import { trace } from 'mobx';
 
 const REACTIONS = [
   { icon: '👍', name: 'thumbs-up' },
@@ -17,32 +16,31 @@ const REACTIONS = [
 ];
 
 interface ReactionsProps {
-  postId: number;
+  postId: string;
+  shouldLoad?: boolean
 }
 
 function Reactions(props: ReactionsProps) {
+  trace();
+  console.log(props);
+  const shouldLoad = (props.shouldLoad !== undefined) ? props.shouldLoad : false;
   const stores = React.useContext(StoresContext);
   const userStore = stores.user;
   const reactionStore = stores.reaction;
   const currentUser = stores.user.currentUser;
   const reactionTypeCounts = reactionStore.postReactionNameCounts(props.postId);
 
-  // console.log('reactionTypeCounts: ', reactionTypeCounts);
-  // console.log('reactionStore.reactionStore.postUserReactionsMap:', JSON.stringify(reactionStore.postUserReactionsMap));
-
-  if (reactionStore.isLoading) {
-    return <Loader/>;
-  }
+  const isLoading = useFetchReactionTypeCounts(props.postId, shouldLoad);
 
   //// EVENT HANDLERS ////
 
-  const handleReactionLabelClick = async (reactionName: string) => {
+  const handleReactionLabelClick = React.useCallback((reactionName: string) => {
     if (!userStore.isLoggedIn) {
       alert('You must login to add reactions');
       return;
     }
-    await reactionStore.updateReaction(props.postId, parseInt(currentUser.userId), reactionName);
-  };
+    reactionStore.updateReaction(parseInt(props.postId), parseInt(currentUser.userId), reactionName);
+  }, []);
 
   //// RENDER HELPERS ////
 
@@ -59,6 +57,12 @@ function Reactions(props: ReactionsProps) {
     });
   };
 
+  //// MAIN RENDERING /////
+
+  if (reactionStore.isLoading || isLoading) {
+    return <Loader/>;
+  }
+
   return (
     <section className="reactions">
       <ReactionsPopUp onClick={handleReactionLabelClick} />
@@ -67,55 +71,12 @@ function Reactions(props: ReactionsProps) {
   );
 }
 
-// function ReactionsV1(props: ReactionsProps) {
-//   const stores = React.useContext(StoresContext);
-//   const currentUser = stores.user.currentUser;
-
-//   // const [reactions, isLoading] = useFetchReactions(props.postId);
-
-//   //TODO: arrange by reaction and then get the subsequent counts
-
-//   const addReaction = (reactionName: string) => {
-//     return reactionService.addReaction(reactionName, props.postId, Number(currentUser.userId));
-//   };
-
-//   //TODO: Fix trash code that won't sort reactions
-//   // let reactionCount = async (reactionName: string) => {
-//   //   let rCount: Reaction[] = await reactionService.getReactionsPost(props.postId);
-//   //   let r = rCount.filter(react => {
-//   //     return react.reactionName === reactionName;
-//   //   }).length;
-//   //   console.log(r);
-//   //   return r;
-//   // };
-
-//   // console.log('React ' + Number(reactionCount('thumbs-up')));
-
-//   const currentReactions = REACTIONS.map((react, index) => (
-//     <Label as="a" key={index} onClick={() => addReaction(react.name)}>
-//       <p className="icon"> {react.icon}</p> <p className="num">1</p>
-//     </Label>
-//   ));
-
-//   return (
-//     <section className="reactions">
-//       <PopupReactions increaseReactionCount={addReaction} />
-//       <div className="curr-react">{currentReactions}</div>
-//     </section>
-//   );
-// }
-
 interface ReactionsPopUpProps {
   onClick: (reactionName: string) => void;
 }
 
 const ReactionsPopUp = observer(function ReactionsPopUp(props: ReactionsPopUpProps) {
-  const reactionStore = React.useContext(StoresContext);
   const { isActive, onOpen, onClose } = useToggleModal();
-
-  // const handleClickedReaction = (reactionName: string) => {
-  //   // props.increaseReactionCount(reactionName);
-  // };
 
   const content = (
     <ul className="react-content">
@@ -148,5 +109,27 @@ const ReactionsPopUp = observer(function ReactionsPopUp(props: ReactionsPopUpPro
     />
   );
 });
+
+
+///// HOOKS /////
+
+/**
+ * Use this to load the reactions for the specified post on component render
+ * This is used, for example, in the threads summary list
+ */
+function useFetchReactionTypeCounts(postId: string, shouldLoad: boolean): boolean {
+  const store = React.useContext(StoresContext).reaction;
+  const [isLoading, setLoading] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (shouldLoad) {
+      setLoading(true);
+      store.fetchPostReactions(parseInt(postId)).then(() => setLoading(false));
+    }
+  }, [postId, shouldLoad]);
+
+  return isLoading;
+}
+
 
 export default observer(Reactions);

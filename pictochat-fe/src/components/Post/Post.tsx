@@ -54,7 +54,7 @@ function Post(props: PostProps) {
         </div>
         {renderLinks.get()}
       </div>
-      <Reactions postId={Number(props.post.postId)} />
+      <Reactions postId={props.post.postId} shouldLoad={postType === PostTypes.Root}/>
     </section>
   );
 }

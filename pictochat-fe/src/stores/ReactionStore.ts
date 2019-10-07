@@ -1,6 +1,6 @@
-import { observable, action, ObservableMap, runInAction } from 'mobx';
+import { observable, action, ObservableMap, runInAction, flow } from 'mobx';
 import { computedFn } from 'mobx-utils';
-import { Reaction } from '../models/Reaction';
+import { Reaction, IReaction } from '../models/Reaction';
 import ObservableIntMap from '../utils/ObserableIntMap';
 import ReactionService from '../services/ReactionService';
 
@@ -33,6 +33,15 @@ export class ReactionStore {
   // {post: {user: Reaction}}
   @observable
   postUserReactionsMap: ObservableIntMap<ObservableIntMap<Reaction>> = new ObservableIntMap(observable.map(undefined));
+
+  @action.bound
+  async fetchPostReactions(postId: number): Promise<void> {
+    let reactionJson: IReaction[] = await ReactionService.getReactionsPost(postId);
+    runInAction(() => {
+      let reactions = reactionJson.map(react => new Reaction(react));
+      reactions.forEach((react) => this.putReact(react));
+    });
+  }
 
   @action.bound
   async updateReaction(postId: number, userId: number, reactionName: string) {
