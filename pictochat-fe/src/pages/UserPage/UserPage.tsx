@@ -1,12 +1,38 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import ThreadListContainer from '../../components/ThreadListContainer';
+import { useFetchUser } from '../../hooks/UsersHooks';
+import { Loader, Segment } from 'semantic-ui-react';
+import { RouteComponentProps } from 'react-router';
+import ProfileCard from '../../components/ProfileCard';
 import './UserPage.less';
 
-interface UserPageProps {}
+interface UserPageMatchParams {
+  username: string;
+}
+
+interface UserPageProps extends RouteComponentProps<UserPageMatchParams> {}
 
 function UserPage(props: UserPageProps) {
-  return <section id="user-page">Hello world this is me life s hould be uh huh fun for everyone</section>;
+  const [user, isLoading] = useFetchUser(props.match.params.username);
+
+  const getContent = () => {
+    if (isLoading) {
+      return (
+        <Segment>
+          <Loader active />
+        </Segment>
+      );
+    }
+
+    return <ProfileCard user={user} isCurrentUser={false} />;
+  };
+
+  return (
+    <section id="user-page">
+      <h1>User{!!user ? ` - ${user.username}` : ''}</h1>
+      {getContent()}
+    </section>
+  );
 }
 
 export default observer(UserPage);

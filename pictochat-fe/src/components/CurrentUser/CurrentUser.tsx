@@ -5,6 +5,7 @@ import Login from '../Login';
 import ProfileCard from '../ProfileCard';
 import { Loader } from 'semantic-ui-react';
 import { observer } from 'mobx-react-lite';
+import './CurrentUser.less';
 
 function CurrentUser() {
   const stores = React.useContext(StoresContext);
@@ -16,6 +17,10 @@ function CurrentUser() {
   };
 
   const getCard = () => {
+    if (stores.user.isLoading) {
+      return <Loader active />;
+    }
+
     if (!stores.user.isLoggedIn) {
       return (
         <Login
@@ -26,12 +31,9 @@ function CurrentUser() {
         />
       );
     }
-    return <ProfileCard user={stores.user.currentUser} onLogoutClick={handleLogout} />;
-  };
 
-  if (stores.user.isLoading) {
-    return <Loader active />;
-  }
+    return <ProfileCard user={stores.user.currentUser} isCurrentUser onLogoutClick={handleLogout} />;
+  };
 
   return (
     <section id="current-user-section">

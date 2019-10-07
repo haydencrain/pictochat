@@ -3,19 +3,37 @@ import { Segment, Rating, Image } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import { User } from '../../models/User';
 import './ProfileCard.less';
+import { Link } from 'react-router-dom';
 
 interface Props {
   user: User;
-  onLogoutClick: () => void;
+  isCurrentUser?: boolean;
+  onLogoutClick?: () => void;
 }
 
 function ProfileCard(props: Props) {
+  const linksSegment = !!props.isCurrentUser && (
+    <Segment className="profile-card-footer">
+      <ul>
+        <li>
+          <Link to={`/user/${props.user.username}`}>View Profile</Link>
+        </li>
+        {/*
+          <li>
+            <a>Settings</a>
+          </li>*/}
+        <li>
+          <a onClick={props.onLogoutClick}>Logout</a>
+        </li>
+      </ul>
+    </Segment>
+  );
+
   return (
     <Segment.Group className="profile-card" raised>
       <Segment className="profile-card-header" horizontal="true">
         <div className="header-image">
           <Image src={props.user.userAvatarURI} />
-          {/*<Image src="https://semantic-ui.com/images/avatar2/large/elyse.png" />*/}
         </div>
         <div className="header-info">
           <div className="user-name">{props.user.username}</div>
@@ -36,19 +54,7 @@ function ProfileCard(props: Props) {
           <span className="value">35</span>
         </div>
       </Segment>
-      <Segment className="profile-card-footer">
-        <ul>
-          {/*<li>
-            <a>View Profile</a>
-          </li>
-          <li>
-            <a>Settings</a>
-          </li>*/}
-          <li>
-            <a onClick={props.onLogoutClick}>Logout</a>
-          </li>
-        </ul>
-      </Segment>
+      {linksSegment}
     </Segment.Group>
   );
 }

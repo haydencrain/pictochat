@@ -34,7 +34,7 @@ export const userRouter = express.Router();
 // GET /user
 userRouter.get('/', async (req, res, next) => {
   try {
-    if (req.params.username) {
+    if (req.query.username) {
       // get user by username
       const user = await UserService.getUserByUsername(req.query.username);
       return res.json(user.toJSON());

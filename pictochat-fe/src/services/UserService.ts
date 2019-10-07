@@ -10,6 +10,10 @@ interface LoginResult {
 }
 
 class UserService {
+  static getUserUrl(username: string): string {
+    return `/user/${username}`;
+  }
+
   static async getUser(username: string): Promise<IUser> {
     const query = {
       username
