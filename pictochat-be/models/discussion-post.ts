@@ -243,7 +243,8 @@ DiscussionPost.init(
     freezeTableName: true,
     indexes: [
       { fields: ['discussionId', 'postId'], using: 'BTREE' },
-      { fields: ['hasInappropriateContentFlag'], using: 'BTREE' }
+      { fields: ['hasInappropriateContentFlag'], using: 'BTREE' },
+      { fields: ['isDisabled', 'isHidden'], using: 'BTREE' }
     ]
   }
 );

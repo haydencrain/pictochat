@@ -77,10 +77,14 @@ export class SockPuppetAlert {
       FROM
         "${LoginLog.tableName}" AS "loginLogs"
         INNER JOIN (
-          SELECT "deviceId", COUNT(DISTINCT "userId") AS "userCount"
-          FROM "${LoginLog.tableName}"
+          SELECT "deviceId", COUNT(DISTINCT "loginLog"."userId") AS "userCount"
+          FROM
+            "${LoginLog.tableName}" AS "loginLog"
+            INNER JOIN ${User.tableName} AS "user"
+            ON "loginLog"."userId" = "user"."userId"
+          WHERE "user"."hasAdminRole" = FALSE AND "user"."isDisabled" = FALSE
           GROUP BY "deviceId"
-          HAVING COUNT(DISTINCT "userId") > :userLimit
+          HAVING COUNT(DISTINCT "loginLog"."userId") > :userLimit
         ) AS "deviceUserCounts"
         ON "loginLogs"."deviceId" = "deviceUserCounts"."deviceId"
         INNER JOIN ${User.tableName} AS "user"
