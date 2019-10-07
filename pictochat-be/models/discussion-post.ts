@@ -130,13 +130,16 @@ export class DiscussionPost extends Model {
   /**
    * Get all replies (and replies of replies) to the specified postId, ordered
    * such that parent posts always come before their replies (aka pre-order traversal order). */
-  static async getPathOrderedSubTreeUnder(rootPost: DiscussionPost): Promise<DiscussionPost[]> {
+  static async getPathOrderedSubTreeUnder(
+    rootPost: DiscussionPost,
+    sortType: SortValue = ''
+  ): Promise<DiscussionPost[]> {
+    const order = DiscussionPost.getSortByValue(sortType);
     const replyPathPrefix: string = rootPost.getReplyPathPrefix();
     let posts: DiscussionPost[] = await DiscussionPost.getDiscussionPosts({
       where: { ...DiscussionPost.replyTreePathFilter(replyPathPrefix), ...DiscussionPost.defaultFilter() },
-      order: [['replyTreePath', 'ASC'], ['postId', 'ASC']]
+      order: [['replyTreePath', 'ASC'], order]
     });
-
     return posts;
   }
 

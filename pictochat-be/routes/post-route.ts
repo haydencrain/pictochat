@@ -4,7 +4,7 @@ import express from 'express';
 import multer from 'multer';
 import passport from 'passport';
 import { strategies } from '../middleware/passport-middleware';
-import { DiscussionService, NewReply, NewThread, ArchiveType } from '../services/discussion-service';
+import { DiscussionService, ArchiveType } from '../services/discussion-service';
 import { MIMETYPE_TO_ENCODING } from '../utils/encoding-content-types';
 import { DiscussionTreeNode } from '../models/discussion-tree-node';
 import config from '../utils/config';
@@ -27,12 +27,12 @@ export const postRouter = express.Router();
  */
 postRouter.get('/:postId', async (req, res, next) => {
   try {
-    const { limit, after } = req.query;
+    const { sort, limit, after } = req.query;
     const paginationOptions = new PaginationOptions(after, limit);
     let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(
       req.params.postId,
-      paginationOptions.limit,
-      paginationOptions.start
+      sort,
+      paginationOptions
     );
     res.json(replyTree.toJSON());
   } catch (error) {

@@ -177,16 +177,20 @@ export class DiscussionService {
 
   static async getReplyTreeUnderPost(
     postId: number,
-    limit?: number,
-    startAfterPostId?: number
+    sortType?: SortValue,
+    paginationOptions?: PaginationOptions
   ): Promise<DiscussionTreeNode> {
-    let posts = await DiscussionService.getPostReplies(postId, startAfterPostId);
-    return await DiscussionService.makeReplyTree(posts, limit);
+    let posts = await DiscussionService.getPostReplies(postId, sortType, paginationOptions.start);
+    return await DiscussionService.makeReplyTree(posts, paginationOptions.limit);
   }
 
-  static async getPostReplies(postId: number, startAfterPostId?: number): Promise<DiscussionPost[]> {
+  static async getPostReplies(
+    postId: number,
+    sortType?: SortValue,
+    startAfterPostId?: number
+  ): Promise<DiscussionPost[]> {
     const rootPost = await DiscussionPost.getDiscussionPost(postId);
-    let posts: DiscussionPost[] = await DiscussionPost.getPathOrderedSubTreeUnder(rootPost);
+    let posts: DiscussionPost[] = await DiscussionPost.getPathOrderedSubTreeUnder(rootPost, sortType);
     if (!isNullOrUndefined(startAfterPostId)) posts = PaginationService.getFilteredReplies(posts, startAfterPostId);
     posts.unshift(rootPost);
     return posts;
