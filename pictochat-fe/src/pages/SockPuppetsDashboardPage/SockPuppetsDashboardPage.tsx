@@ -6,6 +6,7 @@ import { RouteComponentProps } from 'react-router';
 import './SockPuppetsDashboardPage.less';
 import StoresContext from '../../contexts/StoresContext';
 import { SockPuppetAlert } from '../../models/SockPuppetAlert';
+import { computed } from 'mobx';
 
 const USER_LIMIT = 2;
 
@@ -14,10 +15,14 @@ interface PageProps extends RouteComponentProps<any> {}
 export function SockPuppetsDashboardPage(props: PageProps) {
   const stores = React.useContext(StoresContext);
 
+  const isAuthed = computed(() => stores.user.isLoggedIn);
+
   useFetchSockPuppetAlerts([props.location]);
 
   let content;
-  if (stores.sockPuppetAlerts.isLoading) {
+  if (!isAuthed.get()) {
+    content = 'You are unauthorised to view this page';
+  } else if (stores.sockPuppetAlerts.isLoading) {
     content = <Loader />;
   } else {
     content = <SockPuppertsDashboard alerts={stores.sockPuppetAlerts.alerts} />;
@@ -45,13 +50,13 @@ const SockPuppertsDashboard = observer(function SockPuppertsDashboard(props: { a
   const content = props.alerts.length > 0 ? alertViews : placeholder;
 
   return (
-    <Segment className="sock-puppets-dashboard">
+    <>
       <h1>Sock Puppets</h1>
-      <div>
-        This page contains a list of devices that have been used to access more than {USER_LIMIT} users/accounts.
-      </div>
-      {content}
-    </Segment>
+      <p>This page contains a list of devices that have been used to access more than {USER_LIMIT} users/accounts.</p>
+      <Segment raised className="sock-puppets-dashboard">
+        {content}
+      </Segment>
+    </>
   );
 });
 

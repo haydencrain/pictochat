@@ -48,8 +48,8 @@ function AppBody() {
           <Route exact path={FRONTEND_URL_ROOT} component={HomePage} />
           <Route exact path={`${FRONTEND_URL_ROOT}discussion/:id`} component={DiscussionPage} />
           <Route exact path={`${FRONTEND_URL_ROOT}leaderboard`} component={LeaderboardPage} />
-          <Route exact path={`${FRONTEND_URL_ROOT}sock-puppets`} component={SockPuppetsDashboardPage} />
           <Route exact path={`${FRONTEND_URL_ROOT}user/:username`} component={UserPage} />
+          <Route exact path={`${FRONTEND_URL_ROOT}sock-puppets`} component={SockPuppetsDashboardPage} />
           <Route component={NotFoundPage} />
         </Switch>
       </main>
