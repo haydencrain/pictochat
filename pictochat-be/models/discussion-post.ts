@@ -1,7 +1,8 @@
-import { Sequelize, Model, DataTypes, Op, FindOptions, CountOptions } from 'sequelize';
+import { Sequelize, Model, DataTypes, Op, FindOptions, CountOptions, OrderItem } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { ImageService } from '../services/image-service';
 import { User } from './user';
+import { SortValue, SortTypes } from '../utils/sort-types';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
@@ -92,9 +93,23 @@ export class DiscussionPost extends Model {
       include: [DiscussionPost.USER_JOIN],
       attributes: DiscussionPost.PUBLIC_ATTRIBUTES
     };
-    options['where'] = { ...(options['where'] || {}), ...defaultFilters };
-    options = { ...optionDefaults, ...options };
+    options['where'] = {
+      ...(options['where'] || {}),
+      ...defaultFilters
+    };
+    options = {
+      ...optionDefaults,
+      ...options
+    };
     return await DiscussionPost.findAll(options);
+  }
+
+  static async getDiscussionRootPosts(sortType: SortValue): Promise<DiscussionPost[]> {
+    let rootPosts = await DiscussionPost.getDiscussionPosts({
+      where: DiscussionPost.isRootPostFilter(),
+      order: [DiscussionPost.getSortByValue(sortType)]
+    });
+    return rootPosts;
   }
 
   static async getDiscussionPost(postId: number, options: FindOptions = {}): Promise<DiscussionPost> {
@@ -159,6 +174,25 @@ export class DiscussionPost extends Model {
   private static async _count(options?: CountOptions) {
     options['where'] = { ...(options['where'] || {}), ...DiscussionPost.defaultFilter() };
     return await DiscussionPost.count(options);
+  }
+
+  /** @returns Specific ORDER BY Depening on what value is passed in */
+  private static getSortByValue(sortType: SortValue): OrderItem {
+    switch (sortType) {
+      // Order by reactions Descending
+      case SortTypes.REACTIONS:
+        // FIXME: order by reactionCount DESC when implemented
+        return ['postedDate', 'DESC'];
+
+      case SortTypes.NEW:
+      case SortTypes.NONE:
+        // note: comments also comes here as we can't sort here, we have to sort
+        // manually once we compute the comment tree count.
+        return ['postedDate', 'DESC'];
+
+      default:
+        return ['postedDate', 'DESC'];
+    }
   }
 }
 

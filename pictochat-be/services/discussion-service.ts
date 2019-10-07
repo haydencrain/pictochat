@@ -10,6 +10,9 @@ import { NotFoundError } from '../exceptions/not-found-error';
 import { ForbiddenError } from '../exceptions/forbidden-error';
 import { UnprocessableError } from '../exceptions/unprocessable-error';
 import { isNullOrUndefined } from 'util';
+import { SortValue } from '../utils/sort-types';
+import { PaginationOptions } from '../utils/pagination-types';
+import { PaginationService, PaginatedResults } from './pagination-service';
 
 let sequelize = SequelizeConnectionService.getInstance();
 
@@ -163,8 +166,17 @@ export class DiscussionService {
 
   /** Creates a list of summaries for each thread containing the rootPost
    *  and agggregate metrics (e.g. comment count). */
-  static async getThreadSummaries(): Promise<DiscussionThread[]> {
-    return await DiscussionThread.getDiscussionThreads();
+  static async getPaginatedSummaries(
+    sortType: SortValue = '',
+    paginationOptions: PaginationOptions
+  ): Promise<PaginatedResults<DiscussionThread>> {
+    let discussionThreads = await DiscussionThread.getDiscussionThreads(sortType);
+    let paginatedSummaries = PaginationService.getPaginatedResults(
+      discussionThreads,
+      paginationOptions.limit,
+      paginationOptions.start
+    );
+    return paginatedSummaries;
   }
 
   static async getReplyTreeUnderPost(
@@ -221,5 +233,9 @@ export class DiscussionService {
     }
 
     return nodes[rootPostId];
+  }
+
+  static flattenDiscussions(discussions: DiscussionThread[]): DiscussionThread[] {
+    return discussions.map(discussion => discussion.toFlatJSON());
   }
 }
