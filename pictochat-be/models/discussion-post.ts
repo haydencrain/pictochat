@@ -18,7 +18,7 @@ export class DiscussionPost extends Model {
     'replyTreePath',
     'isHidden',
     'isDeleted',
-    'hasInappropriateContentFlag'
+    'hasInappropriateFlag'
   ];
   private static readonly USER_JOIN = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
 
