@@ -9,20 +9,18 @@
   width: 100%;
   z-index: 1000;
   .title {
-    color: @white;
-    margin-left: 40px;
-    font-size: @fsVeryLarge;
-    font-weight: bold;
     height: 100%;
     display: flex;
     align-items: center;
+    margin-left: 40px;
+    color: @white;
+    font-size: @fsVeryLarge;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
 
-    span {
-      a {
-        color: white !important;
-        margin-left: 10px;
-        font-size: 14px;
-      }
+    &:hover {
+      text-decoration: none;
     }
   }
 }

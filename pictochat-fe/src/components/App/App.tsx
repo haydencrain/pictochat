@@ -13,6 +13,7 @@ import { setDeviceIdCookie } from '../../utils/DeviceId';
 import SockPuppetsDashboardPage from '../../pages/SockPuppetsDashboardPage';
 import UserPage from '../../pages/UserPage';
 import CurrentUser from '../CurrentUser';
+import QuickLinks from '../Quicklinks';
 import './App.less';
 
 const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
@@ -53,6 +54,7 @@ function AppBody() {
         </Switch>
       </main>
       <aside id="app-sidebar">
+        <QuickLinks />
         <CurrentUser />
       </aside>
     </div>
