@@ -11,6 +11,7 @@ import { Sequelize } from 'sequelize/types';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { ForbiddenError } from '../exceptions/forbidden-error';
 import { NotFoundError } from '../exceptions/not-found-error';
+import { DiscussionPost } from '../models/discussion-post';
 
 export const reactionRouter = express.Router();
 
