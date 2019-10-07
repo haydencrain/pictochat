@@ -31,18 +31,23 @@ class ReactionService {
       postId: postId,
       userId: userId
     };
-    let res = await ApiService.post('/reaction', data);
-    return res.reaction;
+    return await ApiService.post('/reaction', data);
+    // let res = await ApiService.post('/reaction', data);
+    // return res.reaction;
   }
 
-  static async removeReaction(reactionName: string, postId: number, userId: number) {
-    let data = {
-      reactionName: reactionName,
-      postId: postId,
-      userId: userId
-    };
-    return await ApiService.sendDelete(`/reaction`, data);
+  static async removeReaction(reactionId: number): Promise<void> {
+    return await ApiService.sendDelete(`/reaction/${reactionId}`);
   }
+
+  // static async removeReaction(reactionName: string, postId: number, userId: number) {
+  //   let data = {
+  //     reactionName: reactionName,
+  //     postId: postId,
+  //     userId: userId
+  //   };
+  //   return await ApiService.sendDelete(`/reaction`, data);
+  // }
 }
 
 export default ReactionService;

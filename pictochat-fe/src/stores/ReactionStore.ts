@@ -34,20 +34,67 @@ export class ReactionStore {
   @observable
   postUserReactionsMap: ObservableIntMap<ObservableIntMap<Reaction>> = new ObservableIntMap(observable.map(undefined));
 
-  @action
+  @action.bound
+  async updateReaction(postId: number, userId: number, reactionName: string) {
+    if (!this.hasReacted(postId, userId)) {
+      let reactionJson = await ReactionService.addReaction(reactionName, postId, userId);
+      // console.log('NEW Reaction JSON: ', reactionJson);
+      let reaction = new Reaction(reactionJson);
+      this.putReact(reaction);
+      return;
+    }
+
+    let reaction = this.postUserReactionsMap.get(postId).get(userId);
+
+    if (reaction.reactionName === reactionName) {
+      await ReactionService.removeReaction(reaction.reactionId);
+      this.removeLocalReaction(reaction);
+      return;
+    }
+
+    await ReactionService.removeReaction(reaction.reactionId);
+    this.removeLocalReaction(reaction);
+
+    reaction = new Reaction(await ReactionService.addReaction(reactionName, postId, userId));
+    this.putReact(reaction);
+  }
+
+  @action.bound
+  private removeLocalReaction(reaction: Reaction) {
+    if (!this.postUserReactionsMap.has(reaction.postId)) throw new KeyException();
+    const userReacts = this.postUserReactionsMap.get(reaction.postId);
+
+    // Delete the map entry for this users from the post's reaction map
+    if (!userReacts.has(reaction.userId)) throw new KeyException();
+    userReacts.delete(reaction.userId);
+
+    // Delete the map for the post if it has no more reactions
+    if (this.postUserReactionsMap.entries().length === 0) {
+      this.postUserReactionsMap.delete(reaction.postId);
+    }
+  }
+
+  @action.bound
   async loadThreadReactions(discussionId: string) {
     this.isLoading = true;
     try {
       let reactsJson = await ReactionService.getDiscussionReactions(discussionId);
-      for (let reactJson of reactsJson) {
-        this.putReact(new Reaction(reactJson));
-      }
+      // console.log('reactsJson: ', reactsJson);
+      runInAction(() => {
+        for (let reactJson of reactsJson) {
+          let react = new Reaction(reactJson);
+          // console.log('BEFORE PUT: ', JSON.stringify(this.postUserReactionsMap));
+          this.putReact(react);
+          // console.log('AFTER PUT: ', JSON.stringify(this.postUserReactionsMap));
+        }
+      });
     } finally {
       runInAction(() => this.isLoading = false);
     }
   }
 
-  @action putReact(react: Reaction) {
+  @action.bound
+  putReact(react: Reaction) {
     if (this.postUserReactionsMap.has(react.postId)) {
       let userReacts = this.postUserReactionsMap.get(react.postId);
       this.putInUserReactsMap(userReacts, react);
@@ -58,7 +105,8 @@ export class ReactionStore {
     }
   }
 
-  @action putInUserReactsMap(userReacts, react) {
+  @action.bound
+  putInUserReactsMap(userReacts, react) {
     if (userReacts.has(react.userId)) {
       userReacts.get(react.userId).replace(react);
     } else {
@@ -73,6 +121,11 @@ export class ReactionStore {
     if (!userReacts.has(userId)) throw new KeyException();
 
     return userReacts.get(userId);
+  });
+
+  hasReacted = computedFn(function(postId: number, userId: number) {
+    if (!this.postUserReactionsMap.has(postId)) return false;
+    return this.postUserReactionsMap.get(postId).has(userId);
   });
 
   // number of reactions by name of specified post

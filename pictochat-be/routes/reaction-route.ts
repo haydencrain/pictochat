@@ -4,6 +4,13 @@ import { ReactionService } from '../services/reaction-service';
 import { Reaction } from '../models/reaction';
 import { userRouter } from './users-route';
 import { UnprocessableError } from '../exceptions/unprocessable-error';
+import passport from 'passport';
+import { strategies } from '../middleware/passport-middleware';
+import { User } from '../models/user';
+import { Sequelize } from 'sequelize/types';
+import { SequelizeConnectionService } from '../services/sequelize-connection-service';
+import { ForbiddenError } from '../exceptions/forbidden-error';
+import { NotFoundError } from '../exceptions/not-found-error';
 
 export const reactionRouter = express.Router();
 
@@ -30,21 +37,44 @@ reactionRouter.get('/', async (req, res, next) => {
 });
 
 //POST reaction
-reactionRouter.post('/', async (req: any, res, next) => {
-  try {
-    let createReaction = await ReactionService.createReaction(req.body.reactionName, req.body.postId, req.body.userId);
-    return res.json(createReaction);
-  } catch (error) {
-    next(error);
+reactionRouter.post(
+  '/',
+  passport.authenticate(strategies.JWT, { session: false }),
+  async (req: any, res, next) => {
+    try {
+      let createReaction = await ReactionService.createReaction(req.body.reactionName, req.body.postId, req.body.userId);
+      return res.json(createReaction);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
+
 
 //DELETE reaction
-reactionRouter.delete('/', async (req: any, res, next) => {
-  try {
-    let removeReaction = await ReactionService.removeReaction(req.body.reactionName, req.body.postId, req.body.userId);
-    return res.json(removeReaction);
-  } catch (error) {
-    next(error);
+reactionRouter.delete('/:reactionId',
+  passport.authenticate(strategies.JWT, { session: false }),
+  async (req: any, res, next) => {
+    try {
+      console.log(req.user);
+      // FIXME: Move into reaction service
+      const sequelize = SequelizeConnectionService.getInstance();
+      await sequelize.transaction(async (transaction) => {
+        const requestingUser = await User.getUser(req.user.userId);
+
+        const reaction = await Reaction.findOne({ where: { reactionId: req.params.reactionId } });
+        if (reaction === null) throw new NotFoundError();
+
+        if (requestingUser.userId !== reaction.userId) throw new ForbiddenError();
+
+        await reaction.destroy();
+      });
+      res.status(204);
+      res.end();
+      // let removeReaction = await ReactionService.removeReaction(req.body.reactionName, req.body.postId, req.body.userId);
+      // return res.json(removeReaction);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);

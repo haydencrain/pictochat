@@ -67,30 +67,35 @@ export class Reaction extends Model {
     return await Reaction.create({ reactionName, postId, userId });
   }
 
-  static async removeReaction(reactionName: string, postId: number, userId: number) {
-    return Reaction.destroy({
-      where: {
-        reactionName,
-        postId,
-        userId
-      }
-    });
-  }
+  // static async removeReaction(reactionName: string, postId: number, userId: number) {
+  //   return Reaction.destroy({
+  //     where: {
+  //       reactionName,
+  //       postId,
+  //       userId
+  //     }
+  //   });
+  // }
 }
 
 Reaction.init(
   {
-    reactionId: { type: DataTypes.INTEGER, autoIncrement: true },
-    reactionName: { type: DataTypes.STRING, primaryKey: true },
-    postId: { type: DataTypes.INTEGER, primaryKey: true },
+    reactionId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    reactionName: { type: DataTypes.STRING },
+    postId: { type: DataTypes.INTEGER },
     userId: { type: DataTypes.INTEGER }
   },
   {
     sequelize: sequelize,
     modelName: 'reaction',
     tableName: 'reactions',
-    freezeTableName: true
+    freezeTableName: true,
+    indexes: [{
+      unique: true,
+      fields: ['postId', 'userId']
+    }]
   }
 );
 
-Reaction.belongsTo(DiscussionPost, {as: 'post', targetKey: 'postId', foreignKey: 'postId', constraints: true})
+Reaction.belongsTo(DiscussionPost, {as: 'post', targetKey: 'postId', foreignKey: 'postId', constraints: true});
+Reaction.belongsTo(User, {as: 'user', targetKey: 'userId', foreignKey: 'userId', constraints: true});
