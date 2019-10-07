@@ -1,15 +1,9 @@
 import * as React from 'react';
-import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import StoresContext from '../../contexts/StoresContext';
-import PostsList from '../PostsList';
-import CreatePostModal from '../CreatePostModal/CreatePostModal';
-import { PostTypes } from '../../models/PostTypes';
-import DiscussionStore from '../../stores/DiscussionStore';
-import { DiscussionPost } from '../../models/DiscussionPost';
 import ThreadsSummaryList from '../ThreadsSummaryList/ThreadsSummaryList';
-import './ThreadListContainer.less';
 import RepliesList from '../RepliesList/RepliesList';
+import ThreadListMenu from '../ThreadListMenu';
+import './ThreadListContainer.less';
 
 //// THREADS LIST CONTAINER /////
 
@@ -37,10 +31,11 @@ function ThreadListContainer(props: ThreadListContainerProps) {
 
   return (
     <section className="thread-list-container">
-      <div className="thread-list-header">
-        <h1>{props.sectionHeader}</h1>
-        <CreatePostModal triggerType="button" triggerContent={props.addPostButtonMessage} parentPostId={props.id} />
-      </div>
+      <ThreadListMenu
+        header={props.sectionHeader}
+        createButtonMessage={props.addPostButtonMessage}
+        parentId={props.id}
+      />
       {postList}
     </section>
   );

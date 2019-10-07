@@ -6,15 +6,19 @@
 #app {
   height: 100%;
 
-  a {
+  a:not(.semantic-a) {
     cursor: pointer;
-    text-decoration: underline;
     &.inherit {
       color: inherit;
       text-decoration: inherit;
     }
     &:hover {
       text-decoration: underline;
+    }
+    &.inherit {
+      &:hover {
+        text-decoration: inherit;
+      }
     }
   }
 
