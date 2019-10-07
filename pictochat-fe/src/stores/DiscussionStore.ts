@@ -19,6 +19,7 @@ export default class DiscussionStore {
   @observable threadSummariesMap: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
     observable.map(undefined, { name: 'threadSummariesMap' })
   );
+  @observable activeDiscussionSort: SortValue = SortTypes.NEW;
   @observable activeDiscussionRootId: string;
   @observable activeDiscussionRoot: DiscussionPost = new DiscussionPost();
   @observable activeDiscussionPosts: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
@@ -37,6 +38,12 @@ export default class DiscussionStore {
   setThreadSummariesActiveSort(sort: SortValue) {
     this.threadSummariesActiveSort = sort;
     this.getNewThreadSummaries();
+  }
+
+  @action.bound
+  setActiveDiscussionSort(sort: SortValue) {
+    this.activeDiscussionSort = sort;
+    this.getNewReplies(this.activeDiscussionRootId);
   }
 
   @action.bound
@@ -99,6 +106,22 @@ export default class DiscussionStore {
     } finally {
       runInAction(() => {
         this.isLoadingActiveDiscussion = false;
+        this.isLoadingReplies = false;
+      });
+    }
+  }
+
+  @action.bound
+  async getNewReplies(postId: string) {
+    this.isLoadingReplies = true;
+    this.activeDiscussionPosts.clear();
+    try {
+      let postJson = await DiscussionService.getPost(postId, PAGINATION_LIMIT);
+      runInAction(() => {
+        this.parseJsonTree(postJson, true);
+      });
+    } finally {
+      runInAction(() => {
         this.isLoadingReplies = false;
       });
     }

@@ -3,27 +3,23 @@ import CreatePostModal from '../CreatePostModal/CreatePostModal';
 import './ThreadListMenu.less';
 import { Menu, Input, Dropdown } from 'semantic-ui-react';
 import { SortTypes, SortValue } from '../../models/SortTypes';
+import DropdownPair from '../../models/DropdownPair';
 
 interface ThreadListMenuProps {
   createButtonMessage: string;
   parentId?: string;
+  sortOptions: DropdownPair<SortValue>[];
   activeSort: SortValue;
   onSortSelect: (name: SortValue) => void;
 }
 
-const sortOptions = [
-  { name: SortTypes.NEW, title: 'Newest' },
-  { name: SortTypes.COMMENTS, title: 'Most Comments' },
-  { name: SortTypes.REACTIONS, title: 'Most Reactions' }
-];
-
 export default function ThreadListMenu(props: ThreadListMenuProps) {
-  const sortMenuItems = sortOptions.map(option => {
-    const active = props.activeSort === option.name;
+  const sortMenuItems = props.sortOptions.map(option => {
+    const active = props.activeSort === option.value;
     const handleClick = (e, { name }) => props.onSortSelect(name);
     return (
-      <Menu.Item className="semantic-a" key={option.name} name={option.name} active={active} onClick={handleClick}>
-        {option.name}
+      <Menu.Item className="semantic-a" key={option.value} name={option.value} active={active} onClick={handleClick}>
+        {option.value}
       </Menu.Item>
     );
   });

@@ -16,7 +16,7 @@ function PostMainContainer(props: PostMainContainerProps) {
   const stores = React.useContext(StoresContext);
 
   const renderContent = () => {
-    if (stores.discussion.isLoading || !stores.discussion.activeDiscussionPosts.has(id)) {
+    if (stores.discussion.isLoadingActiveDiscussion || !stores.discussion.activeDiscussionPosts.has(id)) {
       return <Loader active />;
     }
     const post = stores.discussion.activeDiscussionPosts.get(id);
