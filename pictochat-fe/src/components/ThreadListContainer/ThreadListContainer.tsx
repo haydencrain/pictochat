@@ -1,15 +1,12 @@
 import * as React from 'react';
-import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import StoresContext from '../../contexts/StoresContext';
-import PostsList from '../PostsList';
-import CreatePostModal from '../CreatePostModal/CreatePostModal';
-import { PostTypes } from '../../models/PostTypes';
-import DiscussionStore from '../../stores/DiscussionStore';
-import { DiscussionPost } from '../../models/DiscussionPost';
 import ThreadsSummaryList from '../ThreadsSummaryList/ThreadsSummaryList';
-import './ThreadListContainer.less';
 import RepliesList from '../RepliesList/RepliesList';
+import ThreadListMenu from '../ThreadListMenu';
+import './ThreadListContainer.less';
+import { SortTypes, SortValue } from '../../models/SortTypes';
+import StoresContext from '../../contexts/StoresContext';
+import { computed } from 'mobx';
 
 //// THREADS LIST CONTAINER /////
 
@@ -22,6 +19,7 @@ interface ThreadListContainerProps {
 }
 
 function ThreadListContainer(props: ThreadListContainerProps) {
+  const store = React.useContext(StoresContext).discussion;
   let postListProps = {
     noPostsMessage: props.noPostsMessage,
     showReplies: props.showReplies,
@@ -29,7 +27,21 @@ function ThreadListContainer(props: ThreadListContainerProps) {
   };
 
   // If no Id is present, then it's the main threads, otherwise it's the replies
-  let postList = !props.id ? (
+  const isThreadsSummary = !props.id;
+
+  const activeSort = computed(
+    (): SortValue => {
+      return isThreadsSummary ? store.threadSummariesActiveSort : SortTypes.NEW;
+    }
+  );
+
+  const handleSortSelect = (sort: SortValue) => {
+    if (isThreadsSummary) {
+      store.setThreadSummariesActiveSort(sort);
+    }
+  };
+
+  let postList = isThreadsSummary ? (
     <ThreadsSummaryList {...postListProps} />
   ) : (
     <RepliesList {...{ ...postListProps, ...{ postId: props.id } }} />
@@ -37,10 +49,12 @@ function ThreadListContainer(props: ThreadListContainerProps) {
 
   return (
     <section className="thread-list-container">
-      <div className="thread-list-header">
-        <h1>{props.sectionHeader}</h1>
-        <CreatePostModal triggerType="button" triggerContent={props.addPostButtonMessage} parentPostId={props.id} />
-      </div>
+      <h1>{props.sectionHeader}</h1>
+      <ThreadListMenu
+        createButtonMessage={props.addPostButtonMessage}
+        activeSort={activeSort.get()}
+        onSortSelect={handleSortSelect}
+      />
       {postList}
     </section>
   );

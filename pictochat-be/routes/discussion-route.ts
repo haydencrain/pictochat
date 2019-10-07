@@ -1,19 +1,15 @@
 import express from 'express';
 import { DiscussionService } from '../services/discussion-service';
-import { PaginationService } from '../services/pagination-service';
+import { PaginationOptions } from '../utils/pagination-types';
 
 export const discussionRouter = express.Router();
 
 discussionRouter.get('/', async (req, res, next) => {
   try {
-    let threadSummaries = await DiscussionService.getThreadSummaries();
-    let threadSummariesFlat = threadSummaries.map(threadSummary => threadSummary.toFlatJSON());
-    let paginatedSummaries = PaginationService.getPaginatedResults(
-      threadSummariesFlat,
-      req.query.limit,
-      req.query.start
-    );
-    res.json(paginatedSummaries);
+    const { sort, limit, start } = req.query;
+    let threadSummaries = await DiscussionService.getPaginatedSummaries(sort, new PaginationOptions(start, limit));
+    threadSummaries.results = DiscussionService.flattenDiscussions(threadSummaries.results);
+    res.json(threadSummaries);
   } catch (error) {
     next(error);
   }

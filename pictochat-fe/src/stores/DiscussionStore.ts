@@ -4,6 +4,7 @@ import { DiscussionPost, IDiscussionPost } from '../models/DiscussionPost';
 import DiscussionService from '../services/DiscussionService';
 import NewPostPayload from '../models/NewPostPayload';
 import PaginationResult from '../models/PaginationResult';
+import { SortTypes, SortValue } from '../models/SortTypes';
 
 // TODO: Move to env variable
 const PAGINATION_LIMIT = 10;
@@ -12,7 +13,7 @@ const PAGINATION_LIMIT = 10;
  * Coordinates updates to discussion data
  */
 export default class DiscussionStore {
-  // pagination variables
+  @observable threadSummariesActiveSort: SortValue = SortTypes.NEW;
   @observable threadSummariesHasMore = true;
   @observable threadSummariesNextStart = 0;
   @observable threadSummariesMap: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
@@ -27,26 +28,28 @@ export default class DiscussionStore {
   @observable isLoadingActiveDiscussion = false;
   @observable isLoadingReplies = false;
 
-  constructor() {
-    // this.getNewThreadSummaries().catch(error => {
-    //   console.error('Error occured when fetching thread summaries:', error);
-    // });
-  }
-
   @computed
   get isLoading(): boolean {
     return this.isLoadingActiveDiscussion || this.isLoadingThreads;
   }
 
   @action.bound
+  setThreadSummariesActiveSort(sort: SortValue) {
+    this.threadSummariesActiveSort = sort;
+    this.getNewThreadSummaries();
+  }
+
+  @action.bound
   async getNewThreadSummaries() {
     this.isLoadingThreads = true;
-    const paginationResult = await DiscussionService.getDiscussions(PAGINATION_LIMIT);
+    this.threadSummariesMap.clear();
+    this.threadSummariesNextStart = 0;
+    this.threadSummariesHasMore = true;
+    const paginationResult = await DiscussionService.getDiscussions(this.threadSummariesActiveSort, PAGINATION_LIMIT);
     // Mobx @action will only track changes up to the first use of await in an an async function
     // so we need to run the rest in runInAction() to ensure anything observing the modified obserables
     // isLoadingReplies updated
     runInAction(() => {
-      this.threadSummariesMap.clear();
       this.setThreadSummaries(paginationResult);
       this.isLoadingThreads = false;
     });
@@ -55,7 +58,11 @@ export default class DiscussionStore {
   @action.bound
   async getMoreThreadSummaries() {
     this.isLoadingThreads = true;
-    const paginationResult = await DiscussionService.getDiscussions(PAGINATION_LIMIT, this.threadSummariesNextStart);
+    const paginationResult = await DiscussionService.getDiscussions(
+      this.threadSummariesActiveSort,
+      PAGINATION_LIMIT,
+      this.threadSummariesNextStart
+    );
     runInAction(() => {
       this.setThreadSummaries(paginationResult);
       this.isLoadingThreads = false;
@@ -80,6 +87,8 @@ export default class DiscussionStore {
   async setActiveDiscussion(postId: string) {
     this.isLoadingActiveDiscussion = true;
     this.isLoadingReplies = true;
+    this.activeDiscussionRoot.clear();
+    this.activeDiscussionPosts.clear();
     try {
       let postJson = await DiscussionService.getPost(postId, PAGINATION_LIMIT);
       runInAction(() => {
