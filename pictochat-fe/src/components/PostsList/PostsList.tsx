@@ -28,7 +28,14 @@ function PostsList(props: PostListsProps) {
     }
 
     return props.posts.map(post => {
-      return <PostsListItem key={post.postId} post={post} postType={props.postsType} showReplies={props.showReplies} />;
+      return (
+        <PostsListItem
+          key={`post_${post.postId}`}
+          post={post}
+          postType={props.postsType}
+          showReplies={props.showReplies}
+        />
+      );
     });
   };
 

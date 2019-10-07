@@ -1,12 +1,13 @@
 import * as React from 'react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import ThreadsSummaryList from '../ThreadsSummaryList/ThreadsSummaryList';
 import RepliesList from '../RepliesList/RepliesList';
 import ThreadListMenu from '../ThreadListMenu';
-import './ThreadListContainer.less';
 import { SortTypes, SortValue } from '../../models/SortTypes';
 import StoresContext from '../../contexts/StoresContext';
-import { computed } from 'mobx';
+import DropdownPair from '../../models/DropdownPair';
+import './ThreadListContainer.less';
 
 //// THREADS LIST CONTAINER /////
 
@@ -18,20 +19,29 @@ interface ThreadListContainerProps {
   showReplies?: boolean;
 }
 
+const threadSummarySortOptions: DropdownPair<SortValue>[] = [
+  { value: SortTypes.NEW, title: 'Newest' },
+  { value: SortTypes.REACTIONS, title: 'Most Reactions' },
+  { value: SortTypes.COMMENTS, title: 'Most Comments' }
+];
+
+const repliesSortOptions: DropdownPair<SortValue>[] = [
+  { value: SortTypes.NEW, title: 'Newest' },
+  { value: SortTypes.REACTIONS, title: 'Most Reactions' }
+];
+
 function ThreadListContainer(props: ThreadListContainerProps) {
   const store = React.useContext(StoresContext).discussion;
-  let postListProps = {
-    noPostsMessage: props.noPostsMessage,
-    showReplies: props.showReplies,
-    raised: true
-  };
 
   // If no Id is present, then it's the main threads, otherwise it's the replies
   const isThreadsSummary = !props.id;
 
   const activeSort = computed(
     (): SortValue => {
-      return isThreadsSummary ? store.threadSummariesActiveSort : SortTypes.NEW;
+      if (isThreadsSummary) {
+        return store.threadSummariesActiveSort;
+      }
+      return store.activeDiscussionSort;
     }
   );
 
@@ -39,6 +49,13 @@ function ThreadListContainer(props: ThreadListContainerProps) {
     if (isThreadsSummary) {
       store.setThreadSummariesActiveSort(sort);
     }
+    store.setActiveDiscussionSort(sort);
+  };
+
+  const postListProps = {
+    noPostsMessage: props.noPostsMessage,
+    showReplies: props.showReplies,
+    raised: true
   };
 
   let postList = isThreadsSummary ? (
@@ -52,8 +69,10 @@ function ThreadListContainer(props: ThreadListContainerProps) {
       <h1>{props.sectionHeader}</h1>
       <ThreadListMenu
         createButtonMessage={props.addPostButtonMessage}
+        sortOptions={isThreadsSummary ? threadSummarySortOptions : repliesSortOptions}
         activeSort={activeSort.get()}
         onSortSelect={handleSortSelect}
+        parentId={props.id}
       />
       {postList}
     </section>
