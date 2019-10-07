@@ -31,9 +31,9 @@ export class User extends Model {
    * @returns JSON with only PUBLIC_ATTRIBUTES */
   getPublicJSON(): any {
     let json = {};
-    // FIXME: Use PUBLIC_ATTRIBUTES - Jordan
-    for (let attr of ['userId', 'email', 'username']) {
-      json[attr] = this.getDataValue(attr as any);
+    for (let attr of User.PUBLIC_ATTRIBUTES) {
+      json[attr] = this.get(attr);
+      // json[attr] = this.getDataValue(attr as any);
     }
     return json;
   }

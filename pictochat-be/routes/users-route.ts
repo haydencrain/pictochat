@@ -41,7 +41,7 @@ userRouter.get('/', async (req, res, next) => {
     } else {
       // get all users
       let users = await UserService.getUsers();
-      return res.json(users);
+      return res.json(users.map(user => user.getPublicJSON()));
     }
   } catch (error) {
     next(error);
@@ -51,7 +51,7 @@ userRouter.get('/', async (req, res, next) => {
 // GET current user ONLY IF AUTHED
 userRouter.get('/authed', passport.authenticate(strategies.JWT, { session: false }), (req, res, next) => {
   try {
-    res.status(200).json(req.user);
+    res.status(200).json((req.user as User).getPublicJSON());
   } catch (error) {
     next(error);
   }
