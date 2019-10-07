@@ -17,7 +17,8 @@ export class DiscussionPost extends Model {
     'parentPostId',
     'replyTreePath',
     'isHidden',
-    'isDeleted'
+    'isDeleted',
+    'hasInappropriateContentFlag'
   ];
   private static readonly USER_JOIN = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
 
@@ -32,11 +33,24 @@ export class DiscussionPost extends Model {
   replyTreePath!: string;
   isHidden!: boolean;
   isDeleted!: boolean;
+  hasInappropriateFlag!: boolean;
 
   // Attributes for associations
   author?: User;
 
   //// INSTANCE METHODS ////
+
+  hide() {
+    this.isHidden = true;
+  }
+
+  setDeleted() {
+    this.isDeleted = true;
+  }
+
+  setInappropriateContentFlag(value: boolean) {
+    this.hasInappropriateFlag = value;
+  }
 
   async isUpdatable(): Promise<boolean> {
     let replyCount: number = await this.getDirectReplyCount();
@@ -47,14 +61,6 @@ export class DiscussionPost extends Model {
   async isDeleteable(): Promise<boolean> {
     let replyCount: number = await this.getDirectReplyCount();
     return replyCount === 0;
-  }
-
-  hide() {
-    this.isHidden = true;
-  }
-
-  setDeleted() {
-    this.isDeleted = true;
   }
 
   /**
@@ -176,6 +182,7 @@ DiscussionPost.init(
     replyTreePath: { type: DataTypes.STRING },
     isHidden: { type: DataTypes.BOOLEAN, defaultValue: false },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
+    hasInappropriateFlag: { type: DataTypes.BOOLEAN, defaultValue: false },
     imageSrc: {
       type: DataTypes.VIRTUAL,
       get() {
@@ -188,7 +195,10 @@ DiscussionPost.init(
     modelName: 'discussionPost',
     tableName: 'discussion_posts',
     freezeTableName: true,
-    indexes: [{ fields: ['discussionId', 'postId'], using: 'BTREE' }]
+    indexes: [
+      { fields: ['discussionId', 'postId'], using: 'BTREE' },
+      { fields: ['hasInappropriateContentFlag'], using: 'BTREE' }
+    ]
   }
 );
 

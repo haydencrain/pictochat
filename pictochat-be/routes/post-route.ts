@@ -11,6 +11,10 @@ import config from '../utils/config';
 import { User } from '../models/user';
 import { ForbiddenError } from '../exceptions/forbidden-error';
 import { DiscussionPost } from '../models/discussion-post';
+import { NotFoundError } from '../exceptions/not-found-error';
+import { UnprocessableError } from '../exceptions/unprocessable-error';
+import { Sequelize } from 'sequelize/types';
+import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 
 const AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR';
 
@@ -37,6 +41,55 @@ postRouter.get('/:postId', async (req, res, next) => {
   }
 });
 
+// TODO: Put in a a service (not sure which one)
+async function setPostInappropraiteContentFlag(postId: number, flagValue: boolean): Promise<DiscussionPost> {
+  const sequelize = SequelizeConnectionService.getInstance();
+  return await sequelize.transaction(async transaction => {
+    const post = await DiscussionService.getPost(postId);
+    post.setInappropriateContentFlag(flagValue);
+    await post.save();
+    return post;
+  });
+}
+
+function makeContentReport(post) {
+  return { postId: post.postId, hasInappropriateContentFlag: post.hasInappropriateContentFlag };
+}
+
+// POST Flag a post for inappropriate content
+postRouter.post(
+  '/:postId/content-report',
+  passport.authenticate(strategies.JWT, { session: false }),
+  async (req, res, next) => {
+    try {
+      const post: DiscussionPost = await setPostInappropraiteContentFlag(parseInt(req.params.postId), true);
+      res.json(makeContentReport(post));
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+postRouter.delete('/:postId/content-report', async (req, res, next) => {
+  try {
+    const post: DiscussionPost = await setPostInappropraiteContentFlag(parseInt(req.params.postId), false);
+    res.json(makeContentReport(post));
+  } catch (error) {
+    next(error);
+  }
+});
+
+postRouter.get('/:postId/content-report', async (req, res, next) => {
+  try {
+    console.log(req.params);
+    const post: DiscussionPost = await DiscussionService.getPost(parseInt(req.params.postId));
+    if (!post.hasInappropriateFlag) throw new NotFoundError();
+    res.json(makeContentReport(post));
+  } catch (error) {
+    next(error);
+  }
+});
+
 postRouter.post(
   '/',
   passport.authenticate(strategies.JWT, { session: false }),
@@ -54,7 +107,6 @@ postRouter.post(
   }
 );
 
-// Update a post
 postRouter.patch(
   '/:postId',
   passport.authenticate(strategies.JWT, { session: false }),
