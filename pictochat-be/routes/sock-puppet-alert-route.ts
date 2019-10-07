@@ -3,7 +3,7 @@ import passport from 'passport';
 import { strategies } from '../middleware/passport-middleware';
 import { User } from '../models/user';
 import { ForbiddenError } from '../exceptions/forbidden-error';
-import { SockPuppertAlert } from '../models/sock-puppet-alert';
+import { SockPuppetAlert } from '../models/sock-puppet-alert';
 
 export const sockPuppetAlertRouter = express.Router();
 
@@ -19,7 +19,7 @@ sockPuppetAlertRouter.get(
         throw new ForbiddenError();
       }
 
-      const alerts = await SockPuppertAlert.getSockPuppetAlerts(req.query.userLimit);
+      const alerts = await SockPuppetAlert.getSockPuppetAlerts(req.query.userLimit);
       const alertsJson = alerts.map(alert => alert.toJSON());
       console.log('alertsJson: ', JSON.stringify(alertsJson));
 

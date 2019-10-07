@@ -26,7 +26,7 @@ function PostMainContainer(props: PostMainContainerProps) {
   return (
     <section className="post-main-container">
       <div className="post-main-header">
-        <h1>Thread</h1>
+        <h1>Post{!!id ? ` - ${id}` : null}</h1>
       </div>
       <Segment raised>{renderContent()}</Segment>
     </section>
