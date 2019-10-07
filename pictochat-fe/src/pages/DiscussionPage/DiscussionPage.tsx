@@ -4,9 +4,9 @@ import { Observer } from 'mobx-react';
 import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
 import NavHistoryContext from '../../contexts/NavHistoryContext';
 import ThreadListContainer from '../../components/ThreadListContainer';
-import './DiscussionPage.less';
 import { computed } from 'mobx';
 import PostMainContainer from '../../components/PostMainContainer';
+import './DiscussionPage.less';
 
 interface DiscussionPageMatchParams {
   id: string;
