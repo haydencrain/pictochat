@@ -48,19 +48,16 @@ export class Reaction extends Model {
     });
   }
 
-  static async createReaction(
-    reactionId: number,
-    reactionName: string,
-    postId: number,
-    userId: number
-  ): Promise<Reaction> {
-    return await Reaction.create({ reactionId, reactionName, postId, userId });
+  static async createReaction(reactionName: string, postId: number, userId: number): Promise<Reaction> {
+    return await Reaction.create({ reactionName, postId, userId });
   }
 
-  static async removeReaction(reactionId: number) {
+  static async removeReaction(reactionName: string, postId: number, userId: number) {
     return Reaction.destroy({
       where: {
-        reactionId
+        reactionName,
+        postId,
+        userId
       }
     });
   }
@@ -68,9 +65,9 @@ export class Reaction extends Model {
 
 Reaction.init(
   {
-    reactionId: { type: DataTypes.INTEGER, primaryKey: true },
-    reactionName: { type: DataTypes.STRING },
-    postId: { type: DataTypes.INTEGER },
+    reactionId: { type: DataTypes.INTEGER, autoIncrement: true },
+    reactionName: { type: DataTypes.STRING, primaryKey: true },
+    postId: { type: DataTypes.INTEGER, primaryKey: true },
     userId: { type: DataTypes.INTEGER }
   },
   {

@@ -8,6 +8,7 @@ import { DiscussionPost } from '../../models/DiscussionPost';
 import { PostTypes, getPostTypeName } from '../../models/PostTypes';
 import './Post.less';
 import StoresContext from '../../contexts/StoresContext';
+import Reactions from '../Reactions';
 
 interface PostProps {
   post: DiscussionPost;
@@ -32,7 +33,8 @@ function Post(props: PostProps) {
         </div>
         <PostLinks postType={props.postType} post={props.post} />
       </div>
-    </section >
+      <Reactions postId={Number(props.post.postId)} />
+    </section>
   );
 }
 

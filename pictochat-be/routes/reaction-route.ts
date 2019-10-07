@@ -9,10 +9,10 @@ export const reactionRouter = express.Router();
 //GET reaction
 reactionRouter.get('/', async (req, res, next) => {
   try {
-    if (req.params.postId) {
+    if (req.query.postId) {
       const reactionPost = await ReactionService.getReactionsByPost(req.query.postId);
       return res.json(reactionPost);
-    } else if (req.params.userId) {
+    } else if (req.query.userId) {
       let reactionUser = await ReactionService.getReactionsByUser(req.query.userId);
       return res.json(reactionUser);
     } else {
@@ -27,12 +27,7 @@ reactionRouter.get('/', async (req, res, next) => {
 //POST reaction
 reactionRouter.post('/', async (req: any, res, next) => {
   try {
-    let createReaction = await ReactionService.createReaction(
-      req.body.reactionId,
-      req.body.reactionName,
-      req.body.postId,
-      req.body.userId
-    );
+    let createReaction = await ReactionService.createReaction(req.body.reactionName, req.body.postId, req.body.userId);
     return res.json(createReaction);
   } catch (error) {
     next(error);
@@ -42,7 +37,7 @@ reactionRouter.post('/', async (req: any, res, next) => {
 //DELETE reaction
 reactionRouter.delete('/', async (req: any, res, next) => {
   try {
-    let removeReaction = await ReactionService.removeReaction(req.query.reactionId);
+    let removeReaction = await ReactionService.removeReaction(req.body.reactionName, req.body.postId, req.body.userId);
     return res.json(removeReaction);
   } catch (error) {
     next(error);
