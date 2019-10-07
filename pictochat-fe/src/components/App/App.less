@@ -9,6 +9,10 @@
   a {
     cursor: pointer;
     text-decoration: underline;
+    &.inherit {
+      color: inherit;
+      text-decoration: inherit;
+    }
     &:hover {
       text-decoration: underline;
     }
@@ -50,6 +54,11 @@
 #app-sidebar {
   position: sticky;
   height: 100%;
+  width: 280px;
   top: calc(@appPadding + @navHeight);
   margin-left: 30px;
+
+  > section {
+    margin-bottom: 30px;
+  }
 }

@@ -19,3 +19,24 @@ export function useFetchCurrentUser(): [User, boolean] {
 
   return [user, isLoading];
 }
+
+export function useFetchUser(username: string): [User, boolean] {
+  const [user, setUser] = useState<User>();
+  const [isLoading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const user = new User(await userService.getUser(username));
+        setUser(user);
+      } catch (e) {
+        setUser(null);
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [username]);
+
+  return [user, isLoading];
+}

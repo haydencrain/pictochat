@@ -11,6 +11,8 @@ import './Post.less';
 import deletedPlaceholderImg from '../../images/deleted-placeholder.jpg';
 import ShowImageModal from '../ShowImageModal';
 import { computed } from 'mobx';
+import { Link } from 'react-router-dom';
+import UserService from '../../services/UserService';
 
 interface PostProps {
   post: DiscussionPost;
@@ -32,11 +34,15 @@ function Post(props: PostProps) {
   return (
     <section className={classNames('thread-post', getPostTypeName(postType))}>
       <div className="post-sidebar">
-        <Image src={post.author.userAvatarURI} avatar size="mini" />
+        <Link to={UserService.getUserUrl(post.author.username)}>
+          <Image src={post.author.userAvatarURI} avatar size="mini" />
+        </Link>
       </div>
       <div className="post-content">
         <div className="post-header">
-          <div className="post-author">{post.author.username}</div>
+          <Link className="post-author inherit" to={UserService.getUserUrl(post.author.username)}>
+            {post.author.username}
+          </Link>
           <div className="post-date">{moment(post.postedDate).fromNow()}</div>
         </div>
         <div className="post-body">

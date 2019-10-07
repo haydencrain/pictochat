@@ -4,13 +4,8 @@ import './Navbar.less';
 
 export default (props: {}) => (
   <nav id="navbar">
-    <div className="title">
+    <Link className="title" to="/">
       Pictochat
-      <span className="nav-links-container">
-        <Link to="/">Home</Link>
-        <Link to="/leaderboard">Leaderboard</Link>
-        <Link to="/register">Register</Link>
-      </span>
-    </div>
+    </Link>
   </nav>
 );

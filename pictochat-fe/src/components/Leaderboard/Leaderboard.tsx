@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import { Container, Header, Image, Rating } from 'semantic-ui-react';
-import './Leaderboard.less';
-import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
+import { Image, Segment } from 'semantic-ui-react';
 import { LeaderboardRank } from '../../models/LeaderboardRank';
+import './Leaderboard.less';
+import { Link } from 'react-router-dom';
+import UserService from '../../services/UserService';
 
 // const RateUsers = () => <Rating icon="star" defaultRating={3} maxRating={5} disabled />;
 
@@ -15,7 +16,6 @@ import { LeaderboardRank } from '../../models/LeaderboardRank';
 //   { name: 'Stevie Newman', image: 'https://semantic-ui.com/images/avatar/large/stevie.jpg', score: '350' }
 // ];
 
-
 interface LeaderboardProps {
   ranks: LeaderboardRank[];
 }
@@ -24,40 +24,33 @@ export function Leaderboard(props: LeaderboardProps) {
   const { ranks } = props;
 
   const userInfo = ranks.map(rank => (
-    <div className="ui two column grid" key={rank.rank}>
-      <div className="row">
-        <div className="four wide column">
-          <Image src={rank.user.userAvatarURI} size="tiny" circular />
+    <Segment className="user-row" key={rank.rank}>
+      <div className="user-avatar">
+        <Image src={rank.user.userAvatarURI} size="tiny" circular />
+      </div>
+      <div className="user-info">
+        <div id="info-username" className="row">
+          <Link to={UserService.getUserUrl(rank.user.username)} className="link inherit">
+            <h3>{rank.user.username}</h3>
+          </Link>
         </div>
-        <div id="info-col" className="column">
-          <div id="info-username" className="row">
-            <h3> {rank.user.username} </h3>
-          </div>
-          {/*<div id="info-rating" className="row">
+        {/*<div id="info-rating" className="row">
             <RateUsers />
            </div>*/}
-          <div className="row">
-            {<h5> Posts: {rank.postCount} </h5>}
-            {/*<h5> Thread : {user.score} </h5>*/}
-          </div>
+        <div className="row">
+          {<h5>Posts: {rank.postCount}</h5>}
+          {/*<h5> Thread : {user.score} </h5>*/}
         </div>
       </div>
-    </div>
+    </Segment>
   ));
 
   return (
-    <Container id="leaderboard" className="ui segment">
-      <Header as="h2">Leaderboard</Header>
-      <div>{userInfo}</div>
-    </Container>
+    <section id="leaderboard-section">
+      <h1>Leaderboard</h1>
+      <Segment.Group raised>{userInfo}</Segment.Group>
+    </section>
   );
 }
 
 export default observer(Leaderboard);
-
-// export default props => (
-//   <Container id="leaderboard" className="ui segment">
-//     <Header as="h2">Leaderboard</Header>
-//     <div>{UserInfo}</div>
-//   </Container>
-// );

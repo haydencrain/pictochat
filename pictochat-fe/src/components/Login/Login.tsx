@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Button } from 'semantic-ui-react';
-import StoresContext from '../../contexts/StoresContext';
+import { Form, Button, Segment, Loader } from 'semantic-ui-react';
 import UnauthenticatedUser from '../../models/UnauthenticatedUser';
+import StoresContext from '../../contexts/StoresContext';
 import './Login.less';
 
 interface LoginState {
@@ -11,6 +11,7 @@ interface LoginState {
 }
 
 interface LoginProps {
+  isLoading: boolean;
   onLogin?: () => Promise<void>;
 }
 
@@ -57,6 +58,13 @@ class Login extends React.Component<LoginProps, LoginState> {
   }
 
   render() {
+    if (this.props.isLoading) {
+      return (
+        <Segment>
+          <Loader active />
+        </Segment>
+      );
+    }
     return (
       <Form id="login-form" className="ui raised segment" onSubmit={this.handleSubmit} method="POST">
         <Form.Field className="login-field">
@@ -67,7 +75,7 @@ class Login extends React.Component<LoginProps, LoginState> {
           <label>Password</label>
           <input type="password" value={this.state.password} onChange={this.handlePasswordChange} />
         </Form.Field>
-        <Form.Group widths="equal">
+        <Form.Group inline>
           <Form.Field>
             <Button primary className="login-button">
               Log in
