@@ -1,6 +1,7 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { User } from './user';
+import { DiscussionPost } from './discussion-post';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
@@ -27,6 +28,20 @@ export class Reaction extends Model {
         include: Reaction.PUBLIC_ATTRIBUTES
       },
       where: { postId, userId }
+    });
+  }
+
+  static async getReactionsByDiscussion(discussionId: number): Promise<Reaction[]> {
+    const discussionJoin = {
+      model: DiscussionPost,
+      as: 'post',
+      required: true,
+      // attributes: ['postId', 'discussionId'],
+      where: {...DiscussionPost.defaultFilter(), ...{discussionId}}
+    };
+    return Reaction.findAll({
+      attributes: Reaction.PUBLIC_ATTRIBUTES,
+      include: [discussionJoin]
     });
   }
 
@@ -77,3 +92,5 @@ Reaction.init(
     freezeTableName: true
   }
 );
+
+Reaction.belongsTo(DiscussionPost, {as: 'post', targetKey: 'postId', foreignKey: 'postId', constraints: true})

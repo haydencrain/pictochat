@@ -3,18 +3,23 @@ import config from '../utils/config';
 import { ReactionService } from '../services/reaction-service';
 import { Reaction } from '../models/reaction';
 import { userRouter } from './users-route';
+import { UnprocessableError } from '../exceptions/unprocessable-error';
 
 export const reactionRouter = express.Router();
 
-//GET reaction
 reactionRouter.get('/', async (req, res, next) => {
   try {
-    if (req.query.postId) {
+    if (req.query.by === 'POST') {
       const reactionPost = await ReactionService.getReactionsByPost(req.query.postId);
       return res.json(reactionPost);
-    } else if (req.query.userId) {
+    } else if (req.query.by === 'USER') {
       let reactionUser = await ReactionService.getReactionsByUser(req.query.userId);
       return res.json(reactionUser);
+    } else if (req.query.by === 'DISCUSSION') {
+      if (!req.query.discussionId) throw new UnprocessableError('missing discussionId query param');
+      let reactions = await Reaction.getReactionsByDiscussion(req.query.discussionId);
+      let reactionsJson = reactions.map(react => react.toJSON());
+      res.json(reactionsJson);
     } else {
       let reaction = await ReactionService.getReactions(req.query.postId, req.query.userId);
       return res.json(reaction);
