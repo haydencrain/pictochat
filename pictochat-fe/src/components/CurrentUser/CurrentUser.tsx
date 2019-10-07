@@ -37,7 +37,7 @@ function CurrentUser() {
 
   return (
     <section id="current-user-section">
-      <h1>My Profile</h1>
+      <h2>My Profile</h2>
       {getCard()}
     </section>
   );
