@@ -8,7 +8,6 @@ import HomePage from '../../pages/HomePage';
 import LeaderboardPage from '../../pages/LeaderboardPage';
 import DiscussionPage from '../../pages/DiscussionPage';
 import RegisterPage from '../../pages/RegisterPage';
-import LoginPage from '../../pages/LoginPage';
 import NotFoundPage from '../../pages/NotFoundPage';
 import { setDeviceIdCookie } from '../../utils/DeviceId';
 import SockPuppetsDashboardPage from '../../pages/SockPuppetsDashboardPage';
@@ -48,7 +47,6 @@ function AppBody() {
           <Route exact path={FRONTEND_URL_ROOT} component={HomePage} />
           <Route exact path={`${FRONTEND_URL_ROOT}discussion`} component={DiscussionPage} />
           <Route exact path={`${FRONTEND_URL_ROOT}leaderboard`} component={LeaderboardPage} />
-          <Route exact path={`${FRONTEND_URL_ROOT}login`} component={LoginPage} />
           <Route exact path={`${FRONTEND_URL_ROOT}sock-puppets`} component={SockPuppetsDashboardPage} />
           <Route exact path={`${FRONTEND_URL_ROOT}user/:username`} component={UserPage} />
           <Route component={NotFoundPage} />
