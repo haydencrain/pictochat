@@ -19,20 +19,7 @@ const normalLinks: Links[] = [
   { name: 'Register', link: '/register', isActive: pathname => pathname.startsWith('/register') }
 ];
 
-const adminLinks: Links[] = [
-  {
-    name: 'Sock Puppets',
-    link: '/sock-puppets',
-    isActive: pathname => pathname.startsWith('/sock-puppets')
-  },
-  { name: 'Reports', link: '/reports', isActive: pathname => pathname.startsWith('/reports') }
-];
-
 function QuickLinks(props: RouteComponentProps<{}>) {
-  const userStore = React.useContext(StoresContext).user;
-
-  const isAdmin = computed(() => userStore.isLoggedIn && userStore.currentUser.hasAdminRole);
-
   const getLinkSegments = (links: Links[]) =>
     links.map(link => {
       const active = link.isActive(props.location.pathname);
@@ -49,7 +36,6 @@ function QuickLinks(props: RouteComponentProps<{}>) {
       <h2>Quick Links</h2>
       <Segment.Group raised className="links-list">
         {getLinkSegments(normalLinks)}
-        {isAdmin.get() && getLinkSegments(adminLinks)}
       </Segment.Group>
     </section>
   );

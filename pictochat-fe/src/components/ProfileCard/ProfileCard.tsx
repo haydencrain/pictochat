@@ -18,10 +18,16 @@ function ProfileCard(props: Props) {
         <li>
           <Link to={`/user/${props.user.username}`}>View Profile</Link>
         </li>
-        {/*
-          <li>
-            <a>Settings</a>
-          </li>*/}
+        {props.user.hasAdminRole && (
+          <>
+            <li>
+              <Link to="/sock-puppets">Sock Puppets</Link>
+            </li>
+            <li>
+              <Link to="/reports">Reports</Link>
+            </li>
+          </>
+        )}
         <li>
           <a onClick={props.onLogoutClick}>Logout</a>
         </li>
