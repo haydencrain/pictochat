@@ -11,6 +11,7 @@ import RegisterPage from '../../pages/RegisterPage';
 import NotFoundPage from '../../pages/NotFoundPage';
 import { setDeviceIdCookie } from '../../utils/DeviceId';
 import SockPuppetsDashboardPage from '../../pages/SockPuppetsDashboardPage';
+import ReportsPage from '../../pages/ReportsPage';
 import UserPage from '../../pages/UserPage';
 import CurrentUser from '../CurrentUser';
 import QuickLinks from '../Quicklinks';
@@ -48,8 +49,9 @@ function AppBody() {
           <Route exact path={FRONTEND_URL_ROOT} component={HomePage} />
           <Route exact path={`${FRONTEND_URL_ROOT}discussion/:id`} component={DiscussionPage} />
           <Route exact path={`${FRONTEND_URL_ROOT}leaderboard`} component={LeaderboardPage} />
-          <Route exact path={`${FRONTEND_URL_ROOT}sock-puppets`} component={SockPuppetsDashboardPage} />
           <Route exact path={`${FRONTEND_URL_ROOT}user/:username`} component={UserPage} />
+          <Route exact path={`${FRONTEND_URL_ROOT}sock-puppets`} component={SockPuppetsDashboardPage} />
+          <Route exact path={`${FRONTEND_URL_ROOT}reports`} component={ReportsPage} />
           <Route component={NotFoundPage} />
         </Switch>
       </main>

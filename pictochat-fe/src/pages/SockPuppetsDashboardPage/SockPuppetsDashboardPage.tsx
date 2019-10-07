@@ -6,6 +6,8 @@ import { RouteComponentProps } from 'react-router';
 import './SockPuppetsDashboardPage.less';
 import StoresContext from '../../contexts/StoresContext';
 import { SockPuppetAlert } from '../../models/SockPuppetAlert';
+import { computed } from 'mobx';
+import Unauthorised from '../../components/Unauthorised';
 
 const USER_LIMIT = 2;
 
@@ -14,11 +16,17 @@ interface PageProps extends RouteComponentProps<any> {}
 export function SockPuppetsDashboardPage(props: PageProps) {
   const stores = React.useContext(StoresContext);
 
+  const canViewPage = computed(() => stores.user.isLoggedIn && stores.user.currentUser.hasAdminRole);
+
   useFetchSockPuppetAlerts([props.location]);
+
+  if (!canViewPage.get()) {
+    return <Unauthorised />;
+  }
 
   let content;
   if (stores.sockPuppetAlerts.isLoading) {
-    content = <Loader />;
+    content = <Loader active />;
   } else {
     content = <SockPuppertsDashboard alerts={stores.sockPuppetAlerts.alerts} />;
   }
@@ -41,17 +49,17 @@ function useFetchSockPuppetAlerts(dependencies: any[]) {
 
 const SockPuppertsDashboard = observer(function SockPuppertsDashboard(props: { alerts: SockPuppetAlert[] }) {
   const alertViews = props.alerts.map(alert => <SockPuppetAlertView alert={alert} key={alert.deviceId} />);
-  const placeholder = <div className="bold">No suspicious devices found</div>;
+  const placeholder = <Segment className="bold">No suspicious devices found</Segment>;
   const content = props.alerts.length > 0 ? alertViews : placeholder;
 
   return (
-    <Segment className="sock-puppets-dashboard">
+    <>
       <h1>Sock Puppets</h1>
-      <div>
-        This page contains a list of devices that have been used to access more than {USER_LIMIT} users/accounts.
-      </div>
-      {content}
-    </Segment>
+      <p>This page contains a list of devices that have been used to access more than {USER_LIMIT} users/accounts.</p>
+      <Segment.Group raised className="sock-puppets-dashboard">
+        {content}
+      </Segment.Group>
+    </>
   );
 });
 

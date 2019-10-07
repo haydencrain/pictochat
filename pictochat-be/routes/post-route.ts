@@ -3,14 +3,16 @@ import fs from 'fs';
 import express from 'express';
 import multer from 'multer';
 import passport from 'passport';
+import config from '../utils/config';
 import { strategies } from '../middleware/passport-middleware';
 import { DiscussionService, ArchiveType } from '../services/discussion-service';
 import { MIMETYPE_TO_ENCODING } from '../utils/encoding-content-types';
 import { DiscussionTreeNode } from '../models/discussion-tree-node';
-import config from '../utils/config';
 import { User } from '../models/user';
 import { ForbiddenError } from '../exceptions/forbidden-error';
 import { DiscussionPost } from '../models/discussion-post';
+import { NotFoundError } from '../exceptions/not-found-error';
+import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { PaginationOptions } from '../utils/pagination-types';
 
 const AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR';
@@ -40,6 +42,40 @@ postRouter.get('/:postId', async (req, res, next) => {
   }
 });
 
+// POST Flag a post for inappropriate content
+postRouter.post(
+  '/:postId/content-report',
+  passport.authenticate(strategies.JWT, { session: false }),
+  async (req, res, next) => {
+    try {
+      const post: DiscussionPost = await setPostInappropraiteContentFlag(parseInt(req.params.postId), true);
+      res.json(makeContentReport(post));
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+postRouter.delete('/:postId/content-report', async (req, res, next) => {
+  try {
+    const post: DiscussionPost = await setPostInappropraiteContentFlag(parseInt(req.params.postId), false);
+    res.json(makeContentReport(post));
+  } catch (error) {
+    next(error);
+  }
+});
+
+postRouter.get('/:postId/content-report', async (req, res, next) => {
+  try {
+    console.log(req.params);
+    const post: DiscussionPost = await DiscussionService.getPost(parseInt(req.params.postId));
+    if (!post.hasInappropriateFlag) throw new NotFoundError();
+    res.json(makeContentReport(post));
+  } catch (error) {
+    next(error);
+  }
+});
+
 postRouter.post(
   '/',
   passport.authenticate(strategies.JWT, { session: false }),
@@ -57,7 +93,6 @@ postRouter.post(
   }
 );
 
-// Update a post
 postRouter.patch(
   '/:postId',
   passport.authenticate(strategies.JWT, { session: false }),
@@ -113,6 +148,21 @@ postRouter.delete(
 // TODO: Move into module in project utils folder (or maybe see if a promise-based library for fs already exists?)
 const readFile = util.promisify(fs.readFile);
 const deleteFile = util.promisify(fs.unlink);
+
+// TODO: Put in a a service (not sure which one)
+async function setPostInappropraiteContentFlag(postId: number, flagValue: boolean): Promise<DiscussionPost> {
+  const sequelize = SequelizeConnectionService.getInstance();
+  return await sequelize.transaction(async transaction => {
+    const post = await DiscussionService.getPost(postId);
+    post.setInappropriateContentFlag(flagValue);
+    await post.save();
+    return post;
+  });
+}
+
+function makeContentReport(post) {
+  return { postId: post.postId, hasInappropriateContentFlag: post.hasInappropriateContentFlag };
+}
 
 async function makeNewImageSpec(file): Promise<{ data: Buffer; encoding: string }> {
   let data = await readFile(file.path);

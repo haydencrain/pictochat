@@ -13,6 +13,7 @@ import { isNullOrUndefined } from 'util';
 import { SortValue } from '../utils/sort-types';
 import { PaginationOptions } from '../utils/pagination-types';
 import { PaginationService, PaginatedResults } from './pagination-service';
+import { UserService } from './user-service';
 
 let sequelize = SequelizeConnectionService.getInstance();
 
@@ -146,8 +147,13 @@ export class DiscussionService {
     return await sequelize.transaction(async transaction => {
       const post = await DiscussionService.getPost(postId);
 
-      // Posts can only be deleted by their author
-      if (post.authorId !== requestingUserId) throw new ForbiddenError();
+      // Posts can only be deleted by their author OR an admin user
+      if (post.authorId !== requestingUserId) {
+        const requestingUser = await UserService.getUser(requestingUserId);
+        if (!requestingUser.hasAdminRole) {
+          throw new ForbiddenError();
+        }
+      }
 
       let archiveType: ArchiveType;
       if (await post.isDeleteable()) {
@@ -180,8 +186,12 @@ export class DiscussionService {
     sortType?: SortValue,
     paginationOptions?: PaginationOptions
   ): Promise<DiscussionTreeNode> {
-    let posts = await DiscussionService.getPostReplies(postId, sortType, paginationOptions.start);
-    return await DiscussionService.makeReplyTree(posts, paginationOptions.limit);
+    let posts = await DiscussionService.getPostReplies(
+      postId,
+      sortType,
+      paginationOptions ? paginationOptions.start : null
+    );
+    return await DiscussionService.makeReplyTree(posts, paginationOptions ? paginationOptions.limit : null);
   }
 
   static async getPostReplies(
