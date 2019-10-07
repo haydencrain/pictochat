@@ -1,4 +1,5 @@
 import { isNullOrUndefined } from 'util';
+import { PaginationOptions } from '../utils/pagination-types';
 
 export interface PaginatedResults<T> {
   start: number;
@@ -9,17 +10,16 @@ export interface PaginatedResults<T> {
 }
 
 export class PaginationService {
-  static getPaginatedResults<T>(collection: T[], limit: number, start?: number): PaginatedResults<T> {
-    // Null or undefined start should become 0
-    const startIndex = start || 0;
-    // If limit is null or undefined, then just return the entire collection
-    const end = isNullOrUndefined(limit) ? collection.length : startIndex + limit;
+  static getPaginatedResults<T>(collection: T[], paginationOptions: PaginationOptions): PaginatedResults<T> {
+    const end = isNullOrUndefined(paginationOptions.limit)
+      ? collection.length
+      : paginationOptions.start + paginationOptions.limit;
     const hasNextPage = end < collection.length;
-    const results = collection.slice(start, end);
+    const results = collection.slice(paginationOptions.start, end);
     const nextStart = hasNextPage ? end : null;
     const size = results.length;
     return {
-      start: startIndex,
+      start: paginationOptions.start,
       size,
       results,
       hasNextPage,

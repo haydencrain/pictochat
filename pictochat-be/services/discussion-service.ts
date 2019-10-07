@@ -171,11 +171,7 @@ export class DiscussionService {
     paginationOptions: PaginationOptions
   ): Promise<PaginatedResults<DiscussionThread>> {
     let discussionThreads = await DiscussionThread.getDiscussionThreads(sortType);
-    let paginatedSummaries = PaginationService.getPaginatedResults(
-      discussionThreads,
-      paginationOptions.limit,
-      paginationOptions.start
-    );
+    let paginatedSummaries = PaginationService.getPaginatedResults(discussionThreads, paginationOptions);
     return paginatedSummaries;
   }
 

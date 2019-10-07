@@ -11,6 +11,7 @@ import config from '../utils/config';
 import { User } from '../models/user';
 import { ForbiddenError } from '../exceptions/forbidden-error';
 import { DiscussionPost } from '../models/discussion-post';
+import { PaginationOptions } from '../utils/pagination-types';
 
 const AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR';
 
@@ -26,10 +27,12 @@ export const postRouter = express.Router();
  */
 postRouter.get('/:postId', async (req, res, next) => {
   try {
+    const { limit, after } = req.query;
+    const paginationOptions = new PaginationOptions(after, limit);
     let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(
       req.params.postId,
-      req.query.limit,
-      parseInt(req.query.after)
+      paginationOptions.limit,
+      paginationOptions.start
     );
     res.json(replyTree.toJSON());
   } catch (error) {
