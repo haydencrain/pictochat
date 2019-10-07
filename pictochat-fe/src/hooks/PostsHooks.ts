@@ -18,18 +18,18 @@ import discussionService from '../services/DiscussionService';
 //   return [posts, loading];
 // }
 
-export function useFetchPost(id: string): [DiscussionPost, boolean] {
-  const [post, setPost] = useState<DiscussionPost>();
-  const [loading, setLoading] = useState<boolean>(true);
+// export function useFetchPost(id: string): [DiscussionPost, boolean] {
+//   const [post, setPost] = useState<DiscussionPost>();
+//   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const post = await discussionService.getPost(id);
-      setPost(post);
-      setLoading(false);
-    };
-    fetchData();
-  }, [id]);
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       const post = new DiscussionPost(await discussionService.getPost(id));
+//       setPost(post);
+//       setLoading(false);
+//     };
+//     fetchData();
+//   }, [id]);
 
-  return [post, loading];
-}
+//   return [post, loading];
+// }

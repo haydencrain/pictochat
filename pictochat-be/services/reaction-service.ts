@@ -1,4 +1,5 @@
 import { Reaction } from '../models/reaction';
+import { DiscussionPost } from '../models/discussion-post';
 
 export class ReactionService {
   static async getReactions(postId: number, userId: number): Promise<Reaction[]> {
@@ -15,16 +16,15 @@ export class ReactionService {
     return reaction;
   }
 
-  static async createReaction(
-    reactionId: number,
-    reactionName: string,
-    postId: number,
-    userId: number
-  ): Promise<Reaction> {
-    return await Reaction.createReaction(reactionId, reactionName, postId, userId);
+  static async createReaction(reactionName: string, postId: number, userId: number): Promise<Reaction> {
+    const reaction = await Reaction.createReaction(reactionName, postId, userId);
+    await DiscussionPost.incrementReactionsCount(postId);
+    return reaction;
   }
 
-  static async removeReaction(reactionId: number) {
-    return await Reaction.removeReaction(reactionId);
+  static async removeReaction(reactionName: string, postId: number, userId: number) {
+    const numberRemoved = await Reaction.removeReaction(reactionName, postId, userId);
+    await DiscussionPost.decrementReactionsCount(postId);
+    return numberRemoved;
   }
 }

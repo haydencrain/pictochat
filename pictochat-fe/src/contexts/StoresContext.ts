@@ -3,12 +3,14 @@ import DiscussionStore from '../stores/DiscussionStore';
 import UserStore from '../stores/UserStore';
 import { LeaderboardStore } from '../stores/LeaderboardStore';
 import { SockPuppetAlertStore } from '../stores/SockPuppetAlertStore';
+import { ReactionStore } from '../stores/ReactionStore';
 
 export interface IStoresContext {
   discussion: DiscussionStore;
   user: UserStore;
   leaderboard: LeaderboardStore;
   sockPuppetAlerts: SockPuppetAlertStore;
+  reaction: ReactionStore;
 }
 
 // HELPER FUNCTIONS
@@ -19,7 +21,8 @@ export function initStores(): IStoresContext {
     discussion: new DiscussionStore(),
     user: userStore,
     leaderboard: new LeaderboardStore(),
-    sockPuppetAlerts: new SockPuppetAlertStore(userStore)
+    sockPuppetAlerts: new SockPuppetAlertStore(userStore),
+    reaction: new ReactionStore()
   };
 }
 

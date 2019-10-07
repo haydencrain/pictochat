@@ -1,7 +1,8 @@
-import { Sequelize, Model, DataTypes, Op, FindOptions, CountOptions } from 'sequelize';
+import { Sequelize, Model, DataTypes, Op, FindOptions, CountOptions, OrderItem } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { ImageService } from '../services/image-service';
 import { User } from './user';
+import { SortValue, SortTypes } from '../utils/sort-types';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
@@ -18,7 +19,8 @@ export class DiscussionPost extends Model {
     'replyTreePath',
     'isHidden',
     'isDeleted',
-    'hasInappropriateFlag'
+    'hasInappropriateFlag',
+    'reactionsCount'
   ];
   private static readonly USER_JOIN = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
 
@@ -34,6 +36,7 @@ export class DiscussionPost extends Model {
   isHidden!: boolean;
   isDeleted!: boolean;
   hasInappropriateFlag!: boolean;
+  reactionsCount!: number;
 
   // Attributes for associations
   author?: User;
@@ -54,8 +57,7 @@ export class DiscussionPost extends Model {
 
   async isUpdatable(): Promise<boolean> {
     let replyCount: number = await this.getDirectReplyCount();
-    // TODO: Check if the post has any reactions
-    return replyCount === 0;
+    return replyCount === 0 && this.reactionsCount === 0;
   }
 
   async isDeleteable(): Promise<boolean> {
@@ -87,6 +89,14 @@ export class DiscussionPost extends Model {
     return `${replyTreePath || ''}${this.getDataValue('postId')}`;
   }
 
+  static async incrementReactionsCount(postId: number): Promise<DiscussionPost> {
+    return await DiscussionPost.increment({ reactionsCount: 1 }, { where: { postId } });
+  }
+
+  static async decrementReactionsCount(postId: number): Promise<DiscussionPost> {
+    return await DiscussionPost.increment({ reactionsCount: -1 }, { where: { postId } });
+  }
+
   //// STATIC/COLLECTION METHODS ////
 
   /**
@@ -98,9 +108,23 @@ export class DiscussionPost extends Model {
       include: [DiscussionPost.USER_JOIN],
       attributes: DiscussionPost.PUBLIC_ATTRIBUTES
     };
-    options['where'] = { ...(options['where'] || {}), ...defaultFilters };
-    options = { ...optionDefaults, ...options };
+    options['where'] = {
+      ...(options['where'] || {}),
+      ...defaultFilters
+    };
+    options = {
+      ...optionDefaults,
+      ...options
+    };
     return await DiscussionPost.findAll(options);
+  }
+
+  static async getDiscussionRootPosts(sortType: SortValue): Promise<DiscussionPost[]> {
+    let rootPosts = await DiscussionPost.getDiscussionPosts({
+      where: DiscussionPost.isRootPostFilter(),
+      order: [DiscussionPost.getSortByValue(sortType)]
+    });
+    return rootPosts;
   }
 
   static async getDiscussionPost(postId: number, options: FindOptions = {}): Promise<DiscussionPost> {
@@ -121,13 +145,16 @@ export class DiscussionPost extends Model {
   /**
    * Get all replies (and replies of replies) to the specified postId, ordered
    * such that parent posts always come before their replies (aka pre-order traversal order). */
-  static async getPathOrderedSubTreeUnder(rootPost: DiscussionPost): Promise<DiscussionPost[]> {
+  static async getPathOrderedSubTreeUnder(
+    rootPost: DiscussionPost,
+    sortType: SortValue = ''
+  ): Promise<DiscussionPost[]> {
+    const order = DiscussionPost.getSortByValue(sortType);
     const replyPathPrefix: string = rootPost.getReplyPathPrefix();
     let posts: DiscussionPost[] = await DiscussionPost.getDiscussionPosts({
       where: { ...DiscussionPost.replyTreePathFilter(replyPathPrefix), ...DiscussionPost.defaultFilter() },
-      order: [['replyTreePath', 'ASC'], ['postId', 'ASC']]
+      order: [['replyTreePath', 'ASC'], order]
     });
-
     return posts;
   }
 
@@ -166,6 +193,24 @@ export class DiscussionPost extends Model {
     options['where'] = { ...(options['where'] || {}), ...DiscussionPost.defaultFilter() };
     return await DiscussionPost.count(options);
   }
+
+  /** @returns Specific ORDER BY Depening on what value is passed in */
+  private static getSortByValue(sortType: SortValue): OrderItem {
+    switch (sortType) {
+      // Order by reactions Descending
+      case SortTypes.REACTIONS:
+        return ['reactionsCount', 'DESC'];
+
+      case SortTypes.NEW:
+      case SortTypes.NONE:
+        // note: comments also comes here as we can't sort here, we have to sort
+        // manually once we compute the comment tree count.
+        return ['postedDate', 'DESC'];
+
+      default:
+        return ['postedDate', 'DESC'];
+    }
+  }
 }
 
 //// SCHEMA DEFINITION ////
@@ -183,6 +228,7 @@ DiscussionPost.init(
     isHidden: { type: DataTypes.BOOLEAN, defaultValue: false },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
     hasInappropriateFlag: { type: DataTypes.BOOLEAN, defaultValue: false },
+    reactionsCount: { type: DataTypes.INTEGER, defaultValue: 0 },
     imageSrc: {
       type: DataTypes.VIRTUAL,
       get() {

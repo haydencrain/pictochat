@@ -1,15 +1,13 @@
 import * as React from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import StoresContext from '../../contexts/StoresContext';
-import PostsList from '../PostsList';
-import CreatePostModal from '../CreatePostModal/CreatePostModal';
-import { PostTypes } from '../../models/PostTypes';
-import DiscussionStore from '../../stores/DiscussionStore';
-import { DiscussionPost } from '../../models/DiscussionPost';
 import ThreadsSummaryList from '../ThreadsSummaryList/ThreadsSummaryList';
-import './ThreadListContainer.less';
 import RepliesList from '../RepliesList/RepliesList';
+import ThreadListMenu from '../ThreadListMenu';
+import { SortTypes, SortValue } from '../../models/SortTypes';
+import StoresContext from '../../contexts/StoresContext';
+import DropdownPair from '../../models/DropdownPair';
+import './ThreadListContainer.less';
 
 //// THREADS LIST CONTAINER /////
 
@@ -21,15 +19,47 @@ interface ThreadListContainerProps {
   showReplies?: boolean;
 }
 
+const threadSummarySortOptions: DropdownPair<SortValue>[] = [
+  { value: SortTypes.NEW, title: 'Newest' },
+  { value: SortTypes.REACTIONS, title: 'Most Reactions' },
+  { value: SortTypes.COMMENTS, title: 'Most Comments' }
+];
+
+const repliesSortOptions: DropdownPair<SortValue>[] = [
+  { value: SortTypes.NEW, title: 'Newest' },
+  { value: SortTypes.REACTIONS, title: 'Most Reactions' }
+];
+
 function ThreadListContainer(props: ThreadListContainerProps) {
-  let postListProps = {
+  const store = React.useContext(StoresContext).discussion;
+
+  // If no Id is present, then it's the main threads, otherwise it's the replies
+  const isThreadsSummary = !props.id;
+
+  const activeSort = computed(
+    (): SortValue => {
+      if (isThreadsSummary) {
+        return store.threadSummariesActiveSort;
+      }
+      return store.activeDiscussionSort;
+    }
+  );
+
+  const handleSortSelect = (sort: SortValue) => {
+    if (isThreadsSummary) {
+      store.setThreadSummariesActiveSort(sort);
+    } else {
+      store.setActiveDiscussionSort(sort);
+    }
+  };
+
+  const postListProps = {
     noPostsMessage: props.noPostsMessage,
     showReplies: props.showReplies,
     raised: true
   };
 
-  // If no Id is present, then it's the main threads, otherwise it's the replies
-  let postList = !props.id ? (
+  let postList = isThreadsSummary ? (
     <ThreadsSummaryList {...postListProps} />
   ) : (
     <RepliesList {...{ ...postListProps, ...{ postId: props.id } }} />
@@ -37,10 +67,14 @@ function ThreadListContainer(props: ThreadListContainerProps) {
 
   return (
     <section className="thread-list-container">
-      <div className="thread-list-header">
-        <h1>{props.sectionHeader}</h1>
-        <CreatePostModal triggerType="button" triggerContent={props.addPostButtonMessage} parentPostId={props.id} />
-      </div>
+      <h1>{props.sectionHeader}</h1>
+      <ThreadListMenu
+        createButtonMessage={props.addPostButtonMessage}
+        sortOptions={isThreadsSummary ? threadSummarySortOptions : repliesSortOptions}
+        activeSort={activeSort.get()}
+        onSortSelect={handleSortSelect}
+        parentId={props.id}
+      />
       {postList}
     </section>
   );

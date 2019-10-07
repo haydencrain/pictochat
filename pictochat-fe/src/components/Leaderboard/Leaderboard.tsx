@@ -24,7 +24,7 @@ export function Leaderboard(props: LeaderboardProps) {
   const { ranks } = props;
 
   const userInfo = ranks.map(rank => (
-    <Segment className="user-row" key={rank.rank}>
+    <Segment className="user-row" key={`user_${rank.user.username}`}>
       <div className="user-avatar">
         <Image src={rank.user.userAvatarURI} size="tiny" circular />
       </div>
