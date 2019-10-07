@@ -1,6 +1,7 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { User } from './user';
+import { DiscussionPost } from './discussion-post';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
@@ -30,6 +31,20 @@ export class Reaction extends Model {
     });
   }
 
+  static async getReactionsByDiscussion(discussionId: number): Promise<Reaction[]> {
+    const discussionJoin = {
+      model: DiscussionPost,
+      as: 'post',
+      required: true,
+      // attributes: ['postId', 'discussionId'],
+      where: {...DiscussionPost.defaultFilter(), ...{discussionId}}
+    };
+    return Reaction.findAll({
+      attributes: Reaction.PUBLIC_ATTRIBUTES,
+      include: [discussionJoin]
+    });
+  }
+
   static async getReactionsByPost(postId: number): Promise<Reaction[]> {
     return Reaction.findAll({
       attributes: {
@@ -48,19 +63,16 @@ export class Reaction extends Model {
     });
   }
 
-  static async createReaction(
-    reactionId: number,
-    reactionName: string,
-    postId: number,
-    userId: number
-  ): Promise<Reaction> {
-    return await Reaction.create({ reactionId, reactionName, postId, userId });
+  static async createReaction(reactionName: string, postId: number, userId: number): Promise<Reaction> {
+    return await Reaction.create({ reactionName, postId, userId });
   }
 
-  static async removeReaction(reactionId: number) {
+  static async removeReaction(reactionName: string, postId: number, userId: number) {
     return Reaction.destroy({
       where: {
-        reactionId
+        reactionName,
+        postId,
+        userId
       }
     });
   }
@@ -68,9 +80,9 @@ export class Reaction extends Model {
 
 Reaction.init(
   {
-    reactionId: { type: DataTypes.INTEGER, primaryKey: true },
-    reactionName: { type: DataTypes.STRING },
-    postId: { type: DataTypes.INTEGER },
+    reactionId: { type: DataTypes.INTEGER, autoIncrement: true },
+    reactionName: { type: DataTypes.STRING, primaryKey: true },
+    postId: { type: DataTypes.INTEGER, primaryKey: true },
     userId: { type: DataTypes.INTEGER }
   },
   {
@@ -80,3 +92,5 @@ Reaction.init(
     freezeTableName: true
   }
 );
+
+Reaction.belongsTo(DiscussionPost, {as: 'post', targetKey: 'postId', foreignKey: 'postId', constraints: true})

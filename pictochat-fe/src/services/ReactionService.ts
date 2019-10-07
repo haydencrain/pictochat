@@ -1,38 +1,32 @@
 import ApiService from './ApiService';
-import { Reaction } from '../models/Reaction';
+import { Reaction, IReaction } from '../models/Reaction';
 import { reaction } from 'mobx';
 
 class ReactionService {
+
+  static async getDiscussionReactions(discussionId: string): Promise<IReaction[]> {
+    return await ApiService.get('/reaction', {discussionId, by: 'DISCUSSION'});
+  }
+
   static async getReactions(postId: number, userId: number): Promise<Reaction[]> {
-    const query = {
-      postId,
-      userId
-    };
-    return await ApiService.get('/reaction', query);
+    return await ApiService.get(`/reaction/${postId}${userId}`);
   }
 
   static async getReactionsPost(postId: number): Promise<Reaction[]> {
-    const query = {
-      postId
-    };
-    return await ApiService.get('/reaction', query);
+    try {
+      return await ApiService.get(`/reaction`, {postId, by: 'POST'});
+    } catch (error) {
+      if (!!error.status && error.status === 404) return [];
+      throw error;
+    }
   }
 
   static async getReactionsUser(userId: number): Promise<Reaction[]> {
-    const query = {
-      userId
-    };
-    return await ApiService.get('/reaction', query);
+    return await ApiService.get(`/reaction`, {userId, by: 'USER'});
   }
 
-  static async addReaction(
-    reactionId: number,
-    reactionName: string,
-    postId: number,
-    userId: number
-  ): Promise<Reaction> {
-    const data = {
-      reactionId: reactionId,
+  static async addReaction(reactionName: string, postId: number, userId: number): Promise<Reaction> {
+    let data = {
       reactionName: reactionName,
       postId: postId,
       userId: userId
@@ -41,8 +35,13 @@ class ReactionService {
     return res.reaction;
   }
 
-  static async removeReaction(reactionId: number) {
-    return await ApiService.sendDelete(`/reaction?reactionId=${reactionId}`);
+  static async removeReaction(reactionName: string, postId: number, userId: number) {
+    let data = {
+      reactionName: reactionName,
+      postId: postId,
+      userId: userId
+    };
+    return await ApiService.sendDelete(`/reaction`, data);
   }
 }
 

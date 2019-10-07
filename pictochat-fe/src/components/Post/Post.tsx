@@ -8,6 +8,7 @@ import StoresContext from '../../contexts/StoresContext';
 import { DiscussionPost } from '../../models/DiscussionPost';
 import { PostTypes, getPostTypeName } from '../../models/PostTypes';
 import './Post.less';
+import Reactions from '../Reactions';
 import deletedPlaceholderImg from '../../images/deleted-placeholder.jpg';
 import ShowImageModal from '../ShowImageModal';
 import { computed } from 'mobx';
@@ -55,6 +56,7 @@ function Post(props: PostProps) {
         </div>
         {renderLinks.get()}
       </div>
+      <Reactions postId={Number(props.post.postId)} />
     </section>
   );
 }

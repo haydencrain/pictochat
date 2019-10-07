@@ -15,16 +15,11 @@ export class ReactionService {
     return reaction;
   }
 
-  static async createReaction(
-    reactionId: number,
-    reactionName: string,
-    postId: number,
-    userId: number
-  ): Promise<Reaction> {
-    return await Reaction.createReaction(reactionId, reactionName, postId, userId);
+  static async createReaction(reactionName: string, postId: number, userId: number): Promise<Reaction> {
+    return await Reaction.createReaction(reactionName, postId, userId);
   }
 
-  static async removeReaction(reactionId: number) {
-    return await Reaction.removeReaction(reactionId);
+  static async removeReaction(reactionName: string, postId: number, userId: number) {
+    return await Reaction.removeReaction(reactionName, postId, userId);
   }
 }
