@@ -69,7 +69,7 @@ function PostLinks(props: PostLinksProps) {
   const renderMainPostLinks = (): JSX.Element[] => {
     let mainPostLinks = [<ReportPostButton postId={post.postId} />];
     if (shouldShowEditLink(currentUser, post)) {
-      return (mainPostLinks = [...mainPostLinks, ...getCrudLinks()]);
+      mainPostLinks = [...mainPostLinks, ...getCrudLinks()];
     }
     return mapLinks(mainPostLinks);
   };
