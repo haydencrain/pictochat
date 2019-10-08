@@ -9,7 +9,7 @@ FROM node:10.16.1
 RUN mkdir -p /pictochat/
 WORKDIR /pictochat
 
-COPY ./build-scripts ./pictochat-be ./pictochat-fe ./test-data ./package.json ./package-lock.json ./
+COPY . ./
 
 # Install dependencies
 #COPY ./package.json ./package-lock.json ./

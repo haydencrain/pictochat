@@ -1,0 +1,12 @@
+# Nodejs
+node_modules
+
+# Build/compiler output
+build
+tsc
+
+# Prod environment config files
+.env.prod
+.env.be.sh
+dev_env_setup.sh
+dev_env_setup.bat
