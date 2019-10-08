@@ -244,7 +244,7 @@ DiscussionPost.init(
     indexes: [
       { fields: ['discussionId', 'postId'], using: 'BTREE' },
       { fields: ['hasInappropriateFlag'], using: 'BTREE' },
-      { fields: ['isDisabled', 'isHidden'], using: 'BTREE' }
+      { fields: ['isDeleted', 'isHidden'], using: 'BTREE' }
     ]
   }
 );
