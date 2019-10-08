@@ -5,6 +5,7 @@ import StoresContext from '../../contexts/StoresContext';
 import { User } from '../../models/User';
 import './RegisterForm.less';
 import UnauthenticatedUser from '../../models/UnauthenticatedUser';
+import * as EmailValidator from 'email-validator';
 
 interface RegisterFormState {
   username: string;
@@ -78,6 +79,9 @@ export default class RegisterForm extends React.Component<RegisterFormProps, Reg
     }
     if (retryPwd !== password) {
       throw new Error('Passwords do not match!');
+    }
+    if (!EmailValidator.validate(email)) {
+      throw new Error('Email is not valid!');
     }
   }
 

@@ -40,6 +40,7 @@
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
+    "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "express-session": "^1.16.2",
     "fingerprintjs2": "^2.1.0",
