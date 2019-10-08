@@ -176,7 +176,7 @@ export default class DiscussionStore {
     } finally {
       runInAction(() => {
         this.isLoadingActiveDiscussion = false;
-        this.isLoadingReplies = true;
+        this.isLoadingReplies = false;
       });
     }
   }
@@ -198,8 +198,12 @@ export default class DiscussionStore {
   @action.bound
   async createPost(post: NewPostPayload): Promise<DiscussionPost> {
     const postCreationStrategy = post.parentPostId ? this.createReply : this.createThread;
-    let newPost = await postCreationStrategy(post);
-    return new DiscussionPost(newPost);
+    try {
+      let newPost = await postCreationStrategy(post);
+      return new DiscussionPost(newPost);
+    } catch (e) {
+      alert(e.message);
+    }
   }
 
   @action.bound
