@@ -1,0 +1,5 @@
+build:
+  docker:
+    web: build-scripts/web-app.Dockerfile
+  run:
+    web: npm install && npm run build && node build/pictochat-be/app.js
