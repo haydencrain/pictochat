@@ -176,7 +176,7 @@ export default class DiscussionStore {
     } finally {
       runInAction(() => {
         this.isLoadingActiveDiscussion = false;
-        this.isLoadingReplies = true;
+        this.isLoadingReplies = false;
       });
     }
   }
