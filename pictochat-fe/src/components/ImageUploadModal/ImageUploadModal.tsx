@@ -43,10 +43,14 @@ function ImageUploadModal(props: ImageUploadModalProps) {
 
   const handleSubmit = async (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
-    setLoading(true);
-    await props.onSubmit(image);
-    setLoading(false);
-    handleClose();
+    if (!!image) {
+      setLoading(true);
+      await props.onSubmit(image);
+      setLoading(false);
+      handleClose();
+    } else {
+      alert('You have not uploaded an image yet!');
+    }
   };
 
   const handleOpen = async () => {
