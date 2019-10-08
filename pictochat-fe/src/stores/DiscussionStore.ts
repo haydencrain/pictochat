@@ -16,9 +16,9 @@ export default class DiscussionStore {
   @observable threadSummariesActiveSort: SortValue = SortTypes.NEW;
   @observable threadSummariesHasMore = true;
   @observable threadSummariesNextStart = 0;
-  @observable threadSummariesMap: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
-    observable.map(undefined, { name: 'threadSummariesMap' })
-  );
+  @observable threadSummariesMap: ObservableMap<any, DiscussionPost> = observable.map(undefined, {
+    name: 'threadSummariesMap'
+  });
   @observable activeDiscussionSort: SortValue = SortTypes.NEW;
   @observable activeDiscussionRootId: string;
   @observable activeDiscussionRoot: DiscussionPost = new DiscussionPost();
