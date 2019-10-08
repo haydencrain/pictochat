@@ -3,7 +3,7 @@ import ApiException from '../models/ApiException';
 import { DEVICE_ID_COOKIE_NAME } from '../utils/DeviceId';
 import * as cookies from 'js-cookie';
 
-const BACKEND_ENDPOINT = process.env.PICTOCHAT_API_ROOT || 'http://localhost:443/api';
+const BACKEND_ENDPOINT = process.env.PICTOCHAT_API_ROOT || '/api';
 
 export class ApiService {
   static async get(path: string, query: any = null): Promise<any> {
@@ -70,7 +70,7 @@ export class ApiService {
           let responseBody: any = await response.text();
           try {
             responseBody = JSON.parse(responseBody);
-          } catch {}
+          } catch { }
           if (response.ok) {
             resolve(responseBody);
           } else {
