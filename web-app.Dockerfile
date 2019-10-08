@@ -8,5 +8,5 @@ FROM node:10.16.1
 # Install dependencies
 RUN mkdir -p /pictochat/
 WORKDIR /pictochat
-COPY ../package.json ../package-lock.json ./
+COPY ./package.json ./package-lock.json ./
 RUN npm install
