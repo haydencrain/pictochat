@@ -41,6 +41,7 @@ export class SequelizeConnectionService {
       } else {
         SequelizeConnectionService.instance = new Sequelize(DB_URL);
       }
-      return SequelizeConnectionService.instance;
     }
+    return SequelizeConnectionService.instance;
   }
+}
