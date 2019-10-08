@@ -2,9 +2,9 @@
   "name": "pictochat",
   "version": "0.0.1",
   "description": "This repository contains the Project for Assessment 3 of 31242 Advanced Internet",
-  "main": "index.js",
+  "main": "build/pictochat-be/app.js",
   "scripts": {
-    "start": "npm run start-dev-remote",
+    "start": "node build/pictochat-be/app.js",
     "build": "npm run build-backend-prod && npm run build-frontend-prod",
     "build-backend-prod": "tsc",
     "build-frontend-prod": "webpack --config ./pictochat-fe/webpack.prod.js",
