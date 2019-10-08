@@ -39,6 +39,7 @@ export default class RegisterForm extends React.Component<RegisterFormProps, Reg
     this.handleRetryPwdChange = this.handleRetryPwdChange.bind(this);
     this.handleCancelClick = this.handleCancelClick.bind(this);
     this.checkFormValidation = this.checkFormValidation.bind(this);
+    this.onlyLettersAndNumbers = this.onlyLettersAndNumbers.bind(this);
   }
 
   handleUsernameChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -72,6 +73,10 @@ export default class RegisterForm extends React.Component<RegisterFormProps, Reg
     });
   };
 
+  onlyLettersAndNumbers(str: string) {
+    return /^[A-Za-z0-9]+$/.test(str);
+  }
+
   checkFormValidation() {
     const { username, email, password, retryPwd } = this.state;
     if (!username || !email || !password) {
@@ -82,6 +87,9 @@ export default class RegisterForm extends React.Component<RegisterFormProps, Reg
     }
     if (!EmailValidator.validate(email)) {
       throw new Error('Email is not valid!');
+    }
+    if (!this.onlyLettersAndNumbers(username)) {
+      throw new Error('Username must only contain letters and numbers!');
     }
   }
 
