@@ -9,6 +9,8 @@ const DB_PASSWORD = process.env.PICTOCHAT_DB_PASSWORD || 'postgres';
 const DB_NAME = process.env.PICTOCHAT_DB_NAME || 'pictochat';
 const DB_DIALECT = 'postgres';
 
+const DB_URL = process.env.DATABASE_URL;
+
 /**
  * This class maintains a single instanced sequelize connection to the pictochat database
  */
@@ -30,13 +32,15 @@ export class SequelizeConnectionService {
       const namespace = createNamespace('pictochat');
       Sequelize.useCLS(namespace);
 
-      SequelizeConnectionService.instance = new Sequelize(databaseName, user, password, {
-        dialect: dialect,
-        host: host,
-        port: port
-      });
+      if (DB_URL === undefined) {
+        SequelizeConnectionService.instance = new Sequelize(databaseName, user, password, {
+          dialect: dialect,
+          host: host,
+          port: port
+        });
+      } else {
+        SequelizeConnectionService.instance = new Sequelize(DB_URL);
+      }
+      return SequelizeConnectionService.instance;
     }
-
-    return SequelizeConnectionService.instance;
   }
-}
