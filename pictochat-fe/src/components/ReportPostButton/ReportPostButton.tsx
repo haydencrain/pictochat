@@ -14,7 +14,6 @@ function ReportPostButton(props: ReportPostButtonProps) {
   const handleClick = async () => {
     if (confirm('Are you sure you want to report this image for offensive content?')) {
       const report = await ContentReportService.reportPost(props.postId);
-      alert('Report Successful');
     }
   };
 
