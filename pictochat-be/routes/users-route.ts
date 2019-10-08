@@ -7,6 +7,7 @@ import { strategies } from '../middleware/passport-middleware';
 import { deviceIdMiddleware } from '../middleware/device-id-middleware';
 import { User } from '../models/user';
 import { LoginLog } from '../models/login-log';
+import { registerUserMiddleware } from '../middleware/register-user-middleware';
 
 //// HELPERS ////
 
@@ -58,7 +59,7 @@ userRouter.get('/authed', passport.authenticate(strategies.JWT, { session: false
 });
 
 // POST create user
-userRouter.post('/', deviceIdMiddleware, async (req: any, res, next) => {
+userRouter.post('/', registerUserMiddleware, deviceIdMiddleware, async (req: any, res, next) => {
   passport.authenticate(strategies.REGISTER, (err, user: boolean | User, info) => {
     if (err) return next(err);
     if (!user && !!info) {

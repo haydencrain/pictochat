@@ -9,6 +9,7 @@ import { DiscussionPost } from '../../models/DiscussionPost';
 import './PostLinks.less';
 import EditPostModal from '../EditPostModal';
 import DeletePostButton from '../DeletePostButton';
+import ReportPostButton from '../ReportPostButton';
 
 interface PostLinksProps {
   postType: PostTypes;
@@ -22,6 +23,11 @@ function PostLinks(props: PostLinksProps) {
   const currentUser = stores.user.currentUser;
 
   //// HELPERS ////
+
+  const getCrudLinks = () => [
+    <EditPostModal triggerType="link" triggerContent="edit" postId={post.postId} />,
+    <DeletePostButton postId={post.postId} />
+  ];
 
   const shouldShowEditLink = (currentUser: User, post: DiscussionPost): boolean => {
     return currentUser.username === post.author.username;
@@ -47,28 +53,25 @@ function PostLinks(props: PostLinksProps) {
   };
 
   const renderReplyPostLinks = (): JSX.Element[] => {
-    const replyPostLinks = [
+    let replyPostLinks = [
       <Link className="link" to={`/discussion/${post.postId}`}>
         permalink
       </Link>,
-      <CreatePostModal triggerType="link" triggerContent="reply" parentPostId={post.postId} />
+      <CreatePostModal triggerType="link" triggerContent="reply" parentPostId={post.postId} />,
+      <ReportPostButton postId={post.postId} />
     ];
     if (shouldShowEditLink(currentUser, post)) {
-      replyPostLinks.push(<EditPostModal triggerType="link" triggerContent="edit" postId={post.postId} />);
-      replyPostLinks.push(<DeletePostButton postId={post.postId} />);
+      replyPostLinks = [...replyPostLinks, ...getCrudLinks()];
     }
     return mapLinks(replyPostLinks);
   };
 
   const renderMainPostLinks = (): JSX.Element[] => {
+    let mainPostLinks = [<ReportPostButton postId={post.postId} />];
     if (shouldShowEditLink(currentUser, post)) {
-      const replyPostLinks = [
-        <EditPostModal triggerType="link" triggerContent="edit" postId={post.postId} />,
-        <DeletePostButton postId={post.postId} />
-      ];
-      return mapLinks(replyPostLinks);
+      return (mainPostLinks = [...mainPostLinks, ...getCrudLinks()]);
     }
-    return null;
+    return mapLinks(mainPostLinks);
   };
 
   //// MAIN RENDERING ////

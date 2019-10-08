@@ -14,6 +14,7 @@ import { DiscussionPost } from '../models/discussion-post';
 import { NotFoundError } from '../exceptions/not-found-error';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { PaginationOptions } from '../utils/pagination-types';
+import { UnprocessableError } from '../exceptions/unprocessable-error';
 
 const AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR';
 
@@ -167,6 +168,9 @@ function makeContentReport(post) {
 async function makeNewImageSpec(file): Promise<{ data: Buffer; encoding: string }> {
   let data = await readFile(file.path);
   let encoding = MIMETYPE_TO_ENCODING[file.mimetype];
+  if (!encoding) {
+    throw new UnprocessableError('File type is not allowed!');
+  }
   return { data, encoding };
 }
 
