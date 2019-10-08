@@ -19,7 +19,10 @@ import { UnprocessableError } from './exceptions/unprocessable-error';
 import config from './utils/config';
 
 // CONSTANTS
-const PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;
+const _PICTOCHAT_PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;
+const _GENERIC_PORT = process.env.PORT;
+const PORT = (_GENERIC_PORT !== undefined) ? _GENERIC_PORT : _PICTOCHAT_PORT;
+// const PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;
 // Default path is relative to the compiled app.js file's location in the build directory
 const WEB_CONTENT_DIR = process.env.PICTOCHAT_FRONTEND_DIR || path.join(__dirname, '../pictochat-fe');
 const FRONTEND_REQUEST_ORIGIN = process.env.PICTOCHAT_FRONTEND_REQUEST_ORIGIN || 'http://localhost:3000';
@@ -80,7 +83,7 @@ app.use('*', (req, res, next) => {
 });
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 

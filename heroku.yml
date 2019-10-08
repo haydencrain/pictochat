@@ -2,4 +2,4 @@ build:
   docker:
     web: web-app.Dockerfile
 run:
-  web: node build/pictochat-be/app.js
+  web: npm run start
