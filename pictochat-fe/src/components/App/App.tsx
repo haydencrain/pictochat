@@ -14,7 +14,7 @@ import SockPuppetsDashboardPage from '../../pages/SockPuppetsDashboardPage';
 import ReportsPage from '../../pages/ReportsPage';
 import UserPage from '../../pages/UserPage';
 import CurrentUser from '../CurrentUser';
-import QuickLinks from '../Quicklinks';
+import QuickLinks from '../QuickLinks';
 import './App.less';
 
 const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
