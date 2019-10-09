@@ -3,22 +3,22 @@ import { Link } from 'react-router-dom';
 import { Form, Button, Segment, Loader } from 'semantic-ui-react';
 import UnauthenticatedUser from '../../../models/UnauthenticatedUser';
 import StoresContext from '../../../contexts/StoresContext';
-import './Login.less';
+import './LoginForm.less';
 
-interface LoginState {
+interface LoginFormState {
   email: string;
   password: string;
 }
 
-interface LoginProps {
+interface LoginFormProps {
   isLoading: boolean;
   onLogin?: () => Promise<void>;
 }
 
-class Login extends React.Component<LoginProps, LoginState> {
+class LoginForm extends React.Component<LoginFormProps, LoginFormState> {
   static contextType = StoresContext;
 
-  constructor(props: LoginProps) {
+  constructor(props: LoginFormProps) {
     super(props);
     this.state = {
       email: '',
@@ -92,4 +92,4 @@ class Login extends React.Component<LoginProps, LoginState> {
   }
 }
 
-export default Login;
+export default LoginForm;

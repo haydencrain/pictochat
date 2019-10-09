@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as mobx from 'mobx';
 import StoresContext from '../../../contexts/StoresContext';
-import Login from '../Login';
+import LoginForm from '../LoginForm';
 import ProfileCard from '../ProfileCard';
 import { Loader } from 'semantic-ui-react';
 import { observer } from 'mobx-react-lite';
@@ -23,7 +23,7 @@ function CurrentUser() {
 
     if (!stores.user.isLoggedIn) {
       return (
-        <Login
+        <LoginForm
           isLoading={isLoading.get()}
           onLogin={async () => {
             location.reload();
