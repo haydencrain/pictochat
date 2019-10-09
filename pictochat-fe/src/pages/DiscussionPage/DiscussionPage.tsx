@@ -3,9 +3,9 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import { Observer } from 'mobx-react';
 import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
 import NavHistoryContext from '../../contexts/NavHistoryContext';
-import ThreadListContainer from '../../components/ThreadListContainer';
+import ThreadListContainer from '../../components/Post/ThreadListContainer';
 import { computed } from 'mobx';
-import PostMainContainer from '../../components/PostMainContainer';
+import PostMainContainer from '../../components/Post/PostMainContainer';
 import './DiscussionPage.less';
 
 interface DiscussionPageMatchParams {
@@ -20,12 +20,10 @@ function DiscussionPage(props: DiscussionPageProps) {
 
   React.useEffect(() => {
     const discussionStore = stores.discussion;
-    discussionStore
-      .setActiveDiscussion(props.match.params.id)
-      .then(async () => {
-        const discussionId = discussionStore.activeDiscussionRoot.discussionId;
-        stores.reaction.loadThreadReactions(discussionId);
-      });
+    discussionStore.setActiveDiscussion(props.match.params.id).then(async () => {
+      const discussionId = discussionStore.activeDiscussionRoot.discussionId;
+      stores.reaction.loadThreadReactions(discussionId);
+    });
   }, [props.match.params.id]);
 
   return (

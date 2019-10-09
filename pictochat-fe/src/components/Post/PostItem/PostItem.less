@@ -1,0 +1,44 @@
+@import '../../../styles/_constants.less';
+
+.thread-post {
+  display: flex;
+  .post-sidebar {
+    width: @post-sidebar-width;
+    margin-right: @post-sidebar-margin-right;
+  }
+  .post-content {
+    flex: 1 1 auto;
+    > div:not(:last-child) {
+      margin-bottom: 10px;
+    }
+    .post-header {
+      > * {
+        &:not(:last-child) {
+          margin-right: 15px;
+        }
+        display: inline-block;
+      }
+      .post-author {
+        font-weight: bold;
+      }
+      .post-date {
+        font-size: 13px;
+        color: @gray;
+      }
+    }
+
+    img {
+      max-height: 150px;
+      max-width: 300px;
+    }
+  }
+
+  &.main {
+    .post-content {
+      img {
+        max-width: 500px;
+        max-height: unset;
+      }
+    }
+  }
+}

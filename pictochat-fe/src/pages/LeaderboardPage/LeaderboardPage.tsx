@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { observer } from 'mobx-react';
-import Leaderboard from '../../components/Leaderboard';
+import Leaderboard from '../../components/User/Leaderboard';
 import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
 import './LeaderboardPage.less';
 
@@ -16,9 +16,9 @@ export function LeaderboardPage(props: LeaderboardPage) {
 
   return (
     <section id="leaderboard-page">
-      <Leaderboard ranks={stores.leaderboard.ranks}/>
+      <Leaderboard ranks={stores.leaderboard.ranks} />
     </section>
   );
-};
+}
 
 export default observer(LeaderboardPage);

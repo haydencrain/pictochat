@@ -7,7 +7,7 @@ import './SockPuppetsDashboardPage.less';
 import StoresContext from '../../contexts/StoresContext';
 import { SockPuppetAlert } from '../../models/SockPuppetAlert';
 import { computed } from 'mobx';
-import Unauthorised from '../../components/Unauthorised';
+import Unauthorised from '../../components/Layout/Unauthorised';
 
 const USER_LIMIT = 2;
 

@@ -1,0 +1,26 @@
+@import '../../../styles/_constants.less';
+
+#navbar {
+  .primaryGradent();
+  position: fixed;
+  top: 0;
+  display: block;
+  height: @navHeight;
+  width: 100%;
+  z-index: 1000;
+  #navbar-title {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    margin-left: 40px;
+    color: @white;
+    font-size: @fsVeryLarge;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
