@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { useFetchUser } from '../../hooks/UsersHooks';
 import { Loader, Segment } from 'semantic-ui-react';
 import { RouteComponentProps } from 'react-router';
-import ProfileCard from '../../components/ProfileCard';
+import ProfileCard from '../../components/User/ProfileCard';
 import './UserPage.less';
 
 interface UserPageMatchParams {

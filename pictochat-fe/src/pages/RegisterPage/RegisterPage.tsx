@@ -1,7 +1,7 @@
 import * as React from 'react';
-import RegisterForm from '../../components/RegisterForm';
-import './RegisterPage.less';
 import { RouteComponentProps } from 'react-router';
+import RegisterForm from '../../components/User/RegisterForm';
+import './RegisterPage.less';
 
 interface RegisterPageProps extends RouteComponentProps<any> {}
 

@@ -8,9 +8,9 @@ import ContentReportService from '../../services/ContentReportService';
 import moment from 'moment-mini';
 import { IDiscussionPost } from '../../models/DiscussionPost';
 import { Link } from 'react-router-dom';
-import Unauthorised from '../../components/Unauthorised';
-import './ReportsPage.less';
+import Unauthorised from '../../components/Layout/Unauthorised';
 import DiscussionService from '../../services/DiscussionService';
+import './ReportsPage.less';
 
 interface PageProps extends RouteComponentProps<any> {}
 
