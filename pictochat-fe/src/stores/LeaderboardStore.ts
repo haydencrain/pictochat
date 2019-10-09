@@ -1,5 +1,5 @@
 import { observable, action, IObservableArray, runInAction } from 'mobx';
-import { LeaderboardRank } from '../models/LeaderboardRank';
+import { LeaderboardRank } from '../models/store/LeaderboardRank';
 import LeaderboardService from '../services/LeaderboardService';
 
 export class LeaderboardStore {
@@ -15,8 +15,8 @@ export class LeaderboardStore {
     this.isLoading = true;
     try {
       let ranksJson = await LeaderboardService.getLeaderboardRanks(top);
-      let ranks = ranksJson.map((rankJson) => LeaderboardRank.fromJson(rankJson));
-      runInAction(() => (this.ranks.replace(ranks)));
+      let ranks = ranksJson.map(rankJson => LeaderboardRank.fromJson(rankJson));
+      runInAction(() => this.ranks.replace(ranks));
     } finally {
       runInAction(() => (this.isLoading = false));
     }

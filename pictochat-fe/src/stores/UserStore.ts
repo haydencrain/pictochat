@@ -1,5 +1,5 @@
 import { observable, computed, action, ObservableMap, runInAction, flow } from 'mobx';
-import { User, IUser } from '../models/User';
+import { User, IUser } from '../models/store/User';
 import UserService from '../services/UserService';
 import UnauthenticatedUser from '../models/UnauthenticatedUser';
 import { computedFn } from 'mobx-utils';

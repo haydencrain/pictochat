@@ -1,6 +1,6 @@
 import { observable, computed, action, runInAction, IObservableValue, observe, spy, ObservableMap } from 'mobx';
 import ObservableIntMap from '../utils/ObserableIntMap';
-import { DiscussionPost, IDiscussionPost } from '../models/DiscussionPost';
+import { DiscussionPost, IDiscussionPost } from '../models/store/DiscussionPost';
 import DiscussionService from '../services/DiscussionService';
 import NewPostPayload from '../models/NewPostPayload';
 import PaginationResult from '../models/PaginationResult';

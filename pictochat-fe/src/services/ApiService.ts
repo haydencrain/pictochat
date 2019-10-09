@@ -1,5 +1,5 @@
 import { stringify } from 'query-string';
-import ApiException from '../models/ApiException';
+import ApiException from '../models/exceptions/ApiException';
 import { DEVICE_ID_COOKIE_NAME } from '../utils/DeviceId';
 import * as cookies from 'js-cookie';
 

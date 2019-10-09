@@ -9,7 +9,6 @@ export interface IUser {
   hasAdminRole: boolean;
 }
 
-// TODO: Rename class to User once register and login code is stable
 export class User implements IUser {
   @observable username: string;
   @observable email: string;

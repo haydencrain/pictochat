@@ -1,6 +1,6 @@
 import { observable, action, ObservableMap, runInAction, flow } from 'mobx';
 import { computedFn } from 'mobx-utils';
-import { Reaction, IReaction } from '../models/Reaction';
+import { Reaction, IReaction } from '../models/store/Reaction';
 import ObservableIntMap from '../utils/ObserableIntMap';
 import ReactionService from '../services/ReactionService';
 
@@ -39,7 +39,7 @@ export class ReactionStore {
     let reactionJson: IReaction[] = await ReactionService.getReactionsPost(postId);
     runInAction(() => {
       let reactions = reactionJson.map(react => new Reaction(react));
-      reactions.forEach((react) => this.putReact(react));
+      reactions.forEach(react => this.putReact(react));
     });
   }
 
@@ -98,7 +98,7 @@ export class ReactionStore {
         }
       });
     } finally {
-      runInAction(() => this.isLoading = false);
+      runInAction(() => (this.isLoading = false));
     }
   }
 

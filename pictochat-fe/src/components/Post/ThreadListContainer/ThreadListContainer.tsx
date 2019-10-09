@@ -4,9 +4,9 @@ import { observer } from 'mobx-react';
 import ThreadsSummaryList from '../ThreadsSummaryList/ThreadsSummaryList';
 import RepliesList from '../RepliesList/RepliesList';
 import ThreadListMenu from '../ThreadListMenu';
-import { SortTypes, SortValue } from '../../../models/SortTypes';
+import { SortValue } from '../../../models/SortTypes';
 import StoresContext from '../../../contexts/StoresContext';
-import DropdownPair from '../../../models/DropdownPair';
+import { threadSummarySortOptions, repliesSortOptions } from './helpers';
 import './ThreadListContainer.less';
 
 //// THREADS LIST CONTAINER /////
@@ -18,17 +18,6 @@ interface ThreadListContainerProps {
   addPostButtonMessage?: string;
   showReplies?: boolean;
 }
-
-const threadSummarySortOptions: DropdownPair<SortValue>[] = [
-  { value: SortTypes.NEW, title: 'Newest' },
-  { value: SortTypes.REACTIONS, title: 'Most Reactions' },
-  { value: SortTypes.COMMENTS, title: 'Most Comments' }
-];
-
-const repliesSortOptions: DropdownPair<SortValue>[] = [
-  { value: SortTypes.NEW, title: 'Newest' },
-  { value: SortTypes.REACTIONS, title: 'Most Reactions' }
-];
 
 function ThreadListContainer(props: ThreadListContainerProps) {
   const store = React.useContext(StoresContext).discussion;

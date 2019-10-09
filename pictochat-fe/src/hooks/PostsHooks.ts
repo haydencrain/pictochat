@@ -1,4 +1,4 @@
-import { DiscussionPost } from '../models/DiscussionPost';
+import { DiscussionPost } from '../models/store/DiscussionPost';
 import { useState, useEffect } from 'react';
 import discussionService from '../services/DiscussionService';
 

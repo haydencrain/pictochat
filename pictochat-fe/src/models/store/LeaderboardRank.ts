@@ -12,7 +12,7 @@ export class LeaderboardRank implements ILeaderboardRank {
   @observable rank: number;
   @observable postCount: number;
 
-  constructor(data?: { user: User; rank: number, postCount: number }) {
+  constructor(data?: { user: User; rank: number; postCount: number }) {
     if (!!data) {
       this.user = data.user;
       this.rank = data.rank;

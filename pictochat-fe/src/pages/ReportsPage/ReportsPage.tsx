@@ -6,7 +6,7 @@ import StoresContext from '../../contexts/StoresContext';
 import { computed } from 'mobx';
 import ContentReportService from '../../services/ContentReportService';
 import moment from 'moment-mini';
-import { IDiscussionPost } from '../../models/DiscussionPost';
+import { IDiscussionPost } from '../../models/store/DiscussionPost';
 import { Link } from 'react-router-dom';
 import Unauthorised from '../../components/Layout/Unauthorised';
 import DiscussionService from '../../services/DiscussionService';

@@ -4,7 +4,7 @@ import * as classNames from 'classnames';
 import { observer, Observer } from 'mobx-react';
 import { Image } from 'semantic-ui-react';
 import PostLinks from '../PostLinks';
-import { DiscussionPost } from '../../../models/DiscussionPost';
+import { DiscussionPost } from '../../../models/store/DiscussionPost';
 import { PostTypes, getPostTypeName } from '../../../models/PostTypes';
 import ReactionsContainer from '../../Reaction/ReactionsContainer';
 import ShowImageModal from '../../Image/ShowImageModal';

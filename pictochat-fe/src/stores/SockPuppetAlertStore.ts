@@ -1,8 +1,8 @@
 import { observable, action, ObservableMap, computed, runInAction } from 'mobx';
-import { ISockPuppetAlert, SockPuppetAlert } from '../models/SockPuppetAlert';
+import { ISockPuppetAlert, SockPuppetAlert } from '../models/store/SockPuppetAlert';
 import { ApiService } from '../services/ApiService';
 import UserStore from './UserStore';
-import { User } from '../models/User';
+import { User } from '../models/store/User';
 
 export class SockPuppetAlertStore {
   userStore: UserStore;

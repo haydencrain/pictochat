@@ -1,13 +1,8 @@
 import * as cookies from 'js-cookie';
 import ApiService from './ApiService';
-import { IUser } from '../models/User';
+import { IUser } from '../models/store/User';
 import UnauthenticatedUser from '../models/UnauthenticatedUser';
-
-interface LoginResult {
-  auth: boolean;
-  token: string;
-  message: string;
-}
+import LoginResult from '../models/LoginResult';
 
 class UserService {
   static getUserUrl(username: string): string {

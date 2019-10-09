@@ -1,7 +1,7 @@
-import { DiscussionPost, IDiscussionPost } from '../models/DiscussionPost';
+import { IDiscussionPost } from '../models/store/DiscussionPost';
 import ApiService from './ApiService';
 import NewPostPayload from '../models/NewPostPayload';
-import ValidationException from '../models/ValidationException';
+import ValidationException from '../models/exceptions/ValidationException';
 import PaginationResult from '../models/PaginationResult';
 import { SortValue, SortTypes } from '../models/SortTypes';
 

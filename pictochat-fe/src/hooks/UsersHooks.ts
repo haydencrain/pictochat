@@ -1,4 +1,4 @@
-import User from '../models/User';
+import User from '../models/store/User';
 import userService from '../services/UserService';
 import { useState, useEffect } from 'react';
 

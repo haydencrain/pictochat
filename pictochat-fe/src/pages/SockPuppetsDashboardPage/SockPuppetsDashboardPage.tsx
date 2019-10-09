@@ -1,11 +1,11 @@
 import * as React from 'react';
-import User from '../../models/User';
+import User from '../../models/store/User';
 import { Loader, Item, Button, Segment } from 'semantic-ui-react';
 import { observer, Observer } from 'mobx-react';
 import { RouteComponentProps } from 'react-router';
 import './SockPuppetsDashboardPage.less';
 import StoresContext from '../../contexts/StoresContext';
-import { SockPuppetAlert } from '../../models/SockPuppetAlert';
+import { SockPuppetAlert } from '../../models/store/SockPuppetAlert';
 import { computed } from 'mobx';
 import Unauthorised from '../../components/Layout/Unauthorised';
 

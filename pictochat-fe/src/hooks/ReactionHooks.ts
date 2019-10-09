@@ -1,4 +1,4 @@
-import { Reaction } from '../models/Reaction';
+import { Reaction } from '../models/store/Reaction';
 import { useState, useEffect } from 'react';
 import reactionService from '../services/ReactionService';
 

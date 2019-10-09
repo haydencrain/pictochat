@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
 import { Segment, Loader } from 'semantic-ui-react';
-import { DiscussionPost } from '../../../models/DiscussionPost';
+import { DiscussionPost } from '../../../models/store/DiscussionPost';
 import { PostTypes } from '../../../models/PostTypes';
 import PostsListItem from '../PostsListItem';
 import './PostsList.less';

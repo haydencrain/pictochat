@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Segment, Rating, Image } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
-import { User } from '../../../models/User';
+import { User } from '../../../models/store/User';
 import './ProfileCard.less';
 import { Link } from 'react-router-dom';
 

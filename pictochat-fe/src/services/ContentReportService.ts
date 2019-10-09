@@ -1,4 +1,4 @@
-import { IDiscussionPost } from '../models/DiscussionPost';
+import { IDiscussionPost } from '../models/store/DiscussionPost';
 import ApiService from './ApiService';
 
 export class ContentReportService {

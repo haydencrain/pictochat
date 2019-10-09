@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
 import { Image, Segment } from 'semantic-ui-react';
-import { LeaderboardRank } from '../../../models/LeaderboardRank';
+import { LeaderboardRank } from '../../../models/store/LeaderboardRank';
 import { Link } from 'react-router-dom';
 import UserService from '../../../services/UserService';
 import './Leaderboard.less';

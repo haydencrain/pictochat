@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import ImageUploadModal, { TriggerTypes } from '../../Image/ImageUploadModal';
 import StoresContext, { IStoresContext } from '../../../contexts/StoresContext';
-import User from '../../../models/User';
+import User from '../../../models/store/User';
 import NewPostPayload from '../../../models/NewPostPayload';
 import './CreatePostModal.less';
 

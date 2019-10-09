@@ -2,7 +2,7 @@ import * as React from 'react';
 import { observer } from 'mobx-react';
 import ImageUploadModal, { TriggerTypes } from '../../Image/ImageUploadModal';
 import StoresContext, { IStoresContext } from '../../../contexts/StoresContext';
-import ValidationException from '../../../models/ValidationException';
+import ValidationException from '../../../models/exceptions/ValidationException';
 import './EditPostModal.less';
 
 interface EditPostModalProps {

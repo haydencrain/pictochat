@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Form, Button } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import StoresContext from '../../../contexts/StoresContext';
-import { User } from '../../../models/User';
+import { User } from '../../../models/store/User';
 import './RegisterForm.less';
 import UnauthenticatedUser from '../../../models/UnauthenticatedUser';
 import * as EmailValidator from 'email-validator';
