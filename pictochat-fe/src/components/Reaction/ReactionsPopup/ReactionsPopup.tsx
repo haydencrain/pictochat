@@ -2,7 +2,7 @@ import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 import { useToggleModal } from '../../../hooks/ModalHooks';
 import { Popup, Button } from 'semantic-ui-react';
-import ReactionPopupItem from '../ReactionPopupItem';
+import ReactionPopupItem from './ReactionPopupItem';
 import { reactions } from '../helpers';
 
 interface ReactionsPopupProps {
