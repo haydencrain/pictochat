@@ -2,7 +2,6 @@ import * as React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { Observer } from 'mobx-react';
 import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
-import NavHistoryContext from '../../contexts/NavHistoryContext';
 import ThreadListContainer from '../../components/Post/ThreadListContainer';
 import { computed } from 'mobx';
 import PostMainContainer from '../../components/Post/PostMainContainer';
@@ -27,22 +26,20 @@ function DiscussionPage(props: DiscussionPageProps) {
   }, [props.match.params.id]);
 
   return (
-    <NavHistoryContext.Provider value={props.history}>
-      <section id="discussion-page">
-        <Observer>{() => <PostMainContainer id={activeId.get()} />}</Observer>
-        <Observer>
-          {() => (
-            <ThreadListContainer
-              id={activeId.get()}
-              showReplies
-              sectionHeader="Replies"
-              noPostsMessage="No replies have been added yet! Be the first to add a reply!"
-              addPostButtonMessage="Add Reply"
-            />
-          )}
-        </Observer>
-      </section>
-    </NavHistoryContext.Provider>
+    <section id="discussion-page">
+      <Observer>{() => <PostMainContainer id={activeId.get()} />}</Observer>
+      <Observer>
+        {() => (
+          <ThreadListContainer
+            id={activeId.get()}
+            showReplies
+            sectionHeader="Replies"
+            noPostsMessage="No replies have been added yet! Be the first to add a reply!"
+            addPostButtonMessage="Add Reply"
+          />
+        )}
+      </Observer>
+    </section>
   );
 }
 
