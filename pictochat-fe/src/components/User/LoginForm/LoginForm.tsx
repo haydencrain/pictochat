@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { Form, Button, Segment, Loader } from 'semantic-ui-react';
 import UnauthenticatedUser from '../../../models/UnauthenticatedUser';
 import StoresContext from '../../../contexts/StoresContext';
-import './LoginForm.less';
 import { observer } from 'mobx-react';
 import { useLoginForm } from '../../../hooks/FormHooks';
+import './LoginForm.less';
 
 interface LoginFormProps {
   isLoading: boolean;
@@ -14,13 +14,12 @@ interface LoginFormProps {
 
 function LoginForm(props: LoginFormProps) {
   const userStore = React.useContext(StoresContext).user;
-  const { username, password, setFormField, clearForm } = useLoginForm();
+  const { username, password, setFormField } = useLoginForm();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
       const user: UnauthenticatedUser = {
-        // TODO: 'email' field should be 'username'!!!
         username: username,
         email: '',
         password: password
