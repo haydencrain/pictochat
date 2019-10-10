@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import StoresContext from '../../../contexts/StoresContext';
 import UnauthenticatedUser from '../../../models/UnauthenticatedUser';
 import './RegisterForm.less';
+import { useRegisterForm } from '../../../hooks/FormHooks';
 
 interface RegisterFormProps {
   onCancelClick?: () => void;
@@ -90,38 +91,6 @@ function RegisterForm(props: RegisterFormProps) {
       </Form.Group>
     </Form>
   );
-}
-
-function useRegisterForm(): {
-  username: string;
-  email: string;
-  password: string;
-  retryPassword: string;
-  setFormField: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  clearForm: () => void;
-} {
-  const getEmptyForm = () => ({ username: '', email: '', password: '', retryPassword: '' });
-  const [form, setForm] = React.useState(getEmptyForm());
-
-  const setFormField = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const clearForm = () => {
-    setForm(getEmptyForm());
-  };
-
-  return {
-    username: form.username,
-    email: form.email,
-    password: form.password,
-    retryPassword: form.retryPassword,
-    setFormField,
-    clearForm
-  };
 }
 
 export default observer(RegisterForm);
