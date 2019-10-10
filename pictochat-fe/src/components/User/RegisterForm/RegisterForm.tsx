@@ -4,23 +4,31 @@ import { Form, Button } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import StoresContext from '../../../contexts/StoresContext';
 import UnauthenticatedUser from '../../../models/UnauthenticatedUser';
-import './RegisterForm.less';
 import { useRegisterForm } from '../../../hooks/FormHooks';
+import useForm from 'react-hook-form';
+import './RegisterForm.less';
 
 interface RegisterFormProps {
   onCancelClick?: () => void;
   onSubmitSuccess?: () => void;
 }
 
-function RegisterForm(props: RegisterFormProps) {
+type RegisterFormData = {
+  username: string;
+  email: string;
+  password: string;
+  retryPassword: string;
+};
+
+export function RegisterForm(props: RegisterFormProps) {
   const userStore = React.useContext(StoresContext).user;
-  const { username, email, password, retryPassword, setFormField, clearForm } = useRegisterForm();
+  const { handleSubmit, register, reset } = useForm<RegisterFormData>();
 
   const onlyLettersAndNumbers = (str: string): boolean => {
     return /^[A-Za-z0-9]+$/.test(str);
   };
 
-  const validateForm = () => {
+  const validateForm = ({ username, email, password, retryPassword }: RegisterFormData) => {
     if (!username || !email || !password) {
       throw new Error('One or more required fields are empty!');
     }
@@ -35,20 +43,13 @@ function RegisterForm(props: RegisterFormProps) {
     }
   };
 
-  const handleCancelClick = (event: React.SyntheticEvent<any>) => {
-    event.preventDefault();
-    clearForm();
-    props.onCancelClick && props.onCancelClick();
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const onSubmit = handleSubmit(async formData => {
     try {
-      validateForm();
+      validateForm(formData);
       const userJson: UnauthenticatedUser = {
-        username,
-        email,
-        password: password
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
       };
       await userStore.createUserAndAuth(userJson); // assuming an error is thrown if creation failed - Jordan
       alert('User created sucessfully');
@@ -56,26 +57,32 @@ function RegisterForm(props: RegisterFormProps) {
     } catch (e) {
       alert(e.message);
     }
+  });
+
+  const handleCancelClick = (event: React.SyntheticEvent<any>) => {
+    event.preventDefault();
+    reset();
+    props.onCancelClick && props.onCancelClick();
   };
 
   return (
-    <Form id="register-form" onSubmit={handleSubmit} method="POST">
+    <Form id="register-form" onSubmit={onSubmit} method="POST">
       <h1>Create an Account</h1>
       <Form.Field className="register-field-username">
         <label>Username</label>
-        <input name="username" type="text" value={username} onChange={setFormField} />
+        <input name="username" type="text" ref={register} />
       </Form.Field>
       <Form.Field className="register-field-email">
         <label>Email</label>
-        <input name="email" type="text" value={email} onChange={setFormField} />
+        <input name="email" type="text" ref={register} />
       </Form.Field>
       <Form.Field className="register-field-password">
         <label>Password</label>
-        <input name="password" type="password" value={password} onChange={setFormField} />
+        <input name="password" type="password" ref={register} />
       </Form.Field>
       <Form.Field className="register-field-retry-password">
         <label>Re-type Password</label>
-        <input name="retryPassword" type="password" value={retryPassword} onChange={setFormField} />
+        <input name="retryPassword" type="password" ref={register} />
       </Form.Field>
       <Form.Group className="register-actions">
         <Form.Field className="cancel-button">
