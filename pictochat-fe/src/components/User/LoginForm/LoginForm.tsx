@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Button, Segment, Loader } from 'semantic-ui-react';
+import { Form, Button } from 'semantic-ui-react';
 import UnauthenticatedUser from '../../../models/UnauthenticatedUser';
 import StoresContext from '../../../contexts/StoresContext';
 import { observer } from 'mobx-react';
-import { useLoginForm } from '../../../hooks/FormHooks';
+import useForm from 'react-hook-form';
 import './LoginForm.less';
 
 interface LoginFormProps {
@@ -12,13 +12,18 @@ interface LoginFormProps {
   onLogin?: () => Promise<void>;
 }
 
+type LoginFormData = {
+  username: string;
+  password: string;
+};
+
 function LoginForm(props: LoginFormProps) {
   const userStore = React.useContext(StoresContext).user;
-  const { username, password, setFormField } = useLoginForm();
+  const { handleSubmit, register } = useForm<LoginFormData>();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = handleSubmit(async ({ username, password }) => {
+    console.log(username, password);
     try {
-      event.preventDefault();
       const user: UnauthenticatedUser = {
         username: username,
         email: '',
@@ -29,25 +34,17 @@ function LoginForm(props: LoginFormProps) {
     } catch (error) {
       alert(error);
     }
-  };
-
-  if (props.isLoading) {
-    return (
-      <Segment>
-        <Loader active />
-      </Segment>
-    );
-  }
+  });
 
   return (
-    <Form id="login-form" className="ui raised segment" onSubmit={handleSubmit} method="POST">
+    <Form id="login-form" className="ui raised segment" onSubmit={onSubmit} method="POST" loading={props.isLoading}>
       <Form.Field className="login-field">
         <label>Username</label>
-        <input name="username" type="text" value={username} onChange={setFormField} />
+        <input name="username" type="text" ref={register} />
       </Form.Field>
       <Form.Field className="login-field">
         <label>Password</label>
-        <input name="password" type="password" value={password} onChange={setFormField} />
+        <input name="password" type="password" ref={register} />
       </Form.Field>
       <Form.Group inline>
         <Form.Field>

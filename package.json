@@ -63,6 +63,7 @@
     "react-dom": "^16.8.6",
     "react-dropzone": "^10.1.8",
     "react-helmet": "^5.2.1",
+    "react-hook-form": "^3.23.18",
     "react-router-dom": "^5.0.1",
     "react-twemoji": "^0.2.3",
     "semantic-ui-css": "^2.4.1",
