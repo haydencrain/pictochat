@@ -43,8 +43,8 @@ function LoginForm(props: LoginFormProps) {
   return (
     <Form id="login-form" className="ui raised segment" onSubmit={handleSubmit} method="POST">
       <Form.Field className="login-field">
-        <label>Username or Email</label>
-        <input name="username" type="text" placeholder="username" value={username} onChange={setFormField} />
+        <label>Username</label>
+        <input name="username" type="text" value={username} onChange={setFormField} />
       </Form.Field>
       <Form.Field className="login-field">
         <label>Password</label>
