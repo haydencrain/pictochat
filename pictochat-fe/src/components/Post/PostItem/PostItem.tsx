@@ -1,6 +1,6 @@
 import * as React from 'react';
-import * as moment from 'moment-mini';
-import * as classNames from 'classnames';
+import classnames from 'classnames';
+import moment from 'moment-mini';
 import { observer, Observer } from 'mobx-react';
 import { Image } from 'semantic-ui-react';
 import PostLinks from '../PostLinks';
@@ -32,7 +32,7 @@ function PostItem(props: PostItemProps) {
   const imageSrc = computed(() => (post.isHidden ? deletedPlaceholderImg : post.imageSrc));
 
   return (
-    <section className={classNames('thread-post', getPostTypeName(postType))}>
+    <section className={classnames('thread-post', getPostTypeName(postType))}>
       <div className="post-sidebar">
         <Link to={UserService.getUserUrl(post.author.username)}>
           <Image src={post.author.userAvatarURI} avatar size="mini" />

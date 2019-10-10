@@ -36,7 +36,7 @@ class UserService {
 
   static async authUser(user: UnauthenticatedUser): Promise<string> {
     const data = {
-      username: user.email,
+      username: user.username,
       password: user.password
     };
     const res: LoginResult = await ApiService.post('/user/login', data);
