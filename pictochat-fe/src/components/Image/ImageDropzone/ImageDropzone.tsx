@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as classNames from 'classnames';
+import classnames from 'classnames';
 import { useDropzone } from 'react-dropzone';
 import { Icon } from 'semantic-ui-react';
 import './ImageDropzone.less';
@@ -27,7 +27,7 @@ export default function ImageDropzone(props: ImageDropzoneProps) {
   };
 
   const errorClassName = !!errorMessage && 'upload-error';
-  const className = classNames('image-dropzone', errorClassName);
+  const className = classnames('image-dropzone', errorClassName);
 
   return (
     <div {...getRootProps({ className })}>
