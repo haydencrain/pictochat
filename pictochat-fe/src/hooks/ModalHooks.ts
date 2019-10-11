@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 
 /**
  * A React hook which provides a toggleable boolean, useful for handling the opening and closing of modal states
+ * @function
  */
 export function useToggleModal(): {
   /**

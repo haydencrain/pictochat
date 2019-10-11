@@ -3,6 +3,7 @@ import { readFile } from '../utils/FileHelpers';
 
 /**
  * A React Hook that provides functionality for asynchronously creating the base64 string of an image File
+ * @function
  * @param params - callback functions to use
  */
 export function useImage(params: {

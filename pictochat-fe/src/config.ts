@@ -4,5 +4,8 @@ export default {
   },
   discussion: {
     PAGINATION_LIMIT: process.env.DISCUSSION_PAGINATION_LIMIT ? parseInt(process.env.DISCUSSION_PAGINATION_LIMIT) : 10
+  },
+  sockPuppets: {
+    USER_LIMIT: 2
   }
 };
