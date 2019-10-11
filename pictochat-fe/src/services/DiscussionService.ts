@@ -5,6 +5,11 @@ import ValidationException from '../models/exceptions/ValidationException';
 import PaginationResult from '../models/PaginationResult';
 import { SortValue, SortTypes } from '../models/SortTypes';
 
+/**
+ * Implements HTTP Requests for the `'/discussion'` API endpoint
+ * @class
+ * @static
+ */
 export class DiscussionService {
   static async getDiscussions(sort: SortValue, limit = 10, start?: number): Promise<PaginationResult<IDiscussionPost>> {
     return await ApiService.get('/discussion', { sort, limit, start });

@@ -4,6 +4,11 @@ import { IUser } from '../models/store/User';
 import UnauthenticatedUser from '../models/UnauthenticatedUser';
 import LoginResult from '../models/LoginResult';
 
+/**
+ * Implements HTTP Requests for the `'/user'` API endpoint
+ * @class
+ * @static
+ */
 class UserService {
   static getUserUrl(username: string): string {
     return `/user/${username}`;
