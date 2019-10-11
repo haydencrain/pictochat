@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import { useFetchUser } from '../../hooks/UsersHooks';
 import { Loader, Segment } from 'semantic-ui-react';
 import { RouteComponentProps } from 'react-router';
 import ProfileCard from '../../components/User/ProfileCard';
+import { StoresContext } from '../../contexts/StoresContext';
 import './UserPage.less';
 
 interface UserPageMatchParams {
@@ -13,10 +13,14 @@ interface UserPageMatchParams {
 interface UserPageProps extends RouteComponentProps<UserPageMatchParams> {}
 
 function UserPage(props: UserPageProps) {
-  const [user, isLoading] = useFetchUser(props.match.params.username);
+  const userStore = React.useContext(StoresContext).user;
+
+  React.useEffect(() => {
+    userStore.fetchUser(props.match.params.username);
+  }, [props.match.params.username]);
 
   const getContent = () => {
-    if (isLoading) {
+    if (userStore.isLoading) {
       return (
         <Segment raised>
           <Loader active />
@@ -24,6 +28,7 @@ function UserPage(props: UserPageProps) {
       );
     }
 
+    const user = userStore.userMap.get(props.match.params.username);
     if (user) {
       return <ProfileCard user={user} isCurrentUser={false} />;
     }

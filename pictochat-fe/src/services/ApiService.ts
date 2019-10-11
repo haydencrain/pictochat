@@ -40,7 +40,7 @@ export class ApiService {
    * @param contentType value of the Content-Type header field. When null allows the browser to
    *    set Content-Type automatically (required when sending multi-part forms).
    */
-  static async ajax(
+  private static async ajax(
     method: string,
     path: string,
     data: any = null,

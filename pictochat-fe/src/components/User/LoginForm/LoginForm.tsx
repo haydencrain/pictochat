@@ -18,7 +18,7 @@ type LoginFormData = {
 };
 
 function LoginForm(props: LoginFormProps) {
-  const userStore = React.useContext(StoresContext).user;
+  const authStore = React.useContext(StoresContext).auth;
   const { handleSubmit, register } = useForm<LoginFormData>();
 
   const onSubmit = handleSubmit(async ({ username, password }) => {
@@ -29,7 +29,7 @@ function LoginForm(props: LoginFormProps) {
         email: '',
         password: password
       };
-      await userStore.authAndLoadCurrentUser(user);
+      await authStore.authAndLoadCurrentUser(user);
       props.onLogin && props.onLogin();
     } catch (error) {
       alert(error);

@@ -13,7 +13,7 @@ interface EditPostModalProps {
 
 function EditPostModal(props: EditPostModalProps) {
   const stores: IStoresContext = React.useContext(StoresContext);
-  const shouldOpen = async (stores: IStoresContext) => stores.user.isLoggedIn;
+  const shouldOpen = async (stores: IStoresContext) => stores.auth.isLoggedIn;
 
   const handleSubmit = async (image: File) => {
     try {

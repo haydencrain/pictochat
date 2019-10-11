@@ -4,7 +4,6 @@ import { Form, Button } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import StoresContext from '../../../contexts/StoresContext';
 import UnauthenticatedUser from '../../../models/UnauthenticatedUser';
-import { useRegisterForm } from '../../../hooks/FormHooks';
 import useForm from 'react-hook-form';
 import './RegisterForm.less';
 
@@ -21,7 +20,7 @@ type RegisterFormData = {
 };
 
 export function RegisterForm(props: RegisterFormProps) {
-  const userStore = React.useContext(StoresContext).user;
+  const authStore = React.useContext(StoresContext).auth;
   const { handleSubmit, register, reset } = useForm<RegisterFormData>();
 
   const onlyLettersAndNumbers = (str: string): boolean => {
@@ -51,7 +50,7 @@ export function RegisterForm(props: RegisterFormProps) {
         email: formData.email,
         password: formData.password
       };
-      await userStore.createUserAndAuth(userJson); // assuming an error is thrown if creation failed - Jordan
+      await authStore.createUserAndAuth(userJson); // assuming an error is thrown if creation failed - Jordan
       alert('User created sucessfully');
       props.onSubmitSuccess && props.onSubmitSuccess();
     } catch (e) {

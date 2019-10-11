@@ -20,7 +20,7 @@ function PostLinks(props: PostLinksProps) {
   //// DATA ////
   const { post, postType } = props;
   const stores = React.useContext(StoresContext);
-  const currentUser = stores.user.currentUser;
+  const currentUser = stores.auth.currentUser;
 
   //// HELPERS ////
 

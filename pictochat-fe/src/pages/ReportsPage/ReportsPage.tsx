@@ -15,8 +15,8 @@ import './ReportsPage.less';
 interface PageProps extends RouteComponentProps<any> {}
 
 function ReportsPage(props: PageProps) {
-  const stores = React.useContext(StoresContext);
-  const canViewPage = computed(() => stores.user.isLoggedIn && stores.user.currentUser.hasAdminRole);
+  const authStore = React.useContext(StoresContext).auth;
+  const canViewPage = computed(() => authStore.isLoggedIn && authStore.currentUser.hasAdminRole);
   const [reports, setReports] = React.useState<IDiscussionPost[]>();
   const [isLoading, setLoading] = React.useState(true);
 
