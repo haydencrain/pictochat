@@ -1,5 +1,8 @@
 import React from 'react';
 
-export default function Unauthorised(props: any) {
+/**
+ * React component to display when a user navigates to a page they are not authorised to view
+ */
+export default function Unauthorised(props: {}) {
   return <section id="unauthorised">You are unauthorised to view this page</section>;
 }

@@ -20,14 +20,23 @@ import './App.less';
 
 const { FRONTEND_URL_ROOT } = config.urls;
 
+/**
+ * This component encapsulates the entire React application.
+ * It provides the store context to child components, and handles routing
+ * @component
+ */
 function App() {
+  /* Data */
   const [stores] = React.useState(initStores());
 
+  // enforce mobx store actions to be observed
   mobx.configure({ enforceActions: 'observed' });
 
   React.useEffect(() => {
     setDeviceIdCookie();
   });
+
+  /* Rendereing */
 
   return (
     <StoresContext.Provider value={stores}>
@@ -42,7 +51,12 @@ function App() {
   );
 }
 
+/**
+ * This component provides the layout for the Application body, including the main content and the sidebar
+ * @component
+ */
 function AppBody() {
+  /* Rendering */
   return (
     <div id="app-body">
       <main id="app-main">

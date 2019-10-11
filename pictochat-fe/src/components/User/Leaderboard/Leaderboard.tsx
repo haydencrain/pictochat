@@ -7,9 +7,16 @@ import UserService from '../../../services/UserService';
 import './Leaderboard.less';
 
 interface LeaderboardProps {
+  /**
+   * The list of ranks to display
+   */
   ranks: LeaderboardRank[];
 }
 
+/**
+ * A React component that displays a ranked list of users, ordered by the number of posts
+ * @param { LeaderboardProps } props - The props of the component
+ */
 export function Leaderboard(props: LeaderboardProps) {
   const { ranks } = props;
 

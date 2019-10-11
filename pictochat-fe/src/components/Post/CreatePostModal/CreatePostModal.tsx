@@ -1,23 +1,38 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import ImageUploadModal, { TriggerTypes } from '../../Image/ImageUploadModal';
-import StoresContext, { IStoresContext } from '../../../contexts/StoresContext';
+import StoresContext from '../../../contexts/StoresContext';
 import NewPostPayload from '../../../models/NewPostPayload';
 import './CreatePostModal.less';
 
 interface CreatePostModalProps {
+  /**
+   * If no id is present, this component assumes that the new post is a new Discussion post.
+   * Otherwise, it is considered to be a new Reply post.
+   */
   parentPostId?: string;
+  /**
+   * Determines whether the modal's trigger should either be a modal, or a link
+   */
   triggerType: TriggerTypes;
+  /**
+   * The message the trigger should display
+   */
   triggerContent?: any;
 }
 
+/**
+ * React component that extends functionality of the ImageUploadModal.
+ * This component will create a new Post when the image is submitted.
+ * @param { CreatePostModalProps } props - The props of the component
+ */
 function CreatePostModal(props: CreatePostModalProps) {
   const stores = React.useContext(StoresContext);
   const authStore = stores.auth;
   const discussionStore = stores.discussion;
   const activeDiscussionStore = stores.activeDiscussion;
   const currentUser = authStore.currentUser;
-  const shouldOpen = async (stores: IStoresContext) => {
+  const shouldOpen = () => {
     if (authStore.isLoggedIn) {
       return true;
     }
@@ -41,9 +56,6 @@ function CreatePostModal(props: CreatePostModalProps) {
   };
 
   return (
-    // ts complains that className isn't a property of ImageUploadModal
-    // FIXME: configure ImageUploadModal to allow classNames to be added
-    // @ts-ignore
     <ImageUploadModal
       className="create-post-modal"
       triggerType={props.triggerType}

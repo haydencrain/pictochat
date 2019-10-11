@@ -6,9 +6,18 @@ import ReactionPopupItem from './ReactionPopupItem';
 import { reactions } from '../helpers';
 
 interface ReactionsPopupProps {
+  /**
+   * A callback function that fires when the popup trigger has been clicked
+   * @function
+   * @param { string } reactionName - The name of the reaction clicked
+   */
   onClick: (reactionName: string) => void;
 }
 
+/**
+ * A React component that provides a popup of reactions, allowing a user to select a reaction
+ * @param { ReactionsPopupProps } props - The props of the component
+ */
 function ReactionsPopup(props: ReactionsPopupProps) {
   const { isActive, onOpen, onClose } = useToggleModal();
 

@@ -1,22 +1,15 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import { Segment } from 'semantic-ui-react';
 import classnames from 'classnames';
 import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
-import { observer } from 'mobx-react';
+import { Links, normalLinks } from './helpers';
 import './QuickLinks.less';
 
-interface Links {
-  name: string;
-  link: string;
-  isActive: (pathname: string) => any;
-}
-
-const normalLinks: Links[] = [
-  { name: 'Threads', link: '/', isActive: pathname => pathname.startsWith('/discussion') || pathname === '/' },
-  { name: 'Leaderboard', link: '/leaderboard', isActive: pathname => pathname.startsWith('/leaderboard') },
-  { name: 'Register', link: '/register', isActive: pathname => pathname.startsWith('/register') }
-];
-
+/**
+ * React component that supplies links to important routes within the application
+ * @param props (RouteComponentProps)
+ */
 function QuickLinks(props: RouteComponentProps<{}>) {
   const getLinkSegments = (links: Links[]) =>
     links.map(link => {

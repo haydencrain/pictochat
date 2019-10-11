@@ -5,14 +5,19 @@ import StoresContext from '../../../contexts/StoresContext';
 import './DeletePostButton.less';
 
 interface DeletePostButtonProps extends RouteComponentProps<any> {
+  /**
+   * The id of the post to delete (once the button is pressed)
+   */
   postId: string;
-  // onDidDelete?: (stores: IStoresContext, postId: string) => Promise<void>;
 }
 
+/**
+ * React component that provides a button that will delete a post on click
+ * @param { DeletePostButtonProps } props - The props of the component
+ */
 function DeletePostButton(props: DeletePostButtonProps) {
   const activeDiscussionStore = React.useContext(StoresContext).activeDiscussion;
 
-  // TODO: pass the handle Delete method up to a higher component in order to increase modularity
   const handleClick = async () => {
     const post = activeDiscussionStore.postsMap.get(props.postId);
     const isRoot = post.isRootPost;

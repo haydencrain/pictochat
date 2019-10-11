@@ -3,23 +3,41 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import ThreadsSummaryList from '../ThreadsSummaryList/ThreadsSummaryList';
 import RepliesList from '../RepliesList/RepliesList';
-import ThreadListMenu from '../ThreadListMenu';
+import ThreadListMenu, { threadSummarySortOptions, repliesSortOptions } from '../ThreadListMenu';
 import { SortValue } from '../../../models/SortTypes';
 import StoresContext from '../../../contexts/StoresContext';
-import { threadSummarySortOptions, repliesSortOptions } from './helpers';
 import './ThreadListContainer.less';
 
-//// THREADS LIST CONTAINER /////
-
 interface ThreadListContainerProps {
+  /**
+   * The post id of for the thread list. If no id is present, then it's the main threads, otherwise it's the replies
+   */
   id?: string;
+  /**
+   * The header to display within the section
+   */
   sectionHeader: string;
+  /**
+   * The message to display if no posts are present
+   */
   noPostsMessage?: string;
+  /**
+   * The text of the button that is Present within the menu, which is used to create a new post
+   */
   addPostButtonMessage?: string;
+  /**
+   * Set true if the replies of each reply should be displayed (aka display the reply tree)
+   */
   showReplies?: boolean;
 }
 
+/**
+ * A React component that provides a section for loading, display and sorting a list of threads (posts). This component
+ * can be used for either displaying the Main threads, or to display a thread's replies.
+ * @param { ThreadListContainerProps } props - The props of the component
+ */
 function ThreadListContainer(props: ThreadListContainerProps) {
+  /* STORES */
   const store = React.useContext(StoresContext);
   const discussionStore = store.discussion;
   const activeDiscussionStore = store.activeDiscussion;
@@ -29,9 +47,13 @@ function ThreadListContainer(props: ThreadListContainerProps) {
   const activeSort = computed((): SortValue => (isThreadsSummary ? discussionStore.sort : activeDiscussionStore.sort));
   const setSort = isThreadsSummary ? discussionStore.setSort : activeDiscussionStore.setSort;
 
+  /* CALLBACKS */
+
   const handleSortSelect = (sort: SortValue) => {
     setSort(sort);
   };
+
+  /* RENDERING */
 
   const postListProps = {
     noPostsMessage: props.noPostsMessage,

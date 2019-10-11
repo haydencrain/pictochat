@@ -8,7 +8,15 @@ import useForm from 'react-hook-form';
 import './RegisterForm.less';
 
 interface RegisterFormProps {
+  /**
+   * Callback function that executes when the cancel button is clicked
+   * @function
+   */
   onCancelClick?: () => void;
+  /**
+   * Callback function that executes when a user has registered successfully
+   * @function
+   */
   onSubmitSuccess?: () => void;
 }
 
@@ -19,10 +27,18 @@ type RegisterFormData = {
   retryPassword: string;
 };
 
+/**
+ * A React component that Provides a form to register a user
+ * @param { RegisterFormProps } props - The props of the component
+ */
 export function RegisterForm(props: RegisterFormProps) {
+  /* STORES */
   const authStore = React.useContext(StoresContext).auth;
+
+  /* HOOKS */
   const { handleSubmit, register, reset } = useForm<RegisterFormData>();
 
+  /* HELPERS  */
   const onlyLettersAndNumbers = (str: string): boolean => {
     return /^[A-Za-z0-9]+$/.test(str);
   };
@@ -42,6 +58,7 @@ export function RegisterForm(props: RegisterFormProps) {
     }
   };
 
+  /* EVENT HANDLERS */
   const onSubmit = handleSubmit(async formData => {
     try {
       validateForm(formData);
@@ -64,6 +81,7 @@ export function RegisterForm(props: RegisterFormProps) {
     props.onCancelClick && props.onCancelClick();
   };
 
+  /* RENDERING */
   return (
     <Form id="register-form" onSubmit={onSubmit} method="POST">
       <h1>Create an Account</h1>

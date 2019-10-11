@@ -5,13 +5,27 @@ import { User } from '../../../models/store/User';
 import './ProfileCard.less';
 import { Link } from 'react-router-dom';
 
-interface Props {
+interface LoginProps {
+  /**
+   * The user to display within the card
+   */
   user: User;
+  /**
+   * Set true to render a list of links, such as logout and view profile
+   */
   isCurrentUser?: boolean;
+  /**
+   * Callback function that executes when the logout link is clicked
+   * @function
+   */
   onLogoutClick?: () => void;
 }
 
-function ProfileCard(props: Props) {
+/**
+ * A React component that displays a user profile in a card UI layout
+ * @param { LoginProps } props - The props of the component
+ */
+function ProfileCard(props: LoginProps) {
   const linksSegment = !!props.isCurrentUser && (
     <Segment className="profile-card-footer">
       <ul>

@@ -7,9 +7,16 @@ import StoresContext from '../../../contexts/StoresContext';
 import './PostMainContainer.less';
 
 interface PostMainContainerProps {
+  /**
+   * The id of the post to use
+   */
   id: string;
 }
 
+/**
+ * A React component that connects to mobx, and displays the current active discussion post as the main post
+ * @param { PostMainContainerProps } props - The props of the component
+ */
 function PostMainContainer(props: PostMainContainerProps) {
   const { id } = props;
   const activeDiscussionStore = React.useContext(StoresContext).activeDiscussion;

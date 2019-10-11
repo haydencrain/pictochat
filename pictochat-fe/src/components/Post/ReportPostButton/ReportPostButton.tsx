@@ -5,14 +5,20 @@ import ContentReportService from '../../../services/ContentReportService';
 import './ReportPostButton.less';
 
 interface ReportPostButtonProps extends RouteComponentProps<any> {
+  /**
+   * the id of the post to report
+   */
   postId: string;
 }
 
+/**
+ * React component (a button) that will report a post on click
+ * @param { ReportPostButtonProps } props - The props of the component
+ */
 function ReportPostButton(props: ReportPostButtonProps) {
-  // TODO: pass the handle Report method up to a higher component in order to increase modularity
   const handleClick = async () => {
     if (confirm('Are you sure you want to report this image for offensive content?')) {
-      const report = await ContentReportService.reportPost(props.postId);
+      await ContentReportService.reportPost(props.postId);
     }
   };
 

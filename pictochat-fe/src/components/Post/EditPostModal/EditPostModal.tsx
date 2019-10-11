@@ -1,19 +1,36 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
 import ImageUploadModal, { TriggerTypes } from '../../Image/ImageUploadModal';
-import StoresContext, { IStoresContext } from '../../../contexts/StoresContext';
+import StoresContext from '../../../contexts/StoresContext';
 import ValidationException from '../../../models/exceptions/ValidationException';
 import './EditPostModal.less';
 
 interface EditPostModalProps {
+  /**
+   * The id of the post to edit
+   */
   postId: string;
+  /**
+   * Determines whether the modal's trigger should either be a modal, or a link
+   */
   triggerType: TriggerTypes;
+  /**
+   * The message the trigger should display
+   */
   triggerContent?: any;
 }
 
+/**
+ * React component that extends functionality of the ImageUploadModal.
+ * This component will update a Post's image on submit.
+ * @param { EditPostModalProps } props - The props of the component
+ */
 function EditPostModal(props: EditPostModalProps) {
-  const activeDiscussionStore = React.useContext(StoresContext).activeDiscussion;
-  const shouldOpen = async (stores: IStoresContext) => stores.auth.isLoggedIn;
+  const stores = React.useContext(StoresContext);
+  const activeDiscussionStore = stores.activeDiscussion;
+  const authStore = stores.auth;
+
+  const shouldOpen = () => authStore.isLoggedIn;
 
   const handleSubmit = async (image: File) => {
     try {
@@ -28,9 +45,6 @@ function EditPostModal(props: EditPostModalProps) {
   };
 
   return (
-    // FIXME: ts complains that className isn't a property of ImageUploadModal
-    //        (Solution?: figure out what type we need to cast ImageUploadModal to when exporting)
-    // @ts-ignore
     <ImageUploadModal
       className="create-post-modal"
       triggerType={props.triggerType}

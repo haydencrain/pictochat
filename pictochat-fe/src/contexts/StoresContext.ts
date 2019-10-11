@@ -17,8 +17,10 @@ export interface IStoresContext {
   reaction: ReactionStore;
 }
 
-// HELPER FUNCTIONS
-
+/**
+ * Creates the mobx stores
+ * @returns (IStoresContext) The collection of stores
+ */
 export function initStores(): IStoresContext {
   const userStore = new UserStore();
   const discussionStore = new DiscussionStore();
