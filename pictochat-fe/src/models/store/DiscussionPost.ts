@@ -2,32 +2,70 @@ import { PostAuthor, IPostAuthor } from './PostAuthor';
 import { observable, action, IObservableArray } from 'mobx';
 
 export interface IDiscussionPost {
+  /**
+   * The id of the post
+   */
   postId: string;
+  /**
+   * The id of the parent post (if it's a reply)
+   */
   parentPostId: string;
+  /**
+   * The post's discussion id
+   */
   discussionId: string;
+  /**
+   * if the post is a discussion post, then it will be true
+   */
   isRootPost: boolean;
+  /**
+   * The author of the post
+   */
   author: PostAuthor;
+  /**
+   * The url (or base64 string) of the post's image
+   */
   imageSrc: string;
+  /**
+   * The date the post was submitted
+   */
   postedDate: string;
+  /**
+   * Will be set to true if the post has been deleted
+   */
   isHidden: boolean;
+  /**
+   * The number of reactions the post has
+   */
   reactionsCount: number;
+  /**
+   * The number of comments the post has. (NOTE: This will only appear on discussion posts, and will be `null` for reply posts).
+   */
   commentCount?: number;
+  /**
+   * The posts that have replied to the post (if any). NOTE: if `hasMore` is `true`, then this array does not contain
+   * the entire list of replies yet
+   */
   replies?: IDiscussionPost[];
+  /**
+   * If set to true, the post has more replies to fetch from the back end.
+   */
   hasMore?: boolean;
 }
 
+/**
+ * Creates an mobx ovservable instance of a DiscussionPost, and provides extra methods for
+ * handling CRUD updates.
+ * @class
+ */
 export class DiscussionPost implements IDiscussionPost {
   @observable postId: string;
   @observable parentPostId: string;
   @observable discussionId: string;
-  // @observable imageId: string;
   @observable isRootPost: boolean;
   @observable author: IPostAuthor;
-  @observable imageSrc: string; // URI for the post's image
-  // @observable replyTreePath: string;
+  @observable imageSrc: string;
   @observable postedDate: string;
-  // @observable createdAt: string;
-  // @observable updatedAt: string;
   @observable isHidden: boolean;
   @observable reactionsCount: number;
   @observable commentCount?: number = 0;
@@ -57,17 +95,32 @@ export class DiscussionPost implements IDiscussionPost {
     }
   }
 
+  /**
+   * Removes a reply from the post's `replies` array
+   * @function
+   * @param { DiscussionPost } reply - The reply to remove
+   */
   @action.bound
   removeReply(reply: DiscussionPost) {
     let idx = this.replies.findIndex(p => p.postId === reply.postId);
     this.replies.splice(idx, 1);
   }
 
+  /**
+   * Adds more replies to the post's replies array
+   * @function
+   * @param { DiscussionPost[] } replies - The array of replies to add
+   */
   @action.bound
   addReplies(replies: DiscussionPost[]) {
     this.replies.push(...replies);
   }
 
+  /**
+   * Replaces this instance's post with another instance of a post
+   * @function
+   * @param { DiscussionPost } other - The post to replace this instance with
+   */
   @action.bound
   replace(other: DiscussionPost) {
     this.postId = other.postId;
@@ -84,11 +137,20 @@ export class DiscussionPost implements IDiscussionPost {
     this.hasMore = other.hasMore;
   }
 
+  /**
+   * Replaces this instance's post with an empty post
+   * @function
+   */
   @action.bound
   clear() {
     this.replace(new DiscussionPost());
   }
 
+  /**
+   * Creates a new instance from a JSON representation of this class
+   * @param { IDiscussionPost } post - A JSON representation of this class
+   * @returns A new instance of DiscussionPost
+   */
   static fromJSON(post: IDiscussionPost): DiscussionPost {
     if (post.replies !== null || post.replies !== undefined) {
       post['replies'] = post.replies.map(replyJson => DiscussionPost.fromJSON(replyJson));

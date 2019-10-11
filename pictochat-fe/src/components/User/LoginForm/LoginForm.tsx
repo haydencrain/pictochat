@@ -8,7 +8,13 @@ import useForm from 'react-hook-form';
 import './LoginForm.less';
 
 interface LoginFormProps {
+  /**
+   * Set true to render the Segment in a loading state
+   */
   isLoading: boolean;
+  /**
+   * Callback function that fires when the User has logged in successfully
+   */
   onLogin?: () => Promise<void>;
 }
 
@@ -17,6 +23,10 @@ type LoginFormData = {
   password: string;
 };
 
+/**
+ * A React component that Provides a form to login a user
+ * @param { LoginFormProps } props - The props of the component
+ */
 function LoginForm(props: LoginFormProps) {
   const authStore = React.useContext(StoresContext).auth;
   const { handleSubmit, register } = useForm<LoginFormData>();

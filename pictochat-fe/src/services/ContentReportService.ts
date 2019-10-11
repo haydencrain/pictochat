@@ -1,6 +1,11 @@
 import { IDiscussionPost } from '../models/store/DiscussionPost';
 import ApiService from './ApiService';
 
+/**
+ * Implements HTTP Requests for the `'/content-report'` API endpoint
+ * @class
+ * @static
+ */
 export class ContentReportService {
   static async getContentReports(): Promise<IDiscussionPost[]> {
     return await ApiService.get('/content-report');

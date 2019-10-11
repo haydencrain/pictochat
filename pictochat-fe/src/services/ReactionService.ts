@@ -2,6 +2,11 @@ import ApiService from './ApiService';
 import { Reaction, IReaction } from '../models/store/Reaction';
 import { reaction } from 'mobx';
 
+/**
+ * Implements HTTP Requests for the `'/reaction'` API endpoint
+ * @class
+ * @static
+ */
 class ReactionService {
   static async getDiscussionReactions(discussionId: string): Promise<IReaction[]> {
     return await ApiService.get('/reaction', { discussionId, by: 'DISCUSSION' });

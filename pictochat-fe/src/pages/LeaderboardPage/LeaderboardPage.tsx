@@ -5,9 +5,12 @@ import Leaderboard from '../../components/User/Leaderboard';
 import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
 import './LeaderboardPage.less';
 
-interface LeaderboardPage extends RouteComponentProps<any> {}
-
-export function LeaderboardPage(props: LeaderboardPage) {
+/**
+ * A React component that interacts with the store to load the leaderboard, and renders the Page layout
+ * for the Leaderboard page.
+ * @component
+ */
+export function LeaderboardPage(props: {}) {
   const stores: IStoresContext = React.useContext(StoresContext);
 
   React.useEffect(() => {

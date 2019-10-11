@@ -9,21 +9,34 @@ import ReactionChip from '../ReactionChip';
 import './ReactionsContainer.less';
 
 interface ReactionsProps {
+  /**
+   * The id of the post the reactions belong to
+   */
   postId: string;
+  /**
+   * Set to false if the reactions for this post should be loaded
+   */
   shouldLoad?: boolean;
 }
 
+/**
+ * A React component that fetches and displays the reactions of a post, and also handles passes CRUD operations to
+ * the reactions store.
+ * @param { ReactionsProps } props - The props of the component
+ */
 function ReactionsContainer(props: ReactionsProps) {
   const shouldLoad = props.shouldLoad !== undefined ? props.shouldLoad : false;
+  /* STORE */
   const stores = React.useContext(StoresContext);
   const authStore = stores.auth;
   const reactionStore = stores.reaction;
   const currentUser = authStore.currentUser;
+
   const reactionTypeCounts = reactionStore.postReactionNameCounts(props.postId);
 
   const isLoading = useFetchReactionTypeCounts(props.postId, shouldLoad);
 
-  //// EVENT HANDLERS ////
+  /* EVENT HANDLERS */
 
   const handleReactionLabelClick = React.useCallback((reactionName: string) => {
     if (!authStore.isLoggedIn) {
@@ -33,7 +46,7 @@ function ReactionsContainer(props: ReactionsProps) {
     reactionStore.updateReaction(parseInt(props.postId), parseInt(currentUser.userId), reactionName);
   }, []);
 
-  //// RENDER HELPERS ////
+  /* RENDER HELPERS */
 
   const renderReactionLabels = () => {
     return reactions.map(reaction => {
@@ -48,7 +61,7 @@ function ReactionsContainer(props: ReactionsProps) {
     });
   };
 
-  //// MAIN RENDERING /////
+  /* MAIN RENDERING */
 
   if (reactionStore.isLoading || isLoading) {
     return <Loader />;
@@ -62,11 +75,14 @@ function ReactionsContainer(props: ReactionsProps) {
   );
 }
 
-///// HOOKS /////
+/* HOOKS */
 
 /**
- * Use this to load the reactions for the specified post on component render
- * This is used, for example, in the threads summary list
+ * A React Hook that loads the reactions for the specified post on component render.
+ * @function
+ * @param postId - The id of the post to fetch the reactions of.
+ * @param shouldLoad - Set this to false if you would not like to load the reactions for the specified post
+ * @returns A boolean specifying whether reactions are loading or not
  */
 function useFetchReactionTypeCounts(postId: string, shouldLoad: boolean): boolean {
   const store = React.useContext(StoresContext).reaction;

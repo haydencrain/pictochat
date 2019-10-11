@@ -15,14 +15,26 @@ import deletedPlaceholderImg from '../../../images/deleted-placeholder.jpg';
 import './PostItem.less';
 
 interface PostItemProps extends RouteComponentProps<any> {
+  /**
+   * The post to display
+   */
   post: DiscussionPost;
+  /**
+   * The type of post to display (Main, Root, or Reply)
+   */
   postType?: PostTypes;
 }
 
+/**
+ * A React Component that encapsulates the post. Displays the post, the author, its reactions, as well as
+ * functionality links specific to the post.
+ * @param { PostItemProps } props - The props of the component
+ */
 function PostItem(props: PostItemProps) {
   const { post, postType } = props;
 
   const renderLinks = computed(() => {
+    // If the post is the Root post (the main post that is displayed in the discussion page), don't show any links
     if (post.isHidden && postType !== PostTypes.Root) {
       return null;
     }

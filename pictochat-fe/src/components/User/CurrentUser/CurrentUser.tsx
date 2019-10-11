@@ -7,7 +7,11 @@ import { Loader } from 'semantic-ui-react';
 import { observer } from 'mobx-react-lite';
 import './CurrentUser.less';
 
-function CurrentUser() {
+/**
+ * A React component that renders either a login form, or the current user card, depending on whether or not the
+ * current user is logged in or not
+ */
+function CurrentUser(props: {}) {
   const authStore = React.useContext(StoresContext).auth;
   const isLoading = mobx.computed(() => authStore.isLoading);
 

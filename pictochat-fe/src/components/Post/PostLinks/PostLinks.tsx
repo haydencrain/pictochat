@@ -12,17 +12,27 @@ import CreatePostModal from '../CreatePostModal';
 import './PostLinks.less';
 
 interface PostLinksProps {
-  postType: PostTypes;
+  /**
+   * The post to display
+   */
   post: DiscussionPost;
+  /**
+   * The type of post to display (Main, Root, or Reply)
+   */
+  postType: PostTypes;
 }
 
+/**
+ * A React component that provides functional links for a component, depending on the type of post it's for
+ * @param { PostLinksProps } props - The props of the component
+ */
 function PostLinks(props: PostLinksProps) {
-  //// DATA ////
+  /* DATA */
   const { post, postType } = props;
   const stores = React.useContext(StoresContext);
   const currentUser = stores.auth.currentUser;
 
-  //// HELPERS ////
+  /* HELPERS */
 
   const getCrudLinks = () => [
     <EditPostModal triggerType="link" triggerContent="edit" postId={post.postId} />,
@@ -41,7 +51,7 @@ function PostLinks(props: PostLinksProps) {
     ));
   };
 
-  //// POST TYPE RENDER FUNCTIONS ////
+  /* POST TYPE RENDER FUNCTIONS */
 
   const renderRootPostLinks = (): JSX.Element[] => {
     const rootPostLinks = [
@@ -74,20 +84,24 @@ function PostLinks(props: PostLinksProps) {
     return mapLinks(mainPostLinks);
   };
 
-  //// MAIN RENDERING ////
+  /* MAIN RENDERING */
 
-  let links: JSX.Element[] = null; // no links shown on the Main Post
-  if (postType === PostTypes.Root) {
-    links = renderRootPostLinks();
-  } else if (postType === PostTypes.Reply) {
-    links = renderReplyPostLinks();
-  } else if (postType === PostTypes.Main) {
-    links = renderMainPostLinks();
-  }
+  const renderLinks = () => {
+    switch (postType) {
+      case PostTypes.Root:
+        return renderRootPostLinks();
+      case PostTypes.Reply:
+        return renderReplyPostLinks();
+      case PostTypes.Main:
+        return renderMainPostLinks();
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="post-links">
-      <ul className="links-list">{links}</ul>
+      <ul className="links-list">{renderLinks()}</ul>
     </div>
   );
 }
