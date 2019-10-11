@@ -1,14 +1,10 @@
 import { observable, action, ObservableMap, runInAction, flow } from 'mobx';
 import { User } from '../models/store/User';
 import UserService from '../services/UserService';
-import UnauthenticatedUser from '../models/UnauthenticatedUser';
 import { computedFn } from 'mobx-utils';
 
-/**
- * Stores the currently logged in user */
 export default class UserStore {
   @observable isLoading: boolean = true;
-
   // This is used a generic cache if any UI elements need to incorporate
   // data about users other than the one currently logged in
   @observable userMap: ObservableMap<any, User> = observable.map(undefined, { name: 'users' });
@@ -31,7 +27,9 @@ export default class UserStore {
         this.putInUserMap(new User(userJson));
       });
     } finally {
-      this.isLoading = false;
+      runInAction(() => {
+        this.isLoading = false;
+      });
     }
   }
 
@@ -47,13 +45,9 @@ export default class UserStore {
 
   disableUser = flow(function*(user: User) {
     try {
-      // console.log('disabled user: ', user);
       yield UserService.disableUser(user);
-      console.log('disabled user: ', user);
       user.disable();
-      // runInAction(() => {});
     } catch (error) {
-      console.error(error);
       throw error;
     }
   });

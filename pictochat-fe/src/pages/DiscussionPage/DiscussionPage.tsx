@@ -19,10 +19,11 @@ function DiscussionPage(props: DiscussionPageProps) {
 
   React.useEffect(() => {
     const discussionStore = stores.discussion;
-    discussionStore.setActiveDiscussion(props.match.params.id).then(async () => {
+    (async () => {
+      await discussionStore.setActiveDiscussion(props.match.params.id);
       const discussionId = discussionStore.activeDiscussionRoot.discussionId;
       stores.reaction.loadThreadReactions(discussionId);
-    });
+    })();
   }, [props.match.params.id]);
 
   return (

@@ -4,7 +4,6 @@ import { Form, Button } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import StoresContext from '../../../contexts/StoresContext';
 import UnauthenticatedUser from '../../../models/UnauthenticatedUser';
-import { useRegisterForm } from '../../../hooks/FormHooks';
 import useForm from 'react-hook-form';
 import './RegisterForm.less';
 
