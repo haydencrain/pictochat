@@ -10,15 +10,13 @@ interface DeletePostButtonProps extends RouteComponentProps<any> {
 }
 
 function DeletePostButton(props: DeletePostButtonProps) {
-  const discussionStore = React.useContext(StoresContext).discussion;
+  const activeDiscussionStore = React.useContext(StoresContext).activeDiscussion;
 
   // TODO: pass the handle Delete method up to a higher component in order to increase modularity
   const handleClick = async () => {
-    const post = discussionStore.activeDiscussionPosts.get(props.postId);
-    console.log('BEFORE: ', JSON.stringify(post));
+    const post = activeDiscussionStore.activeDiscussionPosts.get(props.postId);
     const isRoot = post.isRootPost;
-    await discussionStore.deletePost(parseInt(props.postId));
-    console.log('AFTER: ', JSON.stringify(post));
+    await activeDiscussionStore.deletePost(parseInt(props.postId));
     if (isRoot && !post.isHidden) {
       props.history.goBack();
     }

@@ -15,6 +15,7 @@ function CreatePostModal(props: CreatePostModalProps) {
   const stores = React.useContext(StoresContext);
   const authStore = stores.auth;
   const discussionStore = stores.discussion;
+  const activeDiscussionStore = stores.activeDiscussion;
   const currentUser = authStore.currentUser;
   const shouldOpen = async (stores: IStoresContext) => {
     if (authStore.isLoggedIn) {
@@ -31,7 +32,11 @@ function CreatePostModal(props: CreatePostModalProps) {
         parentPostId: props.parentPostId || null,
         image: image
       };
-      await discussionStore.createPost(data);
+      if (!data.parentPostId) {
+        discussionStore.createThread(data);
+      } else {
+        activeDiscussionStore.createReply(data);
+      }
     }
   };
 

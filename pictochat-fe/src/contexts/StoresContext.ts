@@ -5,11 +5,13 @@ import UserStore from '../stores/UserStore';
 import { LeaderboardStore } from '../stores/LeaderboardStore';
 import { SockPuppetAlertStore } from '../stores/SockPuppetAlertStore';
 import { ReactionStore } from '../stores/ReactionStore';
+import ActiveDiscussionStore from '../stores/ActiveDiscussionStore';
 
 export interface IStoresContext {
-  discussion: DiscussionStore;
-  user: UserStore;
   auth: AuthStore;
+  user: UserStore;
+  discussion: DiscussionStore;
+  activeDiscussion: ActiveDiscussionStore;
   leaderboard: LeaderboardStore;
   sockPuppetAlerts: SockPuppetAlertStore;
   reaction: ReactionStore;
@@ -19,10 +21,12 @@ export interface IStoresContext {
 
 export function initStores(): IStoresContext {
   const userStore = new UserStore();
+  const discussionStore = new DiscussionStore();
   return {
-    discussion: new DiscussionStore(),
-    user: userStore,
     auth: new AuthStore(),
+    user: userStore,
+    discussion: discussionStore,
+    activeDiscussion: new ActiveDiscussionStore(discussionStore),
     leaderboard: new LeaderboardStore(),
     sockPuppetAlerts: new SockPuppetAlertStore(userStore),
     reaction: new ReactionStore()

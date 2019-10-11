@@ -20,26 +20,27 @@ interface ThreadListContainerProps {
 }
 
 function ThreadListContainer(props: ThreadListContainerProps) {
-  const store = React.useContext(StoresContext).discussion;
+  const store = React.useContext(StoresContext);
+  const discussionStore = store.discussion;
+  const activeDiscussionStore = store.activeDiscussion;
 
   // If no Id is present, then it's the main threads, otherwise it's the replies
   const isThreadsSummary = !props.id;
-
   const activeSort = computed(
     (): SortValue => {
       if (isThreadsSummary) {
-        return store.threadSummariesActiveSort;
+        return discussionStore.threadSummariesSort;
       }
-      return store.activeDiscussionSort;
+      return activeDiscussionStore.activeDiscussionSort;
     }
   );
 
+  const setSort = isThreadsSummary
+    ? discussionStore.setThreadSummariesSort
+    : activeDiscussionStore.setActiveDiscussionSort;
+
   const handleSortSelect = (sort: SortValue) => {
-    if (isThreadsSummary) {
-      store.setThreadSummariesActiveSort(sort);
-    } else {
-      store.setActiveDiscussionSort(sort);
-    }
+    setSort(sort);
   };
 
   const postListProps = {

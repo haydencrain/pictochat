@@ -12,12 +12,12 @@ interface EditPostModalProps {
 }
 
 function EditPostModal(props: EditPostModalProps) {
-  const stores: IStoresContext = React.useContext(StoresContext);
+  const activeDiscussionStore = React.useContext(StoresContext).activeDiscussion;
   const shouldOpen = async (stores: IStoresContext) => stores.auth.isLoggedIn;
 
   const handleSubmit = async (image: File) => {
     try {
-      await stores.discussion.updatePostImage(parseInt(props.postId), image);
+      await activeDiscussionStore.updatePostImage(parseInt(props.postId), image);
     } catch (error) {
       if (error.errorType == ValidationException.ERROR_TYPE) {
         alert('This post is no longer editable. This likely means that someone has reacted or replied to it');

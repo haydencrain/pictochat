@@ -14,7 +14,7 @@ interface RepliesListProps {
 }
 
 function RepliesList(props: RepliesListProps) {
-  const store = React.useContext(StoresContext).discussion;
+  const store = React.useContext(StoresContext).activeDiscussion;
   const { postId, showReplies, noPostsMessage } = props;
 
   const post = computed(

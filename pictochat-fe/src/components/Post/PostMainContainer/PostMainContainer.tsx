@@ -12,13 +12,13 @@ interface PostMainContainerProps {
 
 function PostMainContainer(props: PostMainContainerProps) {
   const { id } = props;
-  const stores = React.useContext(StoresContext);
+  const activeDiscussionStore = React.useContext(StoresContext).activeDiscussion;
 
   const renderContent = () => {
-    if (stores.discussion.isLoadingActiveDiscussion || !stores.discussion.activeDiscussionPosts.has(id)) {
+    if (activeDiscussionStore.isLoadingActiveDiscussion || !activeDiscussionStore.activeDiscussionPosts.has(id)) {
       return <Loader active />;
     }
-    const post = stores.discussion.activeDiscussionPosts.get(id);
+    const post = activeDiscussionStore.activeDiscussionPosts.get(id);
     return <PostItem post={post} postType={PostTypes.Main} />;
   };
 

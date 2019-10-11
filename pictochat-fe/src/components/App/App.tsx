@@ -15,12 +15,13 @@ import ReportsPage from '../../pages/ReportsPage';
 import UserPage from '../../pages/UserPage';
 import CurrentUser from '../User/CurrentUser';
 import QuickLinks from '../Layout/QuickLinks';
+import config from '../../config';
 import './App.less';
 
-const FRONTEND_URL_ROOT = process.env.PICTOCHAT_FRONTEND_URL_ROOT || '/';
+const { FRONTEND_URL_ROOT } = config.urls;
 
 function App() {
-  const [stores, setStores] = React.useState(initStores());
+  const [stores] = React.useState(initStores());
 
   mobx.configure({ enforceActions: 'observed' });
 
