@@ -189,6 +189,7 @@ As this project is almost purely JavaScript, many of the best practices chosen t
 1. Use `// TODO:` to annotate solutions to problems, and `// FIXME:` to annotate parts of the code that need to be fixed.
 1. Don't use multiple blank lines to pad your code.
 1. Use semicolons after all statements, in order to avoid the use of [Automatic Code Insertion](https://tc39.es/ecma262/#sec-automatic-semicolon-insertion).
+1. JSDoc Whenever possible!
 
 ## Contributors
 
