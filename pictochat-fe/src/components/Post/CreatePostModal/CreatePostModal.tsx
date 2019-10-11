@@ -2,7 +2,6 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import ImageUploadModal, { TriggerTypes } from '../../Image/ImageUploadModal';
 import StoresContext, { IStoresContext } from '../../../contexts/StoresContext';
-import User from '../../../models/store/User';
 import NewPostPayload from '../../../models/NewPostPayload';
 import './CreatePostModal.less';
 
@@ -13,10 +12,12 @@ interface CreatePostModalProps {
 }
 
 function CreatePostModal(props: CreatePostModalProps) {
-  const stores: IStoresContext = React.useContext(StoresContext);
-  const currentUser: User = stores.user.currentUser;
+  const stores = React.useContext(StoresContext);
+  const authStore = stores.auth;
+  const discussionStore = stores.discussion;
+  const currentUser = authStore.currentUser;
   const shouldOpen = async (stores: IStoresContext) => {
-    if (stores.user.isLoggedIn) {
+    if (authStore.isLoggedIn) {
       return true;
     }
     alert('You must be logged in to post');
@@ -24,13 +25,13 @@ function CreatePostModal(props: CreatePostModalProps) {
   };
 
   const handleSubmit = async (image: File) => {
-    if (stores.user.isLoggedIn && !stores.user.isLoading) {
+    if (authStore.isLoggedIn && !authStore.isLoading) {
       const data: NewPostPayload = {
         userId: currentUser.userId,
         parentPostId: props.parentPostId || null,
         image: image
       };
-      await stores.discussion.createPost(data);
+      await discussionStore.createPost(data);
     }
   };
 

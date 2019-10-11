@@ -1,5 +1,6 @@
 import * as React from 'react';
 import DiscussionStore from '../stores/DiscussionStore';
+import AuthStore from '../stores/AuthStore';
 import UserStore from '../stores/UserStore';
 import { LeaderboardStore } from '../stores/LeaderboardStore';
 import { SockPuppetAlertStore } from '../stores/SockPuppetAlertStore';
@@ -8,6 +9,7 @@ import { ReactionStore } from '../stores/ReactionStore';
 export interface IStoresContext {
   discussion: DiscussionStore;
   user: UserStore;
+  auth: AuthStore;
   leaderboard: LeaderboardStore;
   sockPuppetAlerts: SockPuppetAlertStore;
   reaction: ReactionStore;
@@ -20,6 +22,7 @@ export function initStores(): IStoresContext {
   return {
     discussion: new DiscussionStore(),
     user: userStore,
+    auth: new AuthStore(),
     leaderboard: new LeaderboardStore(),
     sockPuppetAlerts: new SockPuppetAlertStore(userStore),
     reaction: new ReactionStore()

@@ -15,8 +15,9 @@ interface PageProps extends RouteComponentProps<any> {}
 
 export function SockPuppetsDashboardPage(props: PageProps) {
   const stores = React.useContext(StoresContext);
+  const authStore = stores.auth;
 
-  const canViewPage = computed(() => stores.user.isLoggedIn && stores.user.currentUser.hasAdminRole);
+  const canViewPage = computed(() => authStore.isLoggedIn && authStore.currentUser.hasAdminRole);
 
   useFetchSockPuppetAlerts([props.location]);
 

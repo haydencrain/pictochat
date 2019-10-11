@@ -8,20 +8,20 @@ import { observer } from 'mobx-react-lite';
 import './CurrentUser.less';
 
 function CurrentUser() {
-  const stores = React.useContext(StoresContext);
-  const isLoading = mobx.computed(() => stores.user.isLoading);
+  const authStore = React.useContext(StoresContext).auth;
+  const isLoading = mobx.computed(() => authStore.isLoading);
 
   const handleLogout = () => {
-    stores.user.logout();
+    authStore.logout();
     location.reload();
   };
 
   const getCard = () => {
-    if (stores.user.isLoading) {
+    if (authStore.isLoading) {
       return <Loader active />;
     }
 
-    if (!stores.user.isLoggedIn) {
+    if (!authStore.isLoggedIn) {
       return (
         <LoginForm
           isLoading={isLoading.get()}
@@ -32,7 +32,7 @@ function CurrentUser() {
       );
     }
 
-    return <ProfileCard user={stores.user.currentUser} isCurrentUser onLogoutClick={handleLogout} />;
+    return <ProfileCard user={authStore.currentUser} isCurrentUser onLogoutClick={handleLogout} />;
   };
 
   return (

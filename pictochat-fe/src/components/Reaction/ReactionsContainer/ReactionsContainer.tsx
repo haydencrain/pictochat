@@ -16,9 +16,9 @@ interface ReactionsProps {
 function ReactionsContainer(props: ReactionsProps) {
   const shouldLoad = props.shouldLoad !== undefined ? props.shouldLoad : false;
   const stores = React.useContext(StoresContext);
-  const userStore = stores.user;
+  const authStore = stores.auth;
   const reactionStore = stores.reaction;
-  const currentUser = stores.user.currentUser;
+  const currentUser = authStore.currentUser;
   const reactionTypeCounts = reactionStore.postReactionNameCounts(props.postId);
 
   const isLoading = useFetchReactionTypeCounts(props.postId, shouldLoad);
@@ -26,7 +26,7 @@ function ReactionsContainer(props: ReactionsProps) {
   //// EVENT HANDLERS ////
 
   const handleReactionLabelClick = React.useCallback((reactionName: string) => {
-    if (!userStore.isLoggedIn) {
+    if (!authStore.isLoggedIn) {
       alert('You must login to add reactions');
       return;
     }
