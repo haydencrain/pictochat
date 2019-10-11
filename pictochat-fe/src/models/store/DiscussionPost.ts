@@ -54,8 +54,8 @@ export interface IDiscussionPost {
 }
 
 /**
- * Creates an mobx ovservable instance of a DiscussionPost, and provides extra methods handling CRUD updates,
- * including communicating to the Discussion Api Services.
+ * Creates an mobx ovservable instance of a DiscussionPost, and provides extra methods for
+ * handling CRUD updates.
  * @class
  */
 export class DiscussionPost implements IDiscussionPost {
