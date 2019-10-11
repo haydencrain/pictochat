@@ -15,21 +15,21 @@ function ThreadsSummaryList(props: ThreadsSummaryListProps) {
   const store = React.useContext(StoresContext).discussion;
 
   React.useEffect(() => {
-    store.getNewThreadSummaries();
+    store.getNewDiscussions();
   }, []);
 
   const shouldLoadMore = computed((): boolean => {
-    return store.threadSummariesHasMore;
+    return store.hasMore;
   });
 
   const handleLoadMore = React.useCallback(() => {
-    store.getMoreThreadSummaries();
+    store.getMoreDiscussions();
   }, []);
 
   return (
     <PostsList
-      isLoading={store.isLoadingThreads}
-      posts={store.threadSummaries}
+      isLoading={store.isLoading}
+      posts={store.discussions}
       postsType={PostTypes.Root}
       noPostsMessage={props.noPostsMessage}
       raised={props.raised}

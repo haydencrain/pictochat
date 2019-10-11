@@ -15,10 +15,10 @@ function PostMainContainer(props: PostMainContainerProps) {
   const activeDiscussionStore = React.useContext(StoresContext).activeDiscussion;
 
   const renderContent = () => {
-    if (activeDiscussionStore.isLoadingActiveDiscussion || !activeDiscussionStore.activeDiscussionPosts.has(id)) {
+    if (activeDiscussionStore.isLoadingRoot || !activeDiscussionStore.postsMap.has(id)) {
       return <Loader active />;
     }
-    const post = activeDiscussionStore.activeDiscussionPosts.get(id);
+    const post = activeDiscussionStore.postsMap.get(id);
     return <PostItem post={post} postType={PostTypes.Main} />;
   };
 

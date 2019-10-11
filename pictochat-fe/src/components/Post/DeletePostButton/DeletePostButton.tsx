@@ -14,7 +14,7 @@ function DeletePostButton(props: DeletePostButtonProps) {
 
   // TODO: pass the handle Delete method up to a higher component in order to increase modularity
   const handleClick = async () => {
-    const post = activeDiscussionStore.activeDiscussionPosts.get(props.postId);
+    const post = activeDiscussionStore.postsMap.get(props.postId);
     const isRoot = post.isRootPost;
     await activeDiscussionStore.deletePost(parseInt(props.postId));
     if (isRoot && !post.isHidden) {

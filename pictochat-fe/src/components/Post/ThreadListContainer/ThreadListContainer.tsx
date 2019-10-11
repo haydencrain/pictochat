@@ -26,18 +26,8 @@ function ThreadListContainer(props: ThreadListContainerProps) {
 
   // If no Id is present, then it's the main threads, otherwise it's the replies
   const isThreadsSummary = !props.id;
-  const activeSort = computed(
-    (): SortValue => {
-      if (isThreadsSummary) {
-        return discussionStore.threadSummariesSort;
-      }
-      return activeDiscussionStore.activeDiscussionSort;
-    }
-  );
-
-  const setSort = isThreadsSummary
-    ? discussionStore.setThreadSummariesSort
-    : activeDiscussionStore.setActiveDiscussionSort;
+  const activeSort = computed((): SortValue => (isThreadsSummary ? discussionStore.sort : activeDiscussionStore.sort));
+  const setSort = isThreadsSummary ? discussionStore.setSort : activeDiscussionStore.setSort;
 
   const handleSortSelect = (sort: SortValue) => {
     setSort(sort);

@@ -19,20 +19,20 @@ function RepliesList(props: RepliesListProps) {
 
   const post = computed(
     (): DiscussionPost => {
-      return store.activeDiscussionPosts.has(postId) ? store.activeDiscussionPosts.get(postId) : new DiscussionPost();
+      return store.postsMap.has(postId) ? store.postsMap.get(postId) : new DiscussionPost();
     }
   );
 
   const hasMore = computed((): boolean => {
-    return store.activeDiscussionPosts.has(postId) ? store.activeDiscussionPosts.get(postId).hasMore : false;
+    return store.postsMap.has(postId) ? store.postsMap.get(postId).hasMore : false;
   });
 
   const posts = computed((): DiscussionPost[] => {
-    return store.activeDiscussionPosts.has(postId) ? store.activeDiscussionPosts.get(postId).replies : [];
+    return store.postsMap.has(postId) ? store.postsMap.get(postId).replies : [];
   });
 
   const isLoading = computed((): boolean => {
-    return store.isLoadingReplies || !store.activeDiscussionPosts.has(postId);
+    return store.isLoadingReplies || !store.postsMap.has(postId);
   });
 
   const handleLoadMore = () => {

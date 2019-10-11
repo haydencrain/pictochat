@@ -15,13 +15,13 @@ interface DiscussionPageProps extends RouteComponentProps<DiscussionPageMatchPar
 
 function DiscussionPage(props: DiscussionPageProps) {
   const stores: IStoresContext = React.useContext(StoresContext);
-  const activeId = computed((): string => stores.activeDiscussion.activeDiscussionRootId);
+  const activeId = computed((): string => stores.activeDiscussion.discussionId);
 
   React.useEffect(() => {
     const activeDiscussionStore = stores.activeDiscussion;
     (async () => {
-      await activeDiscussionStore.setActiveDiscussion(props.match.params.id);
-      const discussionId = activeDiscussionStore.activeDiscussionRoot.discussionId;
+      await activeDiscussionStore.setDiscussion(props.match.params.id);
+      const discussionId = activeDiscussionStore.discussion.discussionId;
       stores.reaction.loadThreadReactions(discussionId);
     })();
   }, [props.match.params.id]);

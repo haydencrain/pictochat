@@ -33,7 +33,7 @@ function CreatePostModal(props: CreatePostModalProps) {
         image: image
       };
       if (!data.parentPostId) {
-        discussionStore.createThread(data);
+        discussionStore.createDiscussion(data);
       } else {
         activeDiscussionStore.createReply(data);
       }

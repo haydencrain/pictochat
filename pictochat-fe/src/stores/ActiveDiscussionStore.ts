@@ -14,13 +14,13 @@ const { PAGINATION_LIMIT } = config.discussion;
  */
 export default class ActiveDiscussionStore {
   discussionStore: DiscussionStore;
-  @observable activeDiscussionSort: SortValue = SortTypes.NEW;
-  @observable activeDiscussionRootId: string;
-  @observable activeDiscussionRoot: DiscussionPost = new DiscussionPost();
-  @observable activeDiscussionPosts: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
-    observable.map(undefined, { name: 'activeDiscussionPosts' })
+  @observable sort: SortValue = SortTypes.NEW;
+  @observable discussionId: string;
+  @observable discussion: DiscussionPost = new DiscussionPost();
+  @observable postsMap: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
+    observable.map(undefined, { name: 'postsMap' })
   );
-  @observable isLoadingActiveDiscussion = false;
+  @observable isLoadingRoot = false;
   @observable isLoadingReplies = false;
 
   constructor(discussionStore: DiscussionStore) {
@@ -28,27 +28,27 @@ export default class ActiveDiscussionStore {
   }
 
   @action.bound
-  setActiveDiscussionSort(sort: SortValue) {
-    this.activeDiscussionSort = sort;
-    this.getNewReplies(this.activeDiscussionRootId);
+  setSort(sort: SortValue) {
+    this.sort = sort;
+    this.getNewReplies(this.discussionId);
   }
 
   @action.bound
-  async setActiveDiscussion(postId: string) {
-    this.isLoadingActiveDiscussion = true;
+  async setDiscussion(postId: string) {
+    this.isLoadingRoot = true;
     this.isLoadingReplies = true;
-    this.activeDiscussionRoot.clear();
-    this.activeDiscussionPosts.clear();
+    this.discussion.clear();
+    this.postsMap.clear();
     try {
-      let postJson = await DiscussionService.getPost(postId, this.activeDiscussionSort, PAGINATION_LIMIT);
+      let postJson = await DiscussionService.getPost(postId, this.sort, PAGINATION_LIMIT);
       runInAction(() => {
         let post = this.parseJsonTree(postJson);
-        this.activeDiscussionRootId = postId;
-        this.activeDiscussionRoot.replace(post);
+        this.discussionId = postId;
+        this.discussion.replace(post);
       });
     } finally {
       runInAction(() => {
-        this.isLoadingActiveDiscussion = false;
+        this.isLoadingRoot = false;
         this.isLoadingReplies = false;
       });
     }
@@ -57,9 +57,9 @@ export default class ActiveDiscussionStore {
   @action.bound
   async getNewReplies(postId: string) {
     this.isLoadingReplies = true;
-    this.activeDiscussionPosts.clear();
+    this.postsMap.clear();
     try {
-      let postJson = await DiscussionService.getPost(postId, this.activeDiscussionSort, PAGINATION_LIMIT);
+      let postJson = await DiscussionService.getPost(postId, this.sort, PAGINATION_LIMIT);
       runInAction(() => {
         this.parseJsonTree(postJson);
       });
@@ -74,15 +74,10 @@ export default class ActiveDiscussionStore {
   async getExtraReplies(parentPostId: string, after?: string) {
     this.isLoadingReplies = true;
     try {
-      const postJson = await DiscussionService.getPost(
-        parentPostId,
-        this.activeDiscussionSort,
-        PAGINATION_LIMIT,
-        after
-      );
+      const postJson = await DiscussionService.getPost(parentPostId, this.sort, PAGINATION_LIMIT, after);
       runInAction(() => {
         let replies: DiscussionPost[] = postJson.replies.map(post => this.parseJsonTree(post));
-        const post = this.activeDiscussionPosts.get(postJson.postId);
+        const post = this.postsMap.get(postJson.postId);
         post.hasMore = postJson.hasMore;
         post.addReplies(replies);
       });
@@ -93,7 +88,7 @@ export default class ActiveDiscussionStore {
 
   @action.bound
   async deletePost(postId: number) {
-    this.isLoadingActiveDiscussion = true;
+    this.isLoadingRoot = true;
     this.isLoadingReplies = true;
     try {
       let postJson: IDiscussionPost = await DiscussionService.deletePost(postId);
@@ -104,21 +99,21 @@ export default class ActiveDiscussionStore {
         this.putPostInActiveMap(post);
       } else {
         // Post was deleted
-        const post = this.activeDiscussionPosts.get(postId);
-        if (this.activeDiscussionPosts.has(post.parentPostId)) {
-          const parent = this.activeDiscussionPosts.get(post.parentPostId);
+        const post = this.postsMap.get(postId);
+        if (this.postsMap.has(post.parentPostId)) {
+          const parent = this.postsMap.get(post.parentPostId);
           parent.removeReply(post);
         }
 
-        this.activeDiscussionPosts.delete(post.postId);
+        this.postsMap.delete(post.postId);
 
-        if (parseInt(this.activeDiscussionRoot.postId) === postId) {
-          this.activeDiscussionRoot.clear();
+        if (parseInt(this.discussion.postId) === postId) {
+          this.discussion.clear();
         }
       }
     } finally {
       runInAction(() => {
-        this.isLoadingActiveDiscussion = false;
+        this.isLoadingRoot = false;
         this.isLoadingReplies = false;
       });
     }
@@ -126,7 +121,7 @@ export default class ActiveDiscussionStore {
 
   @action.bound
   async updatePostImage(postId: number, image: File) {
-    this.isLoadingActiveDiscussion = true;
+    this.isLoadingRoot = true;
     try {
       const postJson = await DiscussionService.updatePost({ postId, image });
       const post = new DiscussionPost(postJson);
@@ -134,7 +129,7 @@ export default class ActiveDiscussionStore {
         this.putPostInActiveMap(post);
       });
     } finally {
-      runInAction(() => (this.isLoadingActiveDiscussion = false));
+      runInAction(() => (this.isLoadingRoot = false));
     }
   }
 
@@ -147,8 +142,8 @@ export default class ActiveDiscussionStore {
         this.putPostInActiveMap(reply);
         this.discussionStore.updateCommentCount(reply);
         // Update local copy of parent
-        if (this.activeDiscussionPosts.has(reply.parentPostId)) {
-          this.activeDiscussionPosts.get(reply.parentPostId).replies.push(reply);
+        if (this.postsMap.has(reply.parentPostId)) {
+          this.postsMap.get(reply.parentPostId).replies.push(reply);
         }
       });
       return new DiscussionPost(reply);
@@ -174,10 +169,10 @@ export default class ActiveDiscussionStore {
 
   @action.bound
   private putPostInActiveMap(post: DiscussionPost) {
-    if (this.activeDiscussionPosts.has(post.postId)) {
-      this.activeDiscussionPosts.get(post.postId).replace(post);
+    if (this.postsMap.has(post.postId)) {
+      this.postsMap.get(post.postId).replace(post);
     } else {
-      this.activeDiscussionPosts.set(post.postId, post);
+      this.postsMap.set(post.postId, post);
     }
   }
 }
