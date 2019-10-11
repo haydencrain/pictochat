@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Loader, Item, Button, Segment } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
-import { RouteComponentProps } from 'react-router';
 import StoresContext from '../../contexts/StoresContext';
 import { computed } from 'mobx';
 import ContentReportService from '../../services/ContentReportService';
@@ -12,9 +11,10 @@ import Unauthorised from '../../components/Layout/Unauthorised';
 import DiscussionService from '../../services/DiscussionService';
 import './ReportsPage.less';
 
-interface PageProps extends RouteComponentProps<any> {}
-
-function ReportsPage(props: PageProps) {
+/**
+ * A React component that renders the Reports Page
+ */
+function ReportsPage(props: {}) {
   const authStore = React.useContext(StoresContext).auth;
   const canViewPage = computed(() => authStore.isLoggedIn && authStore.currentUser.hasAdminRole);
   const [reports, setReports] = React.useState<IDiscussionPost[]>();

@@ -149,6 +149,7 @@ export class DiscussionPost implements IDiscussionPost {
   /**
    * Creates a new instance from a JSON representation of this class
    * @param { IDiscussionPost } post - A JSON representation of this class
+   * @returns A new instance of DiscussionPost
    */
   static fromJSON(post: IDiscussionPost): DiscussionPost {
     if (post.replies !== null || post.replies !== undefined) {

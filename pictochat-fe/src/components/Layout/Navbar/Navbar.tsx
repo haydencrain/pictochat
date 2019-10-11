@@ -4,6 +4,7 @@ import './Navbar.less';
 
 /**
  * A React component that renders the navigation bar of the application
+ * @component
  */
 export default (props: {}) => (
   <nav id="navbar">

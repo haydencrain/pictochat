@@ -8,6 +8,7 @@ import './QuickLinks.less';
 
 /**
  * React component that supplies links to important routes within the application
+ * @component
  * @param props (RouteComponentProps)
  */
 function QuickLinks(props: RouteComponentProps<{}>) {

@@ -1,18 +1,27 @@
 import * as React from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
+import { computed } from 'mobx';
 import { Observer } from 'mobx-react';
+import { RouteComponentProps, withRouter } from 'react-router';
 import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
 import ThreadListContainer from '../../components/Post/ThreadListContainer';
-import { computed } from 'mobx';
 import PostMainContainer from '../../components/Post/PostMainContainer';
 import './DiscussionPage.less';
 
 interface DiscussionPageMatchParams {
+  /**
+   * The id of the discussion, from the url route params
+   */
   id: string;
 }
 
 interface DiscussionPageProps extends RouteComponentProps<DiscussionPageMatchParams> {}
 
+/**
+ * A React component that fetches the currently selected discussion (by access the url's route parameters) and rendering
+ * Page layout for the discussion
+ * @component
+ * @param { DiscussionPageProps } props - The props of the component
+ */
 function DiscussionPage(props: DiscussionPageProps) {
   const stores: IStoresContext = React.useContext(StoresContext);
   const activeId = computed((): string => stores.activeDiscussion.discussionId);
@@ -24,7 +33,10 @@ function DiscussionPage(props: DiscussionPageProps) {
       const discussionId = activeDiscussionStore.discussion.discussionId;
       stores.reaction.loadThreadReactions(discussionId);
     })();
-  }, [props.match.params.id]);
+  }, [
+    /* The component should refetch new data every time the id route parameter changes */
+    props.match.params.id
+  ]);
 
   return (
     <section id="discussion-page">
