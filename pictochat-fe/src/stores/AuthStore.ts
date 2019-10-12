@@ -3,9 +3,26 @@ import { User } from '../models/store/User';
 import UserService from '../services/UserService';
 import UnauthenticatedUser from '../models/UnauthenticatedUser';
 
+interface IAuthStore {
+  /**
+   * The currently logged in users
+   */
+  currentUser: User;
+  /**
+   * Set to true if the current user is in the process of logging in or logging out
+   */
+  isLoading: boolean;
+  /**
+   * Whether the current user is logged in successfully (aka whether a current user is present within the store)
+   */
+  isLoggedIn: boolean;
+}
+
 /**
- * Stores the currently logged in user */
-export default class AuthStore {
+ * Creates a new observable instance, which stores and coordinates updates for the currently logged in user
+ * @class
+ */
+export default class AuthStore implements IAuthStore {
   @observable currentUser: User = new User();
   @observable isLoading: boolean = true;
   @observable isLoggedIn: boolean = false;
@@ -16,6 +33,10 @@ export default class AuthStore {
     });
   }
 
+  /**
+   * Automatically fetches the current user if one is already logged in
+   * @function
+   */
   @action.bound
   async init() {
     this.isLoading = true;
@@ -34,6 +55,11 @@ export default class AuthStore {
     }
   }
 
+  /**
+   * Handles registration of a new user, and logs them in as the current user
+   * @function
+   * @param userJson - The registration data
+   */
   @action.bound
   async createUserAndAuth(userJson: UnauthenticatedUser): Promise<User> {
     this.isLoading = true;
@@ -52,6 +78,10 @@ export default class AuthStore {
     }
   }
 
+  /**
+   * Handles authentication and logging in of a user
+   * @param userCredentials - The login details of the user to authenticate
+   */
   @action.bound
   async authAndLoadCurrentUser(userCredentials: UnauthenticatedUser) {
     this.isLoading = true;
@@ -71,6 +101,10 @@ export default class AuthStore {
     }
   }
 
+  /**
+   * Removes the current user (logs out)
+   * @function
+   */
   @action.bound
   async logout() {
     this.isLoading = true;
@@ -83,6 +117,10 @@ export default class AuthStore {
     }
   }
 
+  /**
+   * Sets the current user
+   * @param user - The new user to set
+   */
   @action.bound
   private setCurrentUser(user: User) {
     this.currentUser.replace(user);

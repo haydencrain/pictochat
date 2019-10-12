@@ -1,4 +1,4 @@
-import { observable, computed, action, runInAction, IObservableValue, observe, spy, ObservableMap } from 'mobx';
+import { observable, action, runInAction } from 'mobx';
 import ObservableIntMap from '../utils/ObserableIntMap';
 import { DiscussionPost, IDiscussionPost } from '../models/store/DiscussionPost';
 import DiscussionService from '../services/DiscussionService';
@@ -7,15 +7,49 @@ import { SortTypes, SortValue } from '../models/SortTypes';
 import config from '../config';
 import DiscussionStore from './DiscussionStore';
 
+interface IActiveDiscussionStore {
+  /**
+   * We need access to DiscussionStore so that we are able to update the comment count of the root discussion
+   */
+  discussionStore: DiscussionStore;
+  /**
+   * The currently active sort for the active discussion's replies
+   */
+  sort: SortValue;
+  /**
+   * The currently active discussion's id
+   */
+  postId: string;
+  /**
+   * The currently active discussion
+   */
+  discussion: DiscussionPost;
+  /**
+   * A map of all posts related to the active discussion. This map also includes the active discussion's post as well.
+   */
+  postsMap: ObservableIntMap<DiscussionPost>;
+  /**
+   * This will be true if the Store is currently in tne process of fetching the active discussion.
+   */
+  isLoadingRoot: boolean;
+  /**
+   * This will be true if the Store is currently in tne process of fetching the active discussion's replies.
+   */
+  isLoadingReplies: boolean;
+}
+
 const { PAGINATION_LIMIT } = config.discussion;
 
 /**
- * Coordinates updates to discussion data
+ * Creates an observable instance that coordinates updates to discussion data.
+ * For example, When a user access a route such as `/dicussion/23`, it will handle fetching the discussion postwith an id of '23',
+ * and also fetch its replies
+ * @class
  */
-export default class ActiveDiscussionStore {
+export default class ActiveDiscussionStore implements IActiveDiscussionStore {
   discussionStore: DiscussionStore;
   @observable sort: SortValue = SortTypes.NEW;
-  @observable discussionId: string;
+  @observable postId: string;
   @observable discussion: DiscussionPost = new DiscussionPost();
   @observable postsMap: ObservableIntMap<DiscussionPost> = new ObservableIntMap(
     observable.map(undefined, { name: 'postsMap' })
@@ -27,12 +61,22 @@ export default class ActiveDiscussionStore {
     this.discussionStore = discussionStore;
   }
 
+  /**
+   * Sets the currently active sort, and then re-fetches the replies list
+   * @function
+   * @param sort - The new sort to use
+   */
   @action.bound
   setSort(sort: SortValue) {
     this.sort = sort;
-    this.getNewReplies(this.discussionId);
+    this.getNewReplies(this.postId);
   }
 
+  /**
+   * Sets a new active discussion
+   * @tunction
+   * @param postId - The id of the new post
+   */
   @action.bound
   async setDiscussion(postId: string) {
     this.isLoadingRoot = true;
@@ -43,7 +87,7 @@ export default class ActiveDiscussionStore {
       let postJson = await DiscussionService.getPost(postId, this.sort, PAGINATION_LIMIT);
       runInAction(() => {
         let post = this.parseJsonTree(postJson);
-        this.discussionId = postId;
+        this.postId = postId;
         this.discussion.replace(post);
       });
     } finally {
@@ -54,6 +98,11 @@ export default class ActiveDiscussionStore {
     }
   }
 
+  /**
+   * Fetches a new replies list
+   * @function
+   * @param postId - The id of the post to fetch the replies from
+   */
   @action.bound
   async getNewReplies(postId: string) {
     this.isLoadingReplies = true;
@@ -70,6 +119,12 @@ export default class ActiveDiscussionStore {
     }
   }
 
+  /**
+   * Gets more replies
+   * @function
+   * @param parentPostId - The id of the post fetch the replies from
+   * @param after - The post id where the extra replies should start from
+   */
   @action.bound
   async getExtraReplies(parentPostId: string, after?: string) {
     this.isLoadingReplies = true;
@@ -86,6 +141,11 @@ export default class ActiveDiscussionStore {
     }
   }
 
+  /**
+   * Deletes a post
+   * @function
+   * @param postId - The id of the post to delete
+   */
   @action.bound
   async deletePost(postId: number) {
     this.isLoadingRoot = true;
@@ -119,6 +179,12 @@ export default class ActiveDiscussionStore {
     }
   }
 
+  /**
+   * Updates a Post with a new image
+   * @function
+   * @param postId - The id of the post to update
+   * @param image - The image file to update the post with
+   */
   @action.bound
   async updatePostImage(postId: number, image: File) {
     this.isLoadingRoot = true;
@@ -133,6 +199,11 @@ export default class ActiveDiscussionStore {
     }
   }
 
+  /**
+   * Creates a new reply, and adds it to the map
+   * @function
+   * @param post - The mew post to create
+   */
   @action.bound
   async createReply(post: NewPostPayload): Promise<DiscussionPost> {
     this.isLoadingReplies = true;
