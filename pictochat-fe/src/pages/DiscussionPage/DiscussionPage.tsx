@@ -24,7 +24,7 @@ interface DiscussionPageProps extends RouteComponentProps<DiscussionPageMatchPar
  */
 function DiscussionPage(props: DiscussionPageProps) {
   const stores: IStoresContext = React.useContext(StoresContext);
-  const activeId = computed((): string => stores.activeDiscussion.discussionId);
+  const activeId = computed((): string => stores.activeDiscussion.postId);
 
   React.useEffect(() => {
     const activeDiscussionStore = stores.activeDiscussion;

@@ -4,7 +4,22 @@ import { ApiService } from '../services/ApiService';
 import UserStore from './UserStore';
 import { User } from '../models/store/User';
 
-export class SockPuppetAlertStore {
+interface ISockPuppetAlertStore {
+  /**
+   * Stores the list of users for each Sock puppet alert
+   */
+  userStore: UserStore;
+  /**
+   * Set to true if Sock puppets are currently fetching
+   */
+  isLoading: boolean;
+  /**
+   * Stores the lsit of sock puppet alerts
+   */
+  alertMap: ObservableMap<any, SockPuppetAlert>;
+}
+
+export class SockPuppetAlertStore implements ISockPuppetAlertStore {
   userStore: UserStore;
   @observable isLoading: boolean = false;
   @observable alertMap: ObservableMap<any, SockPuppetAlert> = observable.map(undefined, { name: 'alertMap' });

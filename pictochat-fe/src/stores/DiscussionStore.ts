@@ -1,5 +1,4 @@
-import { observable, computed, action, runInAction, IObservableValue, observe, spy, ObservableMap } from 'mobx';
-import ObservableIntMap from '../utils/ObserableIntMap';
+import { observable, computed, action, runInAction, ObservableMap } from 'mobx';
 import { DiscussionPost, IDiscussionPost } from '../models/store/DiscussionPost';
 import DiscussionService from '../services/DiscussionService';
 import NewPostPayload from '../models/NewPostPayload';
@@ -7,12 +6,36 @@ import PaginationResult from '../models/PaginationResult';
 import { SortTypes, SortValue } from '../models/SortTypes';
 import config from '../config';
 
+interface IDiscussionStore {
+  /**
+   * The currently active sort for the active discussion list
+   */
+  sort: SortValue;
+  /**
+   * Whether there is still more discussions to load
+   */
+  hasMore: boolean;
+  /**
+   * The index to next start the fetching of discussions from
+   */
+  nextStart: number;
+  /**
+   * A map which stores of all of the currently fetched discussions
+   */
+  discussionsMap: ObservableMap<any, DiscussionPost>;
+  /**
+   * Set to true if the store is currently performing an API request to fetch or update discussion data
+   */
+  isLoading: boolean;
+}
+
 const { PAGINATION_LIMIT } = config.discussion;
 
 /**
- * Coordinates updates to discussion data
+ * Creates an observable instance which coordinates updates to discussion data
+ * @class
  */
-export default class DiscussionStore {
+export default class DiscussionStore implements IDiscussionStore {
   @observable sort: SortValue = SortTypes.NEW;
   @observable hasMore = true;
   @observable nextStart = 0;
@@ -21,12 +44,21 @@ export default class DiscussionStore {
   });
   @observable isLoading = false;
 
+  /**
+   * Sets the currently active sort, and then re-fetches the discussion
+   * @function
+   * @param sort - The new sort to use
+   */
   @action.bound
   setSort(sort: SortValue) {
     this.sort = sort;
     this.getNewDiscussions();
   }
 
+  /**
+   * Fetches a new list of discussions
+   * @function
+   */
   @action.bound
   async getNewDiscussions() {
     this.isLoading = true;
@@ -43,6 +75,10 @@ export default class DiscussionStore {
     });
   }
 
+  /**
+   * Uses the `nextStart` field to fetch more discussions after a specific index
+   * @function
+   */
   @action.bound
   async getMoreDiscussions() {
     this.isLoading = true;
@@ -53,6 +89,10 @@ export default class DiscussionStore {
     });
   }
 
+  /**
+   * Adds the fetch discussions result to update the store's fields and discussion map
+   * @param paginationResult - The result retrieved from the api
+   */
   @action.bound
   setDiscussions(paginationResult: PaginationResult<IDiscussionPost>) {
     paginationResult.results.forEach(postJson => {
@@ -62,11 +102,20 @@ export default class DiscussionStore {
     this.nextStart = paginationResult.nextStart;
   }
 
+  /**
+   * Gets the current discussions list
+   * @function
+   * @returns An array of Discussions from the map
+   */
   @computed
   get discussions(): DiscussionPost[] {
     return Array.from(this.discussionsMap.values());
   }
 
+  /**
+   * Creates a new Discussion Post
+   * @param post The new post to create a discussion for
+   */
   @action.bound
   async createDiscussion(post: NewPostPayload): Promise<DiscussionPost> {
     try {
@@ -80,6 +129,10 @@ export default class DiscussionStore {
     }
   }
 
+  /**
+   * Increments the comment count if the discussion is present in the map
+   * @param reply - The post to update the count for
+   */
   @action.bound
   updateCommentCount(reply: DiscussionPost): void {
     // Update thread summary

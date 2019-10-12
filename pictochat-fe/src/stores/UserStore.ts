@@ -3,10 +3,19 @@ import { User } from '../models/store/User';
 import UserService from '../services/UserService';
 import { computedFn } from 'mobx-utils';
 
-export default class UserStore {
+interface IUserStore {
+  /**
+   * Set to true if the store is currently loading or updating users
+   */
+  isLoading: boolean;
+  /**
+   * This is used a generic cache if any UI elements need to incorporate data about users other than the one currently logged in
+   */
+  userMap: ObservableMap<any, User>;
+}
+
+export default class UserStore implements IUserStore {
   @observable isLoading: boolean = true;
-  // This is used a generic cache if any UI elements need to incorporate
-  // data about users other than the one currently logged in
   @observable userMap: ObservableMap<any, User> = observable.map(undefined, { name: 'users' });
 
   constructor() {}
