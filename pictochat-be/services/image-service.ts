@@ -5,7 +5,6 @@ import { Transaction } from 'sequelize/types';
 import config from '../utils/config';
 
 // TEST DATA
-
 const getRandDogUrl = () => `https://placedog.net/600?random&id=${Math.floor(Math.random() * 20) + 1}`;
 const IMAGES = {
   '1': getRandDogUrl(),
@@ -21,7 +20,6 @@ const IMAGES = {
 };
 
 // HELPER INTERFACES
-
 export interface NewImage {
   data: Buffer;
   encoding: string;
