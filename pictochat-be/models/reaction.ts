@@ -22,60 +22,6 @@ export class Reaction extends Model {
     return json;
   }
 
-  static async getReactions(postId: number, userId: number): Promise<Reaction[]> {
-    return Reaction.findAll({
-      attributes: {
-        include: Reaction.PUBLIC_ATTRIBUTES
-      },
-      where: { postId, userId }
-    });
-  }
-
-  static async getReactionsByDiscussion(discussionId: number): Promise<Reaction[]> {
-    const discussionJoin = {
-      model: DiscussionPost,
-      as: 'post',
-      required: true,
-      // attributes: ['postId', 'discussionId'],
-      where: {...DiscussionPost.defaultFilter(), ...{discussionId}}
-    };
-    return Reaction.findAll({
-      attributes: Reaction.PUBLIC_ATTRIBUTES,
-      include: [discussionJoin]
-    });
-  }
-
-  static async getReactionsByPost(postId: number): Promise<Reaction[]> {
-    return Reaction.findAll({
-      attributes: {
-        include: Reaction.PUBLIC_ATTRIBUTES
-      },
-      where: { postId }
-    });
-  }
-
-  static async getReactionsByUser(userId: number): Promise<Reaction[]> {
-    return Reaction.findAll({
-      attributes: {
-        include: Reaction.PUBLIC_ATTRIBUTES
-      },
-      where: { userId }
-    });
-  }
-
-  static async createReaction(reactionName: string, postId: number, userId: number): Promise<Reaction> {
-    return await Reaction.create({ reactionName, postId, userId });
-  }
-
-  // static async removeReaction(reactionName: string, postId: number, userId: number) {
-  //   return Reaction.destroy({
-  //     where: {
-  //       reactionName,
-  //       postId,
-  //       userId
-  //     }
-  //   });
-  // }
 }
 
 Reaction.init(
@@ -97,5 +43,5 @@ Reaction.init(
   }
 );
 
-Reaction.belongsTo(DiscussionPost, {as: 'post', targetKey: 'postId', foreignKey: 'postId', constraints: true});
-Reaction.belongsTo(User, {as: 'user', targetKey: 'userId', foreignKey: 'userId', constraints: true});
+Reaction.belongsTo(DiscussionPost, { as: 'post', targetKey: 'postId', foreignKey: 'postId', constraints: true });
+Reaction.belongsTo(User, { as: 'user', targetKey: 'userId', foreignKey: 'userId', constraints: true });

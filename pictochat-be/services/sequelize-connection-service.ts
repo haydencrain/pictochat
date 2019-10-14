@@ -25,7 +25,7 @@ export class SequelizeConnectionService {
   ): Sequelize {
     if (SequelizeConnectionService.instance === null) {
       console.log('Creating Sequelize instance');
-      // Setting the CLS allows transactions to auto passed through to all queries within
+      // Setting the CLS makes transactions automatically apply to all queries within
       // a sequelize.transaction(...) callback
       const namespace = createNamespace('pictochat');
       Sequelize.useCLS(namespace);

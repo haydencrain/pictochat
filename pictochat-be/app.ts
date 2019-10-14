@@ -12,11 +12,9 @@ import { SequelizeConnectionService } from './services/sequelize-connection-serv
 import { loadTestData } from './utils/load-test-data';
 import { createAdminUser } from './utils/create-admin-user';
 import { initialisePassport } from './middleware/passport-middleware';
-import * as ErrorUtils from './exceptions/error-utils';
-import { ForbiddenError } from './exceptions/forbidden-error';
 import { NotFoundError } from './exceptions/not-found-error';
-import { UnprocessableError } from './exceptions/unprocessable-error';
 import config from './utils/config';
+import { handleErrorMiddleware } from './middleware/handleErrorMiddleware';
 
 // CONSTANTS
 const PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;
@@ -80,34 +78,13 @@ app.use('*', (req, res, next) => {
 });
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+app.use(function (req, res, next) {
+  next(new NotFoundError());
+  // next(createError(404));
 });
 
 /// ERROR HANDLERS ///
 
-app.use((error, req, res, next) => {
-  if (!!error.errorType) {
-    switch (error.errorType) {
-      case ForbiddenError.ERROR_TYPE:
-        return res.status(403).json(error);
-      case NotFoundError.ERROR_TYPE:
-        return res.status(404).json(error);
-      case UnprocessableError.ERROR_TYPE:
-        return res.status(422).json(error);
-    }
-  }
-  next(error);
-});
-
-// app.use(function (err, req, res, next) {
-//   // set locals, only providing error in development
-//   res.locals.message = err.message;
-//   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-//   // render the error page
-//   res.status(err.status || 500);
-//   res.render('error');
-// });
+app.use(handleErrorMiddleware);
 
 app.listen(PORT, () => console.log(`Pictochat server is listening on ${PORT}`));

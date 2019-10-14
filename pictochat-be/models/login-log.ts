@@ -4,7 +4,13 @@ import { User } from './user';
 
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
-export class LoginLog extends Model {
+export interface ILoginLog {
+  userId: number;
+  loginTimestamp: Date;
+  deviceId: string;
+}
+
+export class LoginLog extends Model implements ILoginLog {
   userId: number;
   loginTimestamp: Date;
   deviceId: string;
@@ -12,10 +18,10 @@ export class LoginLog extends Model {
 
 LoginLog.init(
   {
-    _id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    userId: {type: DataTypes.INTEGER},
-    loginTimestamp: {type: DataTypes.DATE},
-    deviceId: {type: DataTypes.STRING}
+    _id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    userId: { type: DataTypes.INTEGER },
+    loginTimestamp: { type: DataTypes.DATE },
+    deviceId: { type: DataTypes.STRING }
   },
   {
     sequelize,

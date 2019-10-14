@@ -16,8 +16,6 @@ import { SequelizeConnectionService } from '../services/sequelize-connection-ser
 import { PaginationOptions } from '../utils/pagination-types';
 import { UnprocessableError } from '../exceptions/unprocessable-error';
 
-const AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR';
-
 // This will temporarily store images in a local staging directory on the API server
 const imageStager = multer({ dest: config.IMAGE_STAGING_DIR });
 
@@ -101,12 +99,7 @@ postRouter.patch(
   async (req: any, res, next) => {
     try {
       let newImageSpec = await makeNewImageSpec(req.file);
-      let postUpdateSpec = {
-        image: newImageSpec,
-        postId: req.body.postId,
-        userId: req.user.userId
-      };
-      let post: DiscussionPost = await DiscussionService.updatePost(postUpdateSpec);
+      let post: DiscussionPost = await DiscussionService.updatePost(req.user.userId, req.body.postId, newImageSpec);
       // Return full tree under updated post so that clients only have to deal with one
       // data structure for all methods.
       let postTree = await DiscussionService.getReplyTreeUnderPost(post.postId);
@@ -184,12 +177,7 @@ async function handleNewReplyPOST(req, res, next) {
   try {
     assertIsPostAuthor(req.body, req.user);
     let newImageSpec = await makeNewImageSpec(req.file);
-    let newReplySpec = {
-      image: newImageSpec,
-      parentPostId: req.body.parentPostId,
-      userId: req.body.userId
-    };
-    let post = await DiscussionService.createReply(newReplySpec);
+    let post = await DiscussionService.createReply(req.body.userId, req.body.parentPostId, newImageSpec);
     // Setting Location and using status 201 to match RESTful conventions for POST responses
     res.set('Location', `${config.API_ROOT}/post/${post.postId}`);
     res.status(201);
@@ -203,8 +191,8 @@ async function handleNewThreadPOST(req, res, next) {
   try {
     assertIsPostAuthor(req.body, req.user);
     let newImageSpec = await makeNewImageSpec(req.file);
-    let newThreadSpec = { image: newImageSpec, userId: req.body.userId };
-    let thread = await DiscussionService.createThread(newThreadSpec);
+    // let newThreadSpec = { image: newImageSpec, userId: req.body.userId };
+    let thread = await DiscussionService.createThread(req.body.userId, newImageSpec);
     // Setting Location and using status 201 to match RESTful conventions for POST responses
     res.set('Location', `${config.API_ROOT}/post/${thread.rootPost.postId}`);
     res.status(201);

@@ -1,17 +1,15 @@
 import express from 'express';
-import config from '../utils/config';
 import { ReactionService } from '../services/reaction-service';
 import { Reaction } from '../models/reaction';
-import { userRouter } from './users-route';
 import { UnprocessableError } from '../exceptions/unprocessable-error';
 import passport from 'passport';
 import { strategies } from '../middleware/passport-middleware';
-import { User } from '../models/user';
-import { Sequelize } from 'sequelize/types';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { ForbiddenError } from '../exceptions/forbidden-error';
 import { NotFoundError } from '../exceptions/not-found-error';
-import { DiscussionPost } from '../models/discussion-post';
+import { ReactionRepo } from '../repositories/reaction-repo';
+import { UserRepo } from '../repositories/user-repo';
+import { DiscussionPostRepo } from '../repositories/discussion-post-repo';
 
 export const reactionRouter = express.Router();
 
@@ -25,7 +23,7 @@ reactionRouter.get('/', async (req, res, next) => {
       return res.json(reactionUser);
     } else if (req.query.by === 'DISCUSSION') {
       if (!req.query.discussionId) throw new UnprocessableError('missing discussionId query param');
-      let reactions = await Reaction.getReactionsByDiscussion(req.query.discussionId);
+      let reactions = await ReactionRepo.getReactionsByDiscussion(req.query.discussionId);
       let reactionsJson = reactions.map(react => react.toJSON());
       res.json(reactionsJson);
     } else {
@@ -61,7 +59,7 @@ reactionRouter.delete('/:reactionId',
       // FIXME: Move into reaction service
       const sequelize = SequelizeConnectionService.getInstance();
       await sequelize.transaction(async (transaction) => {
-        const requestingUser = await User.getUser(req.user.userId);
+        const requestingUser = await UserRepo.getUser(req.user.userId);
 
         const reaction = await Reaction.findOne({ where: { reactionId: req.params.reactionId } });
         if (reaction === null) throw new NotFoundError();
@@ -69,7 +67,7 @@ reactionRouter.delete('/:reactionId',
         if (requestingUser.userId !== reaction.userId) throw new ForbiddenError();
 
         await reaction.destroy();
-        await DiscussionPost.decrementReactionsCount(reaction.postId);
+        await DiscussionPostRepo.decrementReactionsCount(reaction.postId);
       });
       res.status(204);
       res.end();

@@ -1,18 +1,18 @@
-import { Model, DataTypes } from 'sequelize';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
-import { DiscussionPost } from './discussion-post';
+// import { Model, DataTypes } from 'sequelize';
+// import { SequelizeConnectionService } from '../services/sequelize-connection-service';
+// import { DiscussionPost } from './discussion-post';
 
-export class ContentReport {
-  post: DiscussionPost;
+// export class ContentReport {
+//   post: DiscussionPost;
 
-  constructor(post: DiscussionPost) {
-    this.post = post;
-  }
+//   constructor(post: DiscussionPost) {
+//     this.post = post;
+//   }
 
-  toJSON(): any {
-    // return { postId: this.post.postId, hasInappropriateFlag: this.post.hasInappropriateFlag };
-  }
-}
+//   toJSON(): any {
+//     // return { postId: this.post.postId, hasInappropriateFlag: this.post.hasInappropriateFlag };
+//   }
+// }
 
 // const sequelize = SequelizeConnectionService.getInstance();
 

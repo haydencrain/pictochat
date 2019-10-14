@@ -23,22 +23,6 @@ export class Image extends Model {
     let timestamp: string = DateUtils.timestamp(this.getDataValue('uploadedDate'));
     return `${hash}-${timestamp}`;
   }
-
-  // STATIC/COLLECTION METHODS
-
-  static async getImage(imageId: string, options: FindOptions = {}): Promise<Image> {
-    options = { attributes: Image.PUBLIC_ATTRIBUTES, ...options };
-    options['where'] = { ...(options['where'] || {}), imageId };
-    return await Image.findOne(options);
-  }
-
-  /**
-   * Create a new image without persisting it. */
-  static buildImage(attrs: { data: Buffer, encoding: string, uploadedDate: Date }): Image {
-    let image: Image = Image.build(attrs);
-    image.setDataValue('imageId', image.computeImageId());
-    return image;
-  }
 }
 
 Image.init(
