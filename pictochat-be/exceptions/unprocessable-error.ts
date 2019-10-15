@@ -1,3 +1,7 @@
+/**
+ * Throws an `UnprocessableError` when a request cannot be processed
+ * @class
+ */
 export class UnprocessableError {
   static readonly ERROR_TYPE = 'UNPROCESSABLE_ERROR';
   static readonly DEFAULT_MESSAGE = 'Unable to process request';

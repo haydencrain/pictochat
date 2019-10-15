@@ -1,3 +1,7 @@
+/**
+ * Throws a `ForbiddenError` when an account cannot be authenticated
+ * @class
+ */
 export class ForbiddenError {
   static readonly ERROR_TYPE = 'AUTHENTICATION_ERROR';
   static readonly DEFAULT_MESSAGE = 'Request Unauthorised';
