@@ -14,7 +14,7 @@ export class LeaderboardRank {
 
   toJSON(): any {
     let json = {
-      user: this.user.toJSON(),
+      user: this.user.getPublicJSON(),
       rank: this.rank,
       postCount: this.postCount
     };

@@ -14,7 +14,7 @@ import { createAdminUser } from './utils/create-admin-user';
 import { initialisePassport } from './middleware/passport-middleware';
 import { NotFoundError } from './exceptions/not-found-error';
 import config from './utils/config';
-import { handleErrorMiddleware } from './middleware/handleErrorMiddleware';
+import { handleErrorMiddleware } from './middleware/handle-error-middleware';
 
 // CONSTANTS
 const PORT = process.env.PICTOCHAT_BACKEND_PORT || 443;

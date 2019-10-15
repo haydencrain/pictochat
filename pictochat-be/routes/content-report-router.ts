@@ -5,7 +5,7 @@ import { ContentReportService } from '../services/content-report-service';
 import { UserService } from '../services/user-service';
 import { User } from '../models/user';
 import { ForbiddenError } from '../exceptions/forbidden-error';
-import { requireAdminMiddleware } from '../middleware/require-admin-middle';
+import { requireAdminMiddleware } from '../middleware/require-admin-middleware';
 
 export const contentReportRouter = express.Router();
 

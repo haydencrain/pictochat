@@ -22,9 +22,6 @@ export class UserRepo {
       },
       where: { username, ...UserRepo.defaultFilter(includeDisabled) }
     });
-    // if (user === null || user === undefined) {
-    //   throw new NotFoundError();
-    // }
     return user;
   }
 
@@ -44,9 +41,6 @@ export class UserRepo {
       queryParams['attributes'] = { include: User.PUBLIC_ATTRIBUTES };
     }
     const user = await User.findOne(queryParams);
-    // if (user === null || user === undefined) {
-    //   throw new NotFoundError();
-    // }
     return user;
   }
 
@@ -59,9 +53,6 @@ export class UserRepo {
       queryParams['attributes'] = { include: User.PUBLIC_ATTRIBUTES };
     }
     const users = User.findAll(queryParams);
-    // if (users === null || users === undefined) {
-    //   throw new NotFoundError();
-    // }
     return users;
   }
 }

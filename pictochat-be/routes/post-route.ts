@@ -35,6 +35,7 @@ postRouter.get('/:postId', async (req, res, next) => {
       sort,
       paginationOptions
     );
+    console.log('replyTree: ', replyTree);
     res.json(replyTree.toJSON());
   } catch (error) {
     next(error);

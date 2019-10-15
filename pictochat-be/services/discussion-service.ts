@@ -233,6 +233,7 @@ export class DiscussionService {
     startAfterPostId?: number
   ): Promise<DiscussionPost[]> {
     const rootPost = await DiscussionPostRepo.getDiscussionPost(postId);
+    console.log('rootPost:', rootPost);
     let posts: DiscussionPost[] = await DiscussionPostRepo.getPathOrderedSubTreeUnder(rootPost, sortType);
     if (!isNullOrUndefined(startAfterPostId)) posts = PaginationService.getFilteredReplies(posts, startAfterPostId);
     posts.unshift(rootPost);

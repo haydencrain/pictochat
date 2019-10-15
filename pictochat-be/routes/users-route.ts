@@ -23,38 +23,37 @@ function makeJWTPayload(user: User): { auth: boolean; token: string } {
 export const userRouter = express.Router();
 
 // get user by username
-userRouter.get('/:username', async (req, res, next) => {
-  try {
-    const user: User = await UserService.getUserByUsername(req.params.username);
-    res.json(user.getPublicJSON());
-  } catch (error) {
-    next(error);
-  }
-});
+// userRouter.get('/:username', async (req, res, next) => {
+//   try {
+//     const user: User = await UserService.getUserByUsername(req.params.username);
+//     res.json(user.getPublicJSON());
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 // GET /user
 userRouter.get('/', async (req, res, next) => {
   try {
-    let users: User[] = await UserService.getUsers();
-    res.json(users.map(user => user.getPublicJSON()));
-    // if (req.query.username) {
-    //   // get user by username
-    //   const user = await UserService.getUserByUsername(req.query.username);
-    //   return res.json(user.toJSON());
-    // } else {
-    //   // get all users
-    //   let users = await UserService.getUsers();
-    //   return res.json(users.map(user => user.getPublicJSON()));
-    // }
+    if (req.query.username) {
+      // get user by username
+      const user = await UserService.getUserByUsername(req.query.username);
+      res.json(user.toJSON());
+    } else {
+      // get all users
+      let users = await UserService.getUsers();
+      res.json(users.map(user => user.getPublicJSON()));
+    }
   } catch (error) {
     next(error);
   }
 });
 
 // GET current user ONLY IF AUTHED
-userRouter.get('/authed', passport.authenticate(strategies.JWT, { session: false }), (req: any, res, next) => {
+userRouter.get('/authed', passport.authenticate(strategies.JWT, { session: false }), async (req: any, res, next) => {
   try {
-    res.json((req.user as User).getPublicJSON());
+    const user: User = await UserService.getUser(req.user.userId);
+    res.json(user.getPublicJSON());
   } catch (error) {
     next(error);
   }

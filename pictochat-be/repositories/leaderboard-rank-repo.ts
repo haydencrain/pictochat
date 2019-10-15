@@ -16,8 +16,6 @@ export class LeaderboardRankRepo {
   }
 
   private static async getRankedAuthorMetrics(top: number): Promise<any[]> {
-    // const userColumns: any[] = User.PUBLIC_TABLE_COLUMNS.map(colName => [`author."${colName}"`, `user.${col}`]);
-
     let userMetrics: any[] = await sequelize.query(
       `SELECT "authorId", COUNT(*) AS "postCount"
       FROM discussion_posts
@@ -33,13 +31,37 @@ export class LeaderboardRankRepo {
     return userMetrics;
   }
 
-  private static mergeUsersAndMetrics(userDetails: { [userId: string]: User }, topUserMetrics: any[]): any[] {
-    return topUserMetrics.map(userMetricRecord => {
-      // Copying to avoid confusing bugs if function caller doesn't expect topUserMetrics to be mutated
-      userMetricRecord = Object.assign({}, userMetricRecord);
-      userMetricRecord.user = userDetails[userMetricRecord.authorId];
-      return LeaderboardRank.fromJson(userMetricRecord);
-    });
+  private static mergeUsersAndMetrics(
+    userDetails: { [userId: string]: User },
+    topUserMetrics: { authorId: number, postCount: number }[]
+  ): LeaderboardRank[] {
+    let ranks: LeaderboardRank[] = [];
+    for (let metrics of topUserMetrics) {
+      // NOTE: users that have been deleted/disabled will be missing
+      // from userDetails (and shouldn't be included in the ranks)
+      if (userDetails[metrics.authorId] !== undefined) {
+        // Copying to avoid confusing bugs if function caller
+        // doesn't expect topUserMetrics to be mutated
+        metrics = Object.assign({}, metrics);
+        metrics['user'] = userDetails[metrics.authorId];
+        ranks.push(LeaderboardRank.fromJson(metrics));
+      }
+    }
+
+    return ranks;
+    // return topUserMetrics.map(userMetricRecord => {
+    //   // Copying to avoid confusing bugs if function caller doesn't expect topUserMetrics to be mutated
+    //   userMetricRecord = Object.assign({}, userMetricRecord);
+    //   userMetricRecord.user = userDetails[userMetricRecord.authorId];
+    //   return LeaderboardRank.fromJson(userMetricRecord);
+    // });
+
+    // return topUserMetrics.map(userMetricRecord => {
+    //   // Copying to avoid confusing bugs if function caller doesn't expect topUserMetrics to be mutated
+    //   userMetricRecord = Object.assign({}, userMetricRecord);
+    //   userMetricRecord.user = userDetails[userMetricRecord.authorId];
+    //   return LeaderboardRank.fromJson(userMetricRecord);
+    // });
   }
 
   private static async getUserDetails(userIds) {

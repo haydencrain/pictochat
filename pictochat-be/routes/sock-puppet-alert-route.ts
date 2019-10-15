@@ -3,7 +3,7 @@ import passport from 'passport';
 import { strategies } from '../middleware/passport-middleware';
 import { SockPuppetAlertRepo } from '../repositories/sock-puppet-alert-repo';
 import { SockPuppetAlert } from '../models/sock-puppet-alert';
-import { requireAdminMiddleware } from '../middleware/require-admin-middle';
+import { requireAdminMiddleware } from '../middleware/require-admin-middleware';
 
 export const sockPuppetAlertRouter = express.Router();
 

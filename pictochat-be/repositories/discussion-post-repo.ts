@@ -44,7 +44,7 @@ export class DiscussionPostRepo {
 
   static async getDiscussionPost(postId: number, options: FindOptions = {}): Promise<DiscussionPost> {
     options['where'] = { ...(options['where'] || {}), postId };
-    return await DiscussionPost.findOne(options);
+    return await DiscussionPostRepo.findOne(options);
   }
 
   static async getDiscussionRoot(discussionId: string, options: FindOptions = {}): Promise<DiscussionPost> {
