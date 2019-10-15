@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
-
 /**
+ * Implements HTTP responses for the endpoint `'/'`
  * @param webContentDir Directory containing the files that should be served
  */
 export function makeFrontEndRouter(webContentDir: string) {

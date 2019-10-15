@@ -14,9 +14,12 @@ import { NotFoundError } from '../exceptions/not-found-error';
 import { DiscussionPost } from '../models/discussion-post';
 
 export const reactionRouter = express.Router();
-
+/**
+ * Implements HTTP responses for the endpoint `'/reaction'`
+ */
 reactionRouter.get('/', async (req, res, next) => {
   try {
+    /**Returns repsonses based on the postId, userId or discussionId */
     if (req.query.by === 'POST') {
       const reactionPost = await ReactionService.getReactionsByPost(req.query.postId);
       return res.json(reactionPost);
@@ -37,30 +40,32 @@ reactionRouter.get('/', async (req, res, next) => {
   }
 });
 
-//POST reaction
-reactionRouter.post(
-  '/',
-  passport.authenticate(strategies.JWT, { session: false }),
-  async (req: any, res, next) => {
-    try {
-      let createReaction = await ReactionService.createReaction(req.body.reactionName, req.body.postId, req.body.userId);
-      return res.json(createReaction);
-    } catch (error) {
-      next(error);
-    }
+/**
+ * Implements HTTP responses for the endpoint `'/reaction'`
+ * POST reaction
+ */
+reactionRouter.post('/', passport.authenticate(strategies.JWT, { session: false }), async (req: any, res, next) => {
+  try {
+    let createReaction = await ReactionService.createReaction(req.body.reactionName, req.body.postId, req.body.userId);
+    return res.json(createReaction);
+  } catch (error) {
+    next(error);
   }
-);
+});
 
-
-//DELETE reaction
-reactionRouter.delete('/:reactionId',
+/**
+ * Implements HTTP responses for the endpoint `'/reaction/:reactionId'`
+ * DELETE reaction
+ */
+reactionRouter.delete(
+  '/:reactionId',
   passport.authenticate(strategies.JWT, { session: false }),
   async (req: any, res, next) => {
     try {
       console.log(req.user);
       // FIXME: Move into reaction service
       const sequelize = SequelizeConnectionService.getInstance();
-      await sequelize.transaction(async (transaction) => {
+      await sequelize.transaction(async transaction => {
         const requestingUser = await User.getUser(req.user.userId);
 
         const reaction = await Reaction.findOne({ where: { reactionId: req.params.reactionId } });

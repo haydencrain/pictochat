@@ -8,7 +8,9 @@ import { ContentReport } from '../models/content-report';
 import { ForbiddenError } from '../exceptions/forbidden-error';
 
 export const contentReportRouter = express.Router();
-
+/**
+ * Implements HTTP responses for the endpoint `'/content-report'`
+ */
 contentReportRouter.get(
   '/',
   passport.authenticate(strategies.JWT, { session: false }),

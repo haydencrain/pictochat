@@ -24,8 +24,12 @@ const imageStager = multer({ dest: config.IMAGE_STAGING_DIR });
 //// ROUTER ////
 
 export const postRouter = express.Router();
+/**
+ * Implements HTTP responses for the endpoint `'/post'`
+ */
 
 /**
+ * Returns a HTTP response for the endpoint `'/post/:postId'`
  * Get reply tree under post
  */
 postRouter.get('/:postId', async (req, res, next) => {
@@ -43,7 +47,10 @@ postRouter.get('/:postId', async (req, res, next) => {
   }
 });
 
-// POST Flag a post for inappropriate content
+/**
+ * Returns a HTTP response for the endpoint `'/post/:postId/content-report'`
+ * POST Flag a post for inappropriate content
+ */
 postRouter.post(
   '/:postId/content-report',
   passport.authenticate(strategies.JWT, { session: false }),
@@ -57,6 +64,10 @@ postRouter.post(
   }
 );
 
+/**
+ * Returns a HTTP response for the endpoint `'/post/:postId/content-report'`
+ * DELETE flag on post for inappropriate content
+ */
 postRouter.delete('/:postId/content-report', async (req, res, next) => {
   try {
     const post: DiscussionPost = await setPostInappropraiteContentFlag(parseInt(req.params.postId), false);
@@ -66,6 +77,10 @@ postRouter.delete('/:postId/content-report', async (req, res, next) => {
   }
 });
 
+/**
+ * Returns a HTTP response for the endpoint `'/post/:postId/content-report'`
+ * GET Flag on a post for inappropriate content
+ */
 postRouter.get('/:postId/content-report', async (req, res, next) => {
   try {
     console.log(req.params);
@@ -77,8 +92,13 @@ postRouter.get('/:postId/content-report', async (req, res, next) => {
   }
 });
 
+/**
+ * Returns a HTTP response for the endpoint `'/post'`
+ * POST a post by a logged in user
+ */
 postRouter.post(
   '/',
+  /**Checks that the user is logged in prior to posting */
   passport.authenticate(strategies.JWT, { session: false }),
   imageStager.single('image'),
   async (req, res, next) => {
@@ -94,6 +114,10 @@ postRouter.post(
   }
 );
 
+/**
+ * Returns a HTTP response for the endpoint `'/post/:postId'`
+ * PATCH the post tree to add a new post
+ */
 postRouter.patch(
   '/:postId',
   passport.authenticate(strategies.JWT, { session: false }),
@@ -119,7 +143,10 @@ postRouter.patch(
     }
   }
 );
-
+/**
+ * Returns a HTTP response for the endpoint `'post/:postId'`
+ * DELETE a post
+ */
 postRouter.delete(
   '/:postId',
   passport.authenticate(strategies.JWT, { session: false }),
@@ -165,6 +192,10 @@ function makeContentReport(post) {
   return { postId: post.postId, hasInappropriateContentFlag: post.hasInappropriateContentFlag };
 }
 
+/**
+ * Encodes image of a correct filetype to blob for database
+ * @param file
+ */
 async function makeNewImageSpec(file): Promise<{ data: Buffer; encoding: string }> {
   let data = await readFile(file.path);
   let encoding = MIMETYPE_TO_ENCODING[file.mimetype];
@@ -173,13 +204,22 @@ async function makeNewImageSpec(file): Promise<{ data: Buffer; encoding: string 
   }
   return { data, encoding };
 }
-
+/**
+ * Checks that the user is the same as the post's author
+ * @param body
+ * @param user
+ */
 function assertIsPostAuthor(body: { userId: string }, user: User) {
   if (parseInt(body.userId) !== user.userId) {
     throw new ForbiddenError("Post's userId and/or supplied JWT token is incorrect or are for different users");
   }
 }
-
+/**
+ * Creates a reply to a post
+ * @param req
+ * @param res
+ * @param next
+ */
 async function handleNewReplyPOST(req, res, next) {
   try {
     assertIsPostAuthor(req.body, req.user);
@@ -198,7 +238,12 @@ async function handleNewReplyPOST(req, res, next) {
     await deleteFile(req.file.path);
   }
 }
-
+/**
+ * Establishes a post as the parent of the reply thread
+ * @param req
+ * @param res
+ * @param next
+ */
 async function handleNewThreadPOST(req, res, next) {
   try {
     assertIsPostAuthor(req.body, req.user);
