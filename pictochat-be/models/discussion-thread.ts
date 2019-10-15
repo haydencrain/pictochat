@@ -69,6 +69,9 @@ export class DiscussionThread {
     return threads;
   }
 
+  /**
+   * GET an array of the total replies for every thread
+   */
   private static async getReplyCountsForAllThreads(): Promise<{ [discussionId: number]: number }> {
     let records: { discussionId: number; replyCount: number }[] = await sequelize.query(
       `SELECT "discussionId", COUNT(*) - 1 as "replyCount"

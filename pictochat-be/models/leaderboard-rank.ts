@@ -33,14 +33,20 @@ export class LeaderboardRank {
   static fromJson(json) {
     return new LeaderboardRank(json.user, json.rank, json.postCount);
   }
-
+  /**
+   * GET the highest scoring users
+   * @param n
+   */
   static async getTop(n: number): Promise<any[]> {
     let topUserMetrics = await LeaderboardRank.getRankedAuthorMetrics(n);
     let topUserIds = topUserMetrics.map(userMetricRecord => userMetricRecord.authorId);
     let userDetails = await LeaderboardRank.getUserDetails(topUserIds);
     return LeaderboardRank.mergeUsersAndMetrics(userDetails, topUserMetrics);
   }
-
+  /**
+   * GET the scores for the highest scoring users
+   * @param top
+   */
   private static async getRankedAuthorMetrics(top: number): Promise<any[]> {
     // const userColumns: any[] = User.PUBLIC_TABLE_COLUMNS.map(colName => [`author."${colName}"`, `user.${col}`]);
 
@@ -75,6 +81,11 @@ export class LeaderboardRank {
     return userMetrics;
   }
 
+  /**
+   * Map the top users based on their `userId` and `metrics`
+   * @param userDetails
+   * @param topUserMetrics
+   */
   private static mergeUsersAndMetrics(userDetails: { [userId: string]: User }, topUserMetrics: any[]): any[] {
     return topUserMetrics.map(userMetricRecord => {
       // Copying to avoid confusing bugs if function caller doesn't expect topUserMetrics to be mutated
@@ -83,7 +94,10 @@ export class LeaderboardRank {
       return LeaderboardRank.fromJson(userMetricRecord);
     });
   }
-
+  /**
+   * GET user details based on `userId`
+   * @param userIds
+   */
   private static async getUserDetails(userIds) {
     let userDetails = await User.getUsers(true, { userId: { [Op.in]: userIds } });
     let userDetailMap = {};

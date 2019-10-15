@@ -7,6 +7,8 @@ import { SortValue, SortTypes } from '../utils/sort-types';
 const sequelize: Sequelize = SequelizeConnectionService.getInstance();
 
 export class DiscussionPost extends Model {
+  /** Columns for discussion_posts table */
+
   static readonly PUBLIC_ATTRIBUTES = [
     'postId',
     'discussionId',
@@ -22,6 +24,7 @@ export class DiscussionPost extends Model {
     'hasInappropriateFlag',
     'reactionsCount'
   ];
+  /** Inputting the user as a foreign key */
   private static readonly USER_JOIN = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
 
   postId!: number;
@@ -77,6 +80,7 @@ export class DiscussionPost extends Model {
     });
   }
 
+  /** GET the number of replies to a thread via the parent's postId */
   async getDirectReplyCount(): Promise<number> {
     const filter = { where: { parentPostId: this.getDataValue('postId') } };
     return await DiscussionPost._count(filter);
@@ -118,7 +122,10 @@ export class DiscussionPost extends Model {
     };
     return await DiscussionPost.findAll(options);
   }
-
+  /**
+   * GET array of discussion ports by their `sortType`
+   * @param sortType
+   */
   static async getDiscussionRootPosts(sortType: SortValue): Promise<DiscussionPost[]> {
     let rootPosts = await DiscussionPost.getDiscussionPosts({
       where: DiscussionPost.isRootPostFilter(),
@@ -126,12 +133,20 @@ export class DiscussionPost extends Model {
     });
     return rootPosts;
   }
-
+  /**
+   * GET discussion post depending on `FindOptions`
+   * @param postId
+   * @param options
+   */
   static async getDiscussionPost(postId: number, options: FindOptions = {}): Promise<DiscussionPost> {
     options['where'] = { ...(options['where'] || {}), postId };
     return await DiscussionPost._findOne(options);
   }
-
+  /**
+   * GET the root (parent) of a thread of discussion posts
+   * @param discussionId
+   * @param options
+   */
   static async getDiscussionRoot(discussionId: string, options: FindOptions = {}): Promise<DiscussionPost> {
     const existingFilter = options['where'] || {};
     options['where'] = {
@@ -141,10 +156,12 @@ export class DiscussionPost extends Model {
     };
     return await DiscussionPost._findOne(options);
   }
-
   /**
-   * Get all replies (and replies of replies) to the specified postId, ordered
-   * such that parent posts always come before their replies (aka pre-order traversal order). */
+   * GET all replies (and replies of replies) to the specified postId, ordered
+   * such that parent posts always come before their replies (aka pre-order traversal order).
+   * @param rootPost
+   * @param sortType
+   */
   static async getPathOrderedSubTreeUnder(
     rootPost: DiscussionPost,
     sortType: SortValue = ''
@@ -157,27 +174,25 @@ export class DiscussionPost extends Model {
     });
     return posts;
   }
-
   /**
    * @returns Sequelize where clause condition for getting rootPosts */
   static isRootPostFilter(): { [fieldName: string]: any } {
     return { isRootPost: true };
   }
-
   /** @returns Default WHERE condition applied to all queries */
   static defaultFilter() {
     return { isDeleted: false };
   }
-
   /**
    * @returns Sequelize where clause condition for finding posts under the specified path prefix */
   private static replyTreePathFilter(prefix: string) {
     return { replyTreePath: { [Op.like]: `${prefix}/%` } };
   }
-
   /**
    * Wrapper for Model.findOne that ensures author data is included in result
-   * and only returns PUBLIC_ATTRIBUTES by default. */
+   * and only returns PUBLIC_ATTRIBUTES by default
+   * @param options
+   */
   private static async _findOne(options: FindOptions = {}) {
     const filterDefaults = DiscussionPost.defaultFilter();
     const optionDefaults = {
@@ -188,7 +203,10 @@ export class DiscussionPost extends Model {
     options = { ...optionDefaults, ...options };
     return await DiscussionPost.findOne(options);
   }
-
+  /**
+   * Counts the number of posts in a thread
+   * @param options
+   */
   private static async _count(options?: CountOptions) {
     options['where'] = { ...(options['where'] || {}), ...DiscussionPost.defaultFilter() };
     return await DiscussionPost.count(options);

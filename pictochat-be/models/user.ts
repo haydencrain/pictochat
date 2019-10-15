@@ -37,7 +37,10 @@ export class User extends Model {
     }
     return json;
   }
-
+  /**
+   * Checks if the user is disabled
+   * @param includeDisabled
+   */
   static defaultFilter(includeDisabled: boolean = false) {
     let filter = {};
     if (!includeDisabled) {
@@ -46,10 +49,19 @@ export class User extends Model {
     return filter;
   }
 
+  /**
+   * CREATE user
+   * @param username
+   * @param hashedPassword
+   */
   static async createUser(username: string, hashedPassword: string): Promise<User> {
     return await User.create({ username, password: hashedPassword });
   }
-
+  /**
+   * GET user by `username` and filter the search based on `includeDisabled`
+   * @param username
+   * @param includeDisabled
+   */
   static async getUserByUsername(username: string, includeDisabled: boolean = false): Promise<User> {
     const user = await User.findOne({
       attributes: {
@@ -64,6 +76,8 @@ export class User extends Model {
   }
 
   /**
+   * GET user based on `userId` and filter the search based on `onlyIncludePublicAttrs`
+   * and `includeDisabled`
    * @param userId
    * @param onlyIncludePublicAttrs When true, only fields in User.PUBLIC_ATTRIBUTES will be
    *    included in the returned object.
@@ -86,6 +100,7 @@ export class User extends Model {
   }
 
   /**
+   * GET users based on `onlyIncludePublicAttrs` and `filter`
    * @param onlyIncludePublicAttrs When true, only fields in User.PUBLIC_ATTRIBUTES will be
    *    included in the returned object. */
   static async getUsers(onlyIncludePublicAttrs: boolean = true, filter?: WhereOptions): Promise<User[]> {

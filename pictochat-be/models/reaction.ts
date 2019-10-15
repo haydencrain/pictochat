@@ -21,7 +21,11 @@ export class Reaction extends Model {
     }
     return json;
   }
-
+  /**
+   * GET reactions based on `postId` and `userId`
+   * @param postId
+   * @param userId
+   */
   static async getReactions(postId: number, userId: number): Promise<Reaction[]> {
     return Reaction.findAll({
       attributes: {
@@ -30,21 +34,27 @@ export class Reaction extends Model {
       where: { postId, userId }
     });
   }
-
+  /**
+   * GET reactions based on `discussionId`
+   * @param discussionId
+   */
   static async getReactionsByDiscussion(discussionId: number): Promise<Reaction[]> {
     const discussionJoin = {
       model: DiscussionPost,
       as: 'post',
       required: true,
       // attributes: ['postId', 'discussionId'],
-      where: {...DiscussionPost.defaultFilter(), ...{discussionId}}
+      where: { ...DiscussionPost.defaultFilter(), ...{ discussionId } }
     };
     return Reaction.findAll({
       attributes: Reaction.PUBLIC_ATTRIBUTES,
       include: [discussionJoin]
     });
   }
-
+  /**
+   * GET reactions based on `postId`
+   * @param postId
+   */
   static async getReactionsByPost(postId: number): Promise<Reaction[]> {
     return Reaction.findAll({
       attributes: {
@@ -53,7 +63,10 @@ export class Reaction extends Model {
       where: { postId }
     });
   }
-
+  /**
+   * GET reactions based on `userId`
+   * @param userId
+   */
   static async getReactionsByUser(userId: number): Promise<Reaction[]> {
     return Reaction.findAll({
       attributes: {
@@ -63,6 +76,12 @@ export class Reaction extends Model {
     });
   }
 
+  /**
+   * CREATE reaction
+   * @param reactionName
+   * @param postId
+   * @param userId
+   */
   static async createReaction(reactionName: string, postId: number, userId: number): Promise<Reaction> {
     return await Reaction.create({ reactionName, postId, userId });
   }
@@ -90,12 +109,14 @@ Reaction.init(
     modelName: 'reaction',
     tableName: 'reactions',
     freezeTableName: true,
-    indexes: [{
-      unique: true,
-      fields: ['postId', 'userId']
-    }]
+    indexes: [
+      {
+        unique: true,
+        fields: ['postId', 'userId']
+      }
+    ]
   }
 );
 
-Reaction.belongsTo(DiscussionPost, {as: 'post', targetKey: 'postId', foreignKey: 'postId', constraints: true});
-Reaction.belongsTo(User, {as: 'user', targetKey: 'userId', foreignKey: 'userId', constraints: true});
+Reaction.belongsTo(DiscussionPost, { as: 'post', targetKey: 'postId', foreignKey: 'postId', constraints: true });
+Reaction.belongsTo(User, { as: 'user', targetKey: 'userId', foreignKey: 'userId', constraints: true });
