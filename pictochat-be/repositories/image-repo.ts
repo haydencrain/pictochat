@@ -1,5 +1,5 @@
 import { Image } from '../models/image';
-import { FindOptions } from 'sequelize/types';
+import { FindOptions } from 'sequelize';
 
 export class ImageRepo {
 

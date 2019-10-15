@@ -1,7 +1,8 @@
 import { LeaderboardRank } from "../models/leaderboard-rank";
-import { QueryTypes, Op } from "sequelize/types";
+import { QueryTypes, Op } from "sequelize";
 import { User } from "../models/user";
 import { SequelizeConnectionService } from "../services/sequelize-connection-service";
+import { UserRepo } from "./user-repo";
 
 const sequelize = SequelizeConnectionService.getInstance();
 
@@ -42,7 +43,7 @@ export class LeaderboardRankRepo {
   }
 
   private static async getUserDetails(userIds) {
-    let userDetails = await User.getUsers(true, { userId: { [Op.in]: userIds } });
+    let userDetails = await UserRepo.getUsers(true, { userId: { [Op.in]: userIds } });
     let userDetailMap = {};
     for (let user of userDetails) {
       userDetailMap[user.userId] = user;

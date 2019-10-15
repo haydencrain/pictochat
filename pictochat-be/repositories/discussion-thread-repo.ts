@@ -1,7 +1,7 @@
 import { DiscussionPost } from '../models/discussion-post';
 import { DiscussionThread } from '../models/discussion-thread';
 import { SortValue, SortTypes } from '../utils/sort-types';
-import { QueryTypes } from 'sequelize/types';
+import { QueryTypes } from 'sequelize';
 import { DiscussionPostRepo } from '../repositories/discussion-post-repo';
 import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 

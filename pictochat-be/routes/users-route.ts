@@ -23,7 +23,7 @@ function makeJWTPayload(user: User): { auth: boolean; token: string } {
 export const userRouter = express.Router();
 
 // get user by username
-userRouter.get('/:userName', async (req, res, next) => {
+userRouter.get('/:username', async (req, res, next) => {
   try {
     const user: User = await UserService.getUserByUsername(req.params.username);
     res.json(user.getPublicJSON());

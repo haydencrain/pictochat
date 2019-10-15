@@ -1,5 +1,5 @@
 import { User } from "../models/user";
-import { WhereOptions } from "sequelize/types";
+import { WhereOptions } from "sequelize";
 
 export class UserRepo {
 

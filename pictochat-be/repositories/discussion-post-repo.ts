@@ -1,5 +1,5 @@
 import { DiscussionPost } from '../models/discussion-post';
-import { FindOptions, Op, CountOptions, OrderItem } from 'sequelize/types';
+import { FindOptions, Op, CountOptions, OrderItem } from 'sequelize';
 import { SortValue, SortTypes } from '../utils/sort-types';
 import { User } from '../models/user';
 
