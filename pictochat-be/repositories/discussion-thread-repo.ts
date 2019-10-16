@@ -3,9 +3,9 @@ import { DiscussionThread } from '../models/discussion-thread';
 import { SortValue, SortTypes } from '../utils/sort-types';
 import { QueryTypes } from 'sequelize';
 import { DiscussionPostRepo } from './discussion-post-repo';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
+import { SequelizeConnection } from '../utils/sequelize-connection';
 
-const sequelize = SequelizeConnectionService.getInstance();
+const sequelize = SequelizeConnection.getInstance();
 
 /**
  * Summary of posts with in one discussion thread
@@ -25,7 +25,7 @@ export class DiscussionThreadRepo {
   static async getDiscussionThreads(sortType: SortValue): Promise<DiscussionThread[]> {
     // Using application side join rather than one raw SQL query to avoid
     // cascading changes to this method when columns are added to the DiscussionPost model/table.
-    const rootPosts = await DiscussionPostRepo.getDiscussionRootPosts(sortType);
+    const rootPosts = await DiscussionPostRepo.getRootPosts(sortType);
     const replyCounts: { [discussionId: number]: number } = await DiscussionThreadRepo.getReplyCountsForAllThreads();
     let threads: DiscussionThread[] = [];
     for (let rootPost of rootPosts) {

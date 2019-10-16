@@ -3,7 +3,6 @@ import { DiscussionPost } from '../models/discussion-post';
 import { DiscussionThread } from '../models/discussion-thread';
 import { DiscussionTreeNode } from '../models/discussion-tree-node';
 import { NewImage, ImageService } from '../services/image-service';
-import { SequelizeConnectionService } from './sequelize-connection-service';
 import { Image } from '../models/image';
 import { NotFoundError } from '../exceptions/not-found-error';
 import { ForbiddenError } from '../exceptions/forbidden-error';
@@ -15,28 +14,9 @@ import { PaginationService, PaginatedResults } from './pagination-service';
 import { UserService } from './user-service';
 import { DiscussionThreadRepo } from '../repositories/discussion-thread-repo';
 import { DiscussionPostRepo } from '../repositories/discussion-post-repo';
-
-
-let sequelize = SequelizeConnectionService.getInstance();
+import { transaction } from '../utils/transaction';
 
 // HELPER INTERFACES
-
-export interface NewThread {
-  userId: number;
-  image: NewImage;
-}
-
-export interface NewReply {
-  userId: number;
-  parentPostId: number;
-  image: NewImage;
-}
-
-export interface PostUpdate {
-  userId: number;
-  postId: number;
-  image: NewImage;
-}
 
 export enum ArchiveType {
   DELETED,
@@ -60,8 +40,7 @@ export class DiscussionService {
    * @param NewThread Object of structure {image, userId}, where userId is the id for the root post's author
    * @returns DiscussionThread instance created with the specified newThread data */
   static async createThread(userId: number, newImage: NewImage): Promise<DiscussionThread> {
-    // FIXME: Move transaction management into model/data-access layer
-    return await sequelize.transaction(async transaction => {
+    return await transaction(async () => {
       const image: Image = await ImageService.saveImage(newImage);
       const discussionId: string = uuid();
       const rootPost: DiscussionPost = await DiscussionPost.create({
@@ -73,30 +52,6 @@ export class DiscussionService {
       });
       return new DiscussionThread(discussionId, rootPost, 0);
     });
-
-    // let transaction: Transaction;
-    // try {
-    //   transaction = await sequelize.transaction();
-    //   let image: Image = await ImageService.saveImage(newImage, transaction);
-    //   let discussionId: string = uuid();
-    //   let rootPost: DiscussionPost = await DiscussionPost.create(
-    //     {
-    //       isRootPost: true,
-    //       imageId: image.imageId,
-    //       authorId: userId,
-    //       postedDate: new Date(),
-    //       discussionId: discussionId
-    //     },
-    //     { transaction }
-    //   );
-    //   await transaction.commit();
-    //   return new DiscussionThread({ discussionId, rootPost, replyCount: 0 });
-    // } catch (error) {
-    //   if (transaction !== undefined) {
-    //     transaction.rollback();
-    //   }
-    //   throw error;
-    // }
   }
 
   /**
@@ -104,7 +59,7 @@ export class DiscussionService {
    * @param NewThread Object of structure {image, userId, parentPostId}, where userId is the id for the root post's author
    * @returns DiscussionPost instance created with the specified newPost data */
   static async createReply(userId: number, parentPostId: number, newImage: NewImage): Promise<DiscussionPost> {
-    return await sequelize.transaction(async transaction => {
+    return await transaction(async () => {
       const image: Image = await ImageService.saveImage(newImage);
       const parentPost: DiscussionPost = await DiscussionPost.findOne({ where: { postId: parentPostId } });
 
@@ -120,43 +75,11 @@ export class DiscussionService {
 
       return reply;
     });
-
-    // let transaction: Transaction;
-    // try {
-    //   transaction = await sequelize.transaction();
-    //   let image: Image = await ImageService.saveImage(newImage, transaction);
-    //   let parentPost: DiscussionPost = await DiscussionPost.findOne({
-    //     transaction,
-    //     where: { postId: parentPostId }
-    //   });
-
-    //   let parentReplyPath: string = parentPost.getDataValue('replyTreePath') || '';
-    //   let reply: DiscussionPost = await DiscussionPost.create(
-    //     {
-    //       discussionId: parentPost.getDataValue('discussionId'),
-    //       imageId: image.getDataValue('imageId'),
-    //       authorId: userId,
-    //       postedDate: new Date(),
-    //       parentPostId: parentPost.getDataValue('postId'),
-    //       replyTreePath: `${parentReplyPath}${parentPost.getDataValue('postId')}/`
-    //     },
-    //     { transaction }
-    //   );
-
-    //   await transaction.commit();
-    //   return reply;
-    // } catch (error) {
-    //   if (transaction !== undefined) {
-    //     transaction.rollback();
-    //   }
-    //   throw error;
-    // }
   }
 
   static async updatePost(userId: number, postId: number, newImage: NewImage): Promise<DiscussionPost> {
-    return await sequelize.transaction(async transaction => {
+    return await transaction(async () => {
       let post: DiscussionPost = await DiscussionService.getPost(postId);
-      // let post: DiscussionPost = await DiscussionPost.getDiscussionPost(postUpdate.postId);
 
       // Can't update another user's post
       if (post.authorId !== userId) throw new ForbiddenError();
@@ -177,7 +100,7 @@ export class DiscussionService {
    * Marks a post as deleted or hidden
    */
   static async archivePost(postId: number, requestingUserId: number): Promise<ArchiveType> {
-    return await sequelize.transaction(async transaction => {
+    return await transaction(async () => {
       const post = await DiscussionService.getPost(postId);
 
       // Posts can only be deleted by their author OR an admin user
@@ -200,6 +123,15 @@ export class DiscussionService {
       await post.save();
 
       return archiveType;
+    });
+  }
+
+  static async setInappropriateFlag(postId: number, flagValue: boolean): Promise<DiscussionPost> {
+    return await transaction(async () => {
+      const post = await DiscussionService.getPost(postId);
+      post.setInappropriateFlag(flagValue);
+      await post.save();
+      return post;
     });
   }
 
@@ -233,7 +165,6 @@ export class DiscussionService {
     startAfterPostId?: number
   ): Promise<DiscussionPost[]> {
     const rootPost = await DiscussionPostRepo.getDiscussionPost(postId);
-    console.log('rootPost:', rootPost);
     let posts: DiscussionPost[] = await DiscussionPostRepo.getPathOrderedSubTreeUnder(rootPost, sortType);
     if (!isNullOrUndefined(startAfterPostId)) posts = PaginationService.getFilteredReplies(posts, startAfterPostId);
     posts.unshift(rootPost);

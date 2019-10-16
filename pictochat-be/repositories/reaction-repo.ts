@@ -4,6 +4,22 @@ import { DiscussionPostRepo } from "./discussion-post-repo";
 
 export class ReactionRepo {
 
+  /**
+   * @param params Identifying info for the reactions.
+   *    Must be object of type { reactionId: number } or { userId: number, postId: number }
+   */
+  static async getReaction(
+    params: { reactionId?: number, userId?: number, postId?: number }
+  ): Promise<Reaction> {
+    console.log('getReaction$params: ', params);
+    if (params.reactionId !== undefined) {
+      return await Reaction.findOne({ where: { reactionId: params.reactionId } });
+    } else if (params.userId !== undefined && params.postId !== undefined) {
+      return await Reaction.findOne({ where: { userId: params.userId, postId: params.postId } });
+    }
+    throw new Error('Either params.reactionId or both params.userId and params.postId must be specified');
+  }
+
   static async getReactions(postId: number, userId: number): Promise<Reaction[]> {
     return Reaction.findAll({
       attributes: {
@@ -18,7 +34,6 @@ export class ReactionRepo {
       model: DiscussionPost,
       as: 'post',
       required: true,
-      // attributes: ['postId', 'discussionId'],
       where: { ...DiscussionPostRepo.defaultFilter(), ...{ discussionId } }
     };
     return Reaction.findAll({

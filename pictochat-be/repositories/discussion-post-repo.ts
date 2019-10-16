@@ -6,18 +6,10 @@ import { User } from '../models/user';
 export class DiscussionPostRepo {
   private static readonly USER_JOIN = { model: User, as: 'author', required: true, attributes: User.PUBLIC_ATTRIBUTES };
 
-  static async incrementReactionsCount(postId: number): Promise<DiscussionPost> {
-    return await DiscussionPost.increment({ reactionsCount: 1 }, { where: { postId } });
-  }
-
-  static async decrementReactionsCount(postId: number): Promise<DiscussionPost> {
-    return await DiscussionPost.increment({ reactionsCount: -1 }, { where: { postId } });
-  }
-
   /**
    * Wrapper for Sequelize Model.findAll that ensures author data is included in the result
    * and only returns PUBLIC_ATTRIBUTES by default. */
-  static async getDiscussionPosts(options: FindOptions = {}): Promise<DiscussionPost[]> {
+  static async findAll(options: FindOptions = {}): Promise<DiscussionPost[]> {
     const defaultFilters = DiscussionPostRepo.defaultFilter();
     const optionDefaults = {
       include: [DiscussionPostRepo.USER_JOIN],
@@ -34,25 +26,34 @@ export class DiscussionPostRepo {
     return await DiscussionPost.findAll(options);
   }
 
-  static async getDiscussionRootPosts(sortType: SortValue): Promise<DiscussionPost[]> {
-    const rootPosts = await DiscussionPostRepo.getDiscussionPosts({
+  static async getRootPosts(sortType: SortValue): Promise<DiscussionPost[]> {
+    const rootPosts = await DiscussionPostRepo.findAll({
       where: DiscussionPostRepo.isRootPostFilter(),
       order: [DiscussionPostRepo.getSortByValue(sortType)]
     });
     return rootPosts;
   }
 
-  static async getDiscussionPost(postId: number, options: FindOptions = {}): Promise<DiscussionPost> {
-    options['where'] = { ...(options['where'] || {}), postId };
+  /**
+   * Gets posts that have been flaged as inappropriate
+   */
+  static async getFlaggedPosts(): Promise<DiscussionPost[]> {
+    return await DiscussionPostRepo.findAll({
+      where: { hasInappropriateFlag: true, isHidden: false, isDeleted: false }
+    });
+  }
+
+  static async getDiscussionPost(postId: number): Promise<DiscussionPost> {
+    const options = { where: { postId } };
     return await DiscussionPostRepo.findOne(options);
   }
 
-  static async getDiscussionRoot(discussionId: string, options: FindOptions = {}): Promise<DiscussionPost> {
-    const existingFilter = options['where'] || {};
-    options['where'] = {
-      ...existingFilter,
-      ...DiscussionPostRepo.isRootPostFilter(),
-      discussionId
+  /**
+   * @param discussionId
+   */
+  static async getDiscussionRoot(discussionId: string): Promise<DiscussionPost> {
+    let options = {
+      where: { ...DiscussionPostRepo.isRootPostFilter(), discussionId }
     };
     return await DiscussionPostRepo.findOne(options);
   }
@@ -66,7 +67,7 @@ export class DiscussionPostRepo {
   ): Promise<DiscussionPost[]> {
     const order = DiscussionPostRepo.getSortByValue(sortType);
     const replyPathPrefix: string = rootPost.getReplyPathPrefix();
-    let posts: DiscussionPost[] = await DiscussionPostRepo.getDiscussionPosts({
+    let posts: DiscussionPost[] = await DiscussionPostRepo.findAll({
       where: { ...DiscussionPostRepo.replyTreePathFilter(replyPathPrefix), ...DiscussionPostRepo.defaultFilter() },
       order: [['replyTreePath', 'ASC'], order]
     });
@@ -74,21 +75,30 @@ export class DiscussionPostRepo {
   }
 
   /**
-   * @returns Sequelize where clause condition for getting rootPosts */
-  static isRootPostFilter(): { [fieldName: string]: any } {
-    return { isRootPost: true };
-  }
-
-  /** @returns Default WHERE condition applied to all queries */
-  static defaultFilter() {
-    return { isDeleted: false };
-  }
-
-  /**
    * @returns Sequelize where clause condition for finding posts under the specified path prefix */
   private static replyTreePathFilter(prefix: string) {
     return { replyTreePath: { [Op.like]: `${prefix}/%` } };
   }
+
+  /** @returns Specific ORDER BY Depening on what value is passed in */
+  private static getSortByValue(sortType: SortValue): OrderItem {
+    switch (sortType) {
+      // Order by reactions Descending
+      case SortTypes.REACTIONS:
+        return ['reactionsCount', 'DESC'];
+
+      case SortTypes.NEW:
+      case SortTypes.NONE:
+        // note: comments also comes here as we can't sort here, we have to sort
+        // manually once we compute the comment tree count.
+        return ['postedDate', 'DESC'];
+
+      default:
+        return ['postedDate', 'DESC'];
+    }
+  }
+
+  /* BASE SEQUELIZE QUERY OVERLOADS */
 
   /**
    * Wrapper for Model.findOne that ensures author data is included in result
@@ -109,21 +119,26 @@ export class DiscussionPostRepo {
     return await DiscussionPost.count(options);
   }
 
-  /** @returns Specific ORDER BY Depening on what value is passed in */
-  private static getSortByValue(sortType: SortValue): OrderItem {
-    switch (sortType) {
-      // Order by reactions Descending
-      case SortTypes.REACTIONS:
-        return ['reactionsCount', 'DESC'];
+  /* REACTION COUNTS */
 
-      case SortTypes.NEW:
-      case SortTypes.NONE:
-        // note: comments also comes here as we can't sort here, we have to sort
-        // manually once we compute the comment tree count.
-        return ['postedDate', 'DESC'];
+  static async incrementReactionsCount(postId: number): Promise<DiscussionPost> {
+    return await DiscussionPost.increment({ reactionsCount: 1 }, { where: { postId } });
+  }
 
-      default:
-        return ['postedDate', 'DESC'];
-    }
+  static async decrementReactionsCount(postId: number): Promise<DiscussionPost> {
+    return await DiscussionPost.increment({ reactionsCount: -1 }, { where: { postId } });
+  }
+
+  /* FILTERS */
+
+  /**
+   * @returns Sequelize where clause condition for getting rootPosts */
+  static isRootPostFilter(): { [fieldName: string]: any } {
+    return { isRootPost: true };
+  }
+
+  /** @returns Default WHERE condition applied to all queries */
+  static defaultFilter() {
+    return { isDeleted: false };
   }
 }

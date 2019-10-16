@@ -1,13 +1,13 @@
 import { SockPuppetAlert } from "../models/sock-puppet-alert";
 import { User } from "../models/user";
 import { LoginLog } from "../models/login-log";
-import { SequelizeConnectionService } from "../services/sequelize-connection-service";
+import { SequelizeConnection } from "../utils/sequelize-connection";
 
 interface DeviceUserPair extends User {
   deviceId: string;
 }
 
-const sequelize = SequelizeConnectionService.getInstance();
+const sequelize = SequelizeConnection.getInstance();
 
 export class SockPuppetAlertRepo {
   static readonly DEFAULT_CONCURRNENT_USER_LIMIT = 2;
@@ -48,6 +48,7 @@ export class SockPuppetAlertRepo {
   private static async getSuspiciousDeviceUserPairs(userLimit: number): Promise<DeviceUserPair[]> {
     const userColumns = User.PUBLIC_TABLE_COLUMNS.map(colName => `"user"."${colName}" AS "${colName}"`);
     const userSelectStmtList = userColumns.join(', ');
+    const userWhereExpr = '("user"."hasAdminRole" = FALSE AND "user"."isDisabled" = FALSE)';
     // NOTE: queryOptions.replacements will escape value of userLimit before passing it to the db
     const queryOptions = { model: User, replacements: { userLimit: userLimit } };
     // has format {deviceId, ...<User properties>}
@@ -61,14 +62,14 @@ export class SockPuppetAlertRepo {
             "${LoginLog.tableName}" AS "loginLog"
             INNER JOIN ${User.tableName} AS "user"
             ON "loginLog"."userId" = "user"."userId"
-          WHERE "user"."hasAdminRole" = FALSE AND "user"."isDisabled" = FALSE
+          WHERE ${userWhereExpr}
           GROUP BY "deviceId"
           HAVING COUNT(DISTINCT "loginLog"."userId") > :userLimit
         ) AS "deviceUserCounts"
         ON "loginLogs"."deviceId" = "deviceUserCounts"."deviceId"
         INNER JOIN ${User.tableName} AS "user"
         ON "loginLogs"."userId" = "user"."userId"
-      WHERE "user"."hasAdminRole" = FALSE AND "user"."isDisabled" = FALSE
+      WHERE ${userWhereExpr}
       `,
       queryOptions
     );

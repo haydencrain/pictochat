@@ -75,10 +75,9 @@ const jwtStrategy = new passportJwt.Strategy(
   async (jwtPayload, done) => {
     try {
       const userId = jwtPayload.id;
-      // const user = await UserService.getUser(userId);
       return done(null, { userId });
-      // NOTE: Checking if the token is valid (using the key it was signed with)
-      //        is handled internaly by the JWT Strategy - Jordan
+      // NOTE: Checking if the token is valid (using the cryptographic key it was signed with)
+      //        is handled internly by the JWT Strategy - Jordan
       // return done(null, false, { message: 'Invalid token' });
     } catch (e) {
       done(e);

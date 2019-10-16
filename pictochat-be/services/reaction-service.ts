@@ -1,12 +1,12 @@
 import { Reaction } from '../models/reaction';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { UniqueConstraintError } from 'sequelize';
 import { UnprocessableError } from '../exceptions/unprocessable-error';
-import { DiscussionPost } from '../models/discussion-post';
 import { DiscussionPostRepo } from '../repositories/discussion-post-repo';
 import { ReactionRepo } from '../repositories/reaction-repo';
-
-const sequelize = SequelizeConnectionService.getInstance();
+import { transaction } from '../utils/transaction';
+import { UserRepo } from '../repositories/user-repo';
+import { NotFoundError } from '../exceptions/not-found-error';
+import { ForbiddenError } from '../exceptions/forbidden-error';
 
 export class ReactionService {
   static async getReactions(postId: number, userId: number): Promise<Reaction[]> {
@@ -24,28 +24,30 @@ export class ReactionService {
   }
 
   static async createReaction(reactionName: string, postId: number, userId: number): Promise<Reaction> {
-    return await sequelize.transaction(async transaction => {
+    return await transaction(async () => {
       try {
+        const reaction: Reaction = await ReactionRepo.createReaction(reactionName, postId, userId);
         await DiscussionPostRepo.incrementReactionsCount(postId);
-        return await ReactionRepo.createReaction(reactionName, postId, userId);
+        return reaction;
       } catch (error) {
         if (error instanceof UniqueConstraintError) {
-          throw new UnprocessableError('User already has a reaction of the type for this post');
+          throw new UnprocessableError('User already has a reaction for this post');
         }
       }
     });
   }
 
-  /**
-   * TODO: Use this instead of inlining in router - Jordan
-   */
-  static async removeReaction(reactionName: string, postId: number, userId: number) {
-    const numberRemoved = await ReactionRepo.removeReaction(reactionName, postId, userId);
-    await DiscussionPostRepo.decrementReactionsCount(postId);
-    return numberRemoved;
-  }
+  static async removeReaction(reactionId: number, requestingUserId: number): Promise<void> {
+    await transaction(async () => {
+      const requestingUser = await UserRepo.getUser(requestingUserId);
 
-  // static async removeReaction(reactionName: string, postId: number, userId: number) {
-  //   return await Reaction.removeReaction(reactionName, postId, userId);
-  // }
+      const reaction = await ReactionRepo.getReaction({ reactionId });
+      if (reaction === null) throw new NotFoundError();
+
+      if (requestingUser.userId !== reaction.userId) throw new ForbiddenError();
+
+      await reaction.destroy();
+      await DiscussionPostRepo.decrementReactionsCount(reaction.postId);
+    });
+  }
 }

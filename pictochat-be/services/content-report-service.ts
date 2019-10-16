@@ -5,9 +5,7 @@ import { DiscussionPostRepo } from '../repositories/discussion-post-repo';
 
 export class ContentReportService {
   static async getReportedPosts(): Promise<DiscussionPost[]> {
-    const reportedPosts = await DiscussionPostRepo.getDiscussionPosts({
-      where: { hasInappropriateFlag: true, isHidden: false }
-    });
+    const reportedPosts = await DiscussionPostRepo.getFlaggedPosts();
     return reportedPosts;
   }
 }

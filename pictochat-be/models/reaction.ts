@@ -1,9 +1,9 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
+import { SequelizeConnection } from '../utils/sequelize-connection';
 import { User } from './user';
 import { DiscussionPost } from './discussion-post';
 
-const sequelize: Sequelize = SequelizeConnectionService.getInstance();
+const sequelize: Sequelize = SequelizeConnection.getInstance();
 
 export class Reaction extends Model {
   static readonly PUBLIC_ATTRIBUTES = ['reactionId', 'reactionName', 'postId', 'userId'];

@@ -1,12 +1,13 @@
 import { User } from '../models/user';
 import bcrypt from 'bcrypt';
 import { ForbiddenError } from '../exceptions/forbidden-error';
-import { SequelizeConnectionService } from './sequelize-connection-service';
+import { SequelizeConnection } from '../utils/sequelize-connection';
 import { NotFoundError } from '../exceptions/not-found-error';
 import { UserRepo } from '../repositories/user-repo';
+import config from '../utils/config';
 
-const BCRYPT_SALT_ROUNDS = 12;
-const sequelize = SequelizeConnectionService.getInstance();
+const BCRYPT_SALT_ROUNDS = config.BCRYPT_SALT_ROUNDS;
+const sequelize = SequelizeConnection.getInstance();
 
 interface UpdateUserData {
   username?: string;
@@ -55,7 +56,6 @@ export class UserService {
 
       user.disable();
       await user.save();
-      // await user.destroy();
     });
   }
 
