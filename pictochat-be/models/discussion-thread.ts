@@ -1,8 +1,8 @@
 import { Sequelize } from 'sequelize';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
+import { SequelizeConnection } from '../utils/sequelize-connection';
 import { DiscussionPost } from './discussion-post';
 
-const sequelize: Sequelize = SequelizeConnectionService.getInstance();
+const sequelize: Sequelize = SequelizeConnection.getInstance();
 
 /**
  * Summary of posts with in one discussion thread

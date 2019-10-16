@@ -1,18 +1,19 @@
 import { createNamespace } from 'continuation-local-storage';
 import { Sequelize, Dialect } from 'sequelize';
+import config from './config';
 
 // Config
-const DB_HOST = process.env.PICTOCHAT_DB_HOST || '192.168.99.100';
-const DB_PORT = parseInt(process.env.PICTOCHAT_DB_PORT) || 5432;
-const DB_USER = process.env.PICTOCHAT_DB_USER || 'postgres';
-const DB_PASSWORD = process.env.PICTOCHAT_DB_PASSWORD || 'postgres';
-const DB_NAME = process.env.PICTOCHAT_DB_NAME || 'pictochat';
-const DB_DIALECT = 'postgres';
+const DB_HOST = config.DB_HOST;
+const DB_PORT = config.DB_PORT;
+const DB_USER = config.DB_USER;
+const DB_PASSWORD = config.DB_PASSWORD;
+const DB_NAME = config.DB_NAME;
+const DB_DIALECT = (config.DB_DIALECT as Dialect);
 
 /**
  * This class maintains a single instanced sequelize connection to the pictochat database
  */
-export class SequelizeConnectionService {
+export class SequelizeConnection {
   private static instance: Sequelize = null;
 
   static getInstance(
@@ -23,20 +24,20 @@ export class SequelizeConnectionService {
     databaseName: string = DB_NAME,
     dialect: Dialect = DB_DIALECT
   ): Sequelize {
-    if (SequelizeConnectionService.instance === null) {
+    if (SequelizeConnection.instance === null) {
       console.log('Creating Sequelize instance');
       // Setting the CLS makes transactions automatically apply to all queries within
       // a sequelize.transaction(...) callback
-      const namespace = createNamespace('pictochat');
+      const namespace = createNamespace('default');
       Sequelize.useCLS(namespace);
 
-      SequelizeConnectionService.instance = new Sequelize(databaseName, user, password, {
+      SequelizeConnection.instance = new Sequelize(databaseName, user, password, {
         dialect: dialect,
         host: host,
         port: port
       });
     }
 
-    return SequelizeConnectionService.instance;
+    return SequelizeConnection.instance;
   }
 }

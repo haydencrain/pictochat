@@ -1,8 +1,8 @@
 import { Sequelize, Model, DataTypes, WhereOptions } from 'sequelize';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
+import { SequelizeConnection } from '../utils/sequelize-connection';
 import { ImageService } from '../services/image-service';
 
-const sequelize: Sequelize = SequelizeConnectionService.getInstance();
+const sequelize: Sequelize = SequelizeConnection.getInstance();
 
 export class User extends Model {
   static readonly PUBLIC_ATTRIBUTES = ['userId', 'email', 'username', 'userAvatarURI', 'hasAdminRole'];
@@ -33,7 +33,6 @@ export class User extends Model {
     let json = {};
     for (let attr of User.PUBLIC_ATTRIBUTES) {
       json[attr] = this.get(attr);
-      // json[attr] = this.getDataValue(attr as any);
     }
     return json;
   }
@@ -66,7 +65,9 @@ User.init(
     modelName: 'user',
     tableName: 'users',
     freezeTableName: true,
-    // paranoid: true,
-    indexes: [{ fields: ['userId'], using: 'BTREE' }, { fields: ['username'], using: 'BTREE' }]
+    indexes: [
+      { fields: ['userId', 'isDisabled', 'hasAdminRole'], using: 'BTREE' },
+      { fields: ['username'], using: 'BTREE' }
+    ]
   }
 );

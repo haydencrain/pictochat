@@ -1,8 +1,8 @@
 import { Sequelize, Model, DataTypes, Op, FindOptions } from 'sequelize';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
+import { SequelizeConnection } from '../utils/sequelize-connection';
 import { User } from './user';
 
-const sequelize: Sequelize = SequelizeConnectionService.getInstance();
+const sequelize: Sequelize = SequelizeConnection.getInstance();
 
 export interface ILoginLog {
   userId: number;
@@ -30,7 +30,6 @@ LoginLog.init(
     underscored: false,
     indexes: [
       { fields: ['userId'], using: 'BTREE' },
-      { fields: ['deviceId'], using: 'BTREE' },
       { fields: ['deviceId', 'userId'], using: 'BTREE' }
     ]
   }

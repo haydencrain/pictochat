@@ -1,10 +1,10 @@
 import { LeaderboardRank } from "../models/leaderboard-rank";
-import { QueryTypes, Op } from "sequelize";
+import { QueryTypes } from "sequelize";
 import { User } from "../models/user";
-import { SequelizeConnectionService } from "../services/sequelize-connection-service";
+import { SequelizeConnection } from "../utils/sequelize-connection";
 import { UserRepo } from "./user-repo";
 
-const sequelize = SequelizeConnectionService.getInstance();
+const sequelize = SequelizeConnection.getInstance();
 
 export class LeaderboardRankRepo {
 
@@ -49,23 +49,10 @@ export class LeaderboardRankRepo {
     }
 
     return ranks;
-    // return topUserMetrics.map(userMetricRecord => {
-    //   // Copying to avoid confusing bugs if function caller doesn't expect topUserMetrics to be mutated
-    //   userMetricRecord = Object.assign({}, userMetricRecord);
-    //   userMetricRecord.user = userDetails[userMetricRecord.authorId];
-    //   return LeaderboardRank.fromJson(userMetricRecord);
-    // });
-
-    // return topUserMetrics.map(userMetricRecord => {
-    //   // Copying to avoid confusing bugs if function caller doesn't expect topUserMetrics to be mutated
-    //   userMetricRecord = Object.assign({}, userMetricRecord);
-    //   userMetricRecord.user = userDetails[userMetricRecord.authorId];
-    //   return LeaderboardRank.fromJson(userMetricRecord);
-    // });
   }
 
   private static async getUserDetails(userIds) {
-    let userDetails = await UserRepo.getUsers(true, { userId: { [Op.in]: userIds } });
+    let userDetails = await UserRepo.getUsers(true, userIds);
     let userDetailMap = {};
     for (let user of userDetails) {
       userDetailMap[user.userId] = user;

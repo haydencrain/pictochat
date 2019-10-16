@@ -1,10 +1,10 @@
-import { Sequelize, Model, DataTypes, Op, FindOptions, CountOptions, OrderItem } from 'sequelize';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
+import { Sequelize, Model, DataTypes, Op } from 'sequelize';
+import { SequelizeConnection } from '../utils/sequelize-connection';
 import { ImageService } from '../services/image-service';
 import { User } from './user';
 import { DiscussionPostRepo } from '../repositories/discussion-post-repo';
 
-const sequelize: Sequelize = SequelizeConnectionService.getInstance();
+const sequelize: Sequelize = SequelizeConnection.getInstance();
 
 export class DiscussionPost extends Model {
   static readonly PUBLIC_ATTRIBUTES = [
@@ -48,7 +48,7 @@ export class DiscussionPost extends Model {
     this.isDeleted = true;
   }
 
-  setInappropriateContentFlag(value: boolean) {
+  setInappropriateFlag(value: boolean) {
     this.hasInappropriateFlag = value;
   }
 
@@ -117,7 +117,9 @@ DiscussionPost.init(
     indexes: [
       { fields: ['discussionId', 'postId'], using: 'BTREE' },
       { fields: ['hasInappropriateFlag'], using: 'BTREE' },
-      { fields: ['isDeleted', 'isHidden'], using: 'BTREE' }
+      { fields: ['isDeleted', 'isHidden'], using: 'BTREE' },
+      // Supports counts of posts by user; excluding deleted/hidden posts
+      { fields: ['authorId', 'isHidden', 'isDeleted', 'postId'], using: 'BTREE' }
     ]
   }
 );

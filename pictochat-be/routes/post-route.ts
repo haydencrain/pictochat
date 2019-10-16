@@ -1,5 +1,4 @@
-import util from 'util';
-import fs from 'fs';
+import { unlink, readFile } from 'fs-extra';
 import express from 'express';
 import multer from 'multer';
 import passport from 'passport';
@@ -8,11 +7,8 @@ import { strategies } from '../middleware/passport-middleware';
 import { DiscussionService, ArchiveType } from '../services/discussion-service';
 import { MIMETYPE_TO_ENCODING } from '../utils/encoding-content-types';
 import { DiscussionTreeNode } from '../models/discussion-tree-node';
-import { User } from '../models/user';
-import { ForbiddenError } from '../exceptions/forbidden-error';
 import { DiscussionPost } from '../models/discussion-post';
 import { NotFoundError } from '../exceptions/not-found-error';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { PaginationOptions } from '../utils/pagination-types';
 import { UnprocessableError } from '../exceptions/unprocessable-error';
 
@@ -35,7 +31,6 @@ postRouter.get('/:postId', async (req, res, next) => {
       sort,
       paginationOptions
     );
-    console.log('replyTree: ', replyTree);
     res.json(replyTree.toJSON());
   } catch (error) {
     next(error);
@@ -48,7 +43,7 @@ postRouter.post(
   passport.authenticate(strategies.JWT, { session: false }),
   async (req, res, next) => {
     try {
-      const post: DiscussionPost = await setPostInappropraiteContentFlag(parseInt(req.params.postId), true);
+      const post: DiscussionPost = await DiscussionService.setInappropriateFlag(parseInt(req.params.postId), true);
       res.json(makeContentReport(post));
     } catch (error) {
       next(error);
@@ -58,7 +53,7 @@ postRouter.post(
 
 postRouter.delete('/:postId/content-report', async (req, res, next) => {
   try {
-    const post: DiscussionPost = await setPostInappropraiteContentFlag(parseInt(req.params.postId), false);
+    const post: DiscussionPost = await DiscussionService.setInappropriateFlag(parseInt(req.params.postId), false);
     res.json(makeContentReport(post));
   } catch (error) {
     next(error);
@@ -67,7 +62,6 @@ postRouter.delete('/:postId/content-report', async (req, res, next) => {
 
 postRouter.get('/:postId/content-report', async (req, res, next) => {
   try {
-    console.log(req.params);
     const post: DiscussionPost = await DiscussionService.getPost(parseInt(req.params.postId));
     if (!post.hasInappropriateFlag) throw new NotFoundError();
     res.json(makeContentReport(post));
@@ -109,7 +103,7 @@ postRouter.patch(
     } catch (error) {
       next(error);
     } finally {
-      deleteFile(req.file.path);
+      unlink(req.file.path);
     }
   }
 );
@@ -123,9 +117,8 @@ postRouter.delete(
       let archiveType: ArchiveType = await DiscussionService.archivePost(req.params.postId, requestingUserId);
 
       if (archiveType === ArchiveType.DELETED) {
-        res.status(204); // Successful, no content
-        res.send(null);
-        return;
+        res.status(204);
+        return res.end();
       }
 
       // If Post was hidden
@@ -140,21 +133,6 @@ postRouter.delete(
 
 //// HELPER FUNCTIONS ////
 
-// TODO: Move into module in project utils folder (or maybe see if a promise-based library for fs already exists?)
-const readFile = util.promisify(fs.readFile);
-const deleteFile = util.promisify(fs.unlink);
-
-// TODO: Put in a a service (not sure which one)
-async function setPostInappropraiteContentFlag(postId: number, flagValue: boolean): Promise<DiscussionPost> {
-  const sequelize = SequelizeConnectionService.getInstance();
-  return await sequelize.transaction(async transaction => {
-    const post = await DiscussionService.getPost(postId);
-    post.setInappropriateContentFlag(flagValue);
-    await post.save();
-    return post;
-  });
-}
-
 function makeContentReport(post) {
   return { postId: post.postId, hasInappropriateContentFlag: post.hasInappropriateContentFlag };
 }
@@ -168,37 +146,40 @@ async function makeNewImageSpec(file): Promise<{ data: Buffer; encoding: string 
   return { data, encoding };
 }
 
-function assertIsPostAuthor(body: { userId: string }, user: User) {
-  if (parseInt(body.userId) !== user.userId) {
-    throw new ForbiddenError("Post's userId and/or supplied JWT token is incorrect or are for different users");
-  }
-}
+// function assertIsPostAuthor(body: { userId: string }, user: User) {
+//   if (parseInt(body.userId) !== user.userId) {
+//     throw new ForbiddenError("Post's userId and/or supplied JWT token is incorrect or are for different users");
+//   }
+// }
 
 async function handleNewReplyPOST(req, res, next) {
   try {
-    assertIsPostAuthor(req.body, req.user);
-    let newImageSpec = await makeNewImageSpec(req.file);
-    let post = await DiscussionService.createReply(req.body.userId, req.body.parentPostId, newImageSpec);
+    // assertIsPostAuthor(req.body, req.user);
+    const newImageSpec = await makeNewImageSpec(req.file);
+    const post = await DiscussionService.createReply(req.user.userId, req.body.parentPostId, newImageSpec);
+    // let post = await DiscussionService.createReply(req.body.userId, req.body.parentPostId, newImageSpec);
     // Setting Location and using status 201 to match RESTful conventions for POST responses
-    res.set('Location', `${config.API_ROOT}/post/${post.postId}`);
+    // res.set('Location', `${config.API_ROOT}/post/${post.postId}`);
     res.status(201);
     res.json(post.toJSON());
   } finally {
-    await deleteFile(req.file.path);
+    await unlink(req.file.path);
+    // await deleteFile(req.file.path);
   }
 }
 
 async function handleNewThreadPOST(req, res, next) {
   try {
-    assertIsPostAuthor(req.body, req.user);
-    let newImageSpec = await makeNewImageSpec(req.file);
+    // assertIsPostAuthor(req.body, req.user);
+    const newImageSpec = await makeNewImageSpec(req.file);
     // let newThreadSpec = { image: newImageSpec, userId: req.body.userId };
-    let thread = await DiscussionService.createThread(req.body.userId, newImageSpec);
+    const thread = await DiscussionService.createThread(req.user.userId, newImageSpec);
+    // let thread = await DiscussionService.createThread(req.body.userId, newImageSpec);
     // Setting Location and using status 201 to match RESTful conventions for POST responses
-    res.set('Location', `${config.API_ROOT}/post/${thread.rootPost.postId}`);
+    // res.set('Location', `${config.API_ROOT}/post/${thread.rootPost.postId}`);
     res.status(201);
     res.json(thread.toFlatJSON());
   } finally {
-    await deleteFile(req.file.path);
+    await unlink(req.file.path);
   }
 }

@@ -1,11 +1,12 @@
 import { Image } from '../models/image';
-import { FindOptions } from 'sequelize';
 
 export class ImageRepo {
 
-  static async getImage(imageId: string, options: FindOptions = {}): Promise<Image> {
-    options = { attributes: Image.PUBLIC_ATTRIBUTES, ...options };
-    options['where'] = { ...(options['where'] || {}), imageId };
+  static async getImage(imageId: string): Promise<Image> {
+    const options = {
+      attributes: Image.PUBLIC_ATTRIBUTES,
+      where: { imageId }
+    };
     return await Image.findOne(options);
   }
 

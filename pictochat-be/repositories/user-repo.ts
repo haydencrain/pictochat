@@ -1,5 +1,5 @@
 import { User } from "../models/user";
-import { WhereOptions } from "sequelize";
+import { Op } from "sequelize";
 
 export class UserRepo {
 
@@ -47,11 +47,22 @@ export class UserRepo {
   /**
    * @param onlyIncludePublicAttrs When true, only fields in User.PUBLIC_ATTRIBUTES will be
    *    included in the returned object. */
-  static async getUsers(onlyIncludePublicAttrs: boolean = true, filter?: WhereOptions): Promise<User[]> {
-    let queryParams = { order: ['userId'], where: UserRepo.defaultFilter() };
+  static async getUsers(onlyIncludePublicAttrs: boolean = true, userIds?: number[]): Promise<User[]> {
+    let queryParams = {
+      where: UserRepo.defaultFilter()
+    };
+
+    if (userIds !== undefined) {
+      queryParams['where'] = {
+        ...queryParams['where'],
+        ...{ userId: { [Op.in]: userIds } }
+      };
+    }
+
     if (onlyIncludePublicAttrs) {
       queryParams['attributes'] = { include: User.PUBLIC_ATTRIBUTES };
     }
+
     const users = User.findAll(queryParams);
     return users;
   }

@@ -17,7 +17,7 @@ interface LeaderboardProps {
 export function Leaderboard(props: LeaderboardProps) {
   const { ranks } = props;
 
-  /* RENDERING HELPERS*/
+  /* RENDERING HELPERS */
   const getContent = () => {
     if (ranks.length == 0) {
       // show placeholder
@@ -39,6 +39,8 @@ export function Leaderboard(props: LeaderboardProps) {
         </div>
       </Segment>
     ));
+
+    return userInfo;
 
   };
 
