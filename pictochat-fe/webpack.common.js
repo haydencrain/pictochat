@@ -3,6 +3,8 @@ const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
+const BrotliPlugin = require('brotli-webpack-plugin');
 
 module.exports = {
   entry: { main: path.resolve(__dirname, './src/index.tsx') },
@@ -27,6 +29,21 @@ module.exports = {
     new webpack.DefinePlugin({
       // Placeholder for global used in any node_modules, avoids Content Security Policy script-src 'unsafe-eval'
       global: 'window'
+    }),
+    new CompressionPlugin({
+      filename: `[path].gz[query]`,
+      algorithm: 'gzip',
+      test: /\.(js|css|html|svg)$/,
+      threshold: 10240,
+      minRatio: 0.8,
+      deleteOriginalAssets: false
+    }),
+    new BrotliPlugin({
+      filename: `[path].br[query]`,
+      test: /\.(js|css|html|svg)$/,
+      threshold: 10240,
+      minRatio: 0.8,
+      deleteOriginalAssets: false
     })
   ],
   resolve: {
