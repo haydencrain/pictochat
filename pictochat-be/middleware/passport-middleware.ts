@@ -4,6 +4,8 @@ import passportJwt, { ExtractJwt } from 'passport-jwt';
 import { UserService } from '../services/user-service';
 import config from '../utils/config';
 import { transaction } from '../utils/transaction';
+import { AuthError, AuthErrorMessageTypes } from '../exceptions/auth-error';
+import { User } from '../models/user';
 
 /**
  * NOTE: Much of the code in this module is adapted from:
@@ -39,10 +41,7 @@ const registerStrategy = new passportLocal.Strategy(
       await transaction(async () => {
         // if user already exists, return false
         let user = await UserService.getUserByUsername(username);
-        if (user !== null) {
-          done(null, false, { message: 'Username is already being used' });
-          return;
-        }
+        if (user !== null) throw new AuthError(AuthErrorMessageTypes.DUPLICATE_USERNAME);
 
         // else create the user
         user = await UserService.createUser(username, password);
@@ -67,15 +66,15 @@ const loginStrategy = new passportLocal.Strategy(
     try {
       // check if correct username
       const user = await UserService.getUserByUsername(username, true);
-      if (user === null) return done(null, false, { message: 'incorrect username' });
 
-      if (user.isDisabled) {
-        return done(null, false, { message: 'This account has been disabled due to suspicious activity' });
-      }
+      if (user === null) throw new AuthError(AuthErrorMessageTypes.INCORRECT_CREDENTIALS);
+      if (user.isDisabled) throw new AuthError(AuthErrorMessageTypes.USER_DISABLED);
+
+      await assertPasswordMatch(user, password);
 
       // check if correct password
       const isCorrectPassword = await UserService.assertPasswordMatch(user, password);
-      if (!isCorrectPassword) return done(null, false, { message: 'passwords do not match' });
+      if (!isCorrectPassword) throw new AuthError(AuthErrorMessageTypes.INCORRECT_CREDENTIALS);
 
       // user found
       return done(null, user);
@@ -102,3 +101,14 @@ const jwtStrategy = new passportJwt.Strategy(
     }
   }
 );
+
+/**
+ * Checks to see if the password matches the user's password, and throws an `AuthError` if false
+ * @function
+ * @param user
+ * @param password
+ */
+async function assertPasswordMatch(user: User, password: string) {
+  const isCorrectPassword = await UserService.assertPasswordMatch(user, password);
+  if (!isCorrectPassword) throw new AuthError(AuthErrorMessageTypes.INCORRECT_CREDENTIALS);
+}
