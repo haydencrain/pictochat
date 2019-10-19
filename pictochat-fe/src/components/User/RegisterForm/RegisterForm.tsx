@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import StoresContext from '../../../contexts/StoresContext';
 import UnauthenticatedUser from '../../../models/UnauthenticatedUser';
 import useForm from 'react-hook-form';
+import { handleError } from '../../../utils/ErrorHelpers';
 import './RegisterForm.less';
 
 interface RegisterFormProps {
@@ -71,7 +72,7 @@ export function RegisterForm(props: RegisterFormProps) {
       alert('User created sucessfully');
       props.onSubmitSuccess && props.onSubmitSuccess();
     } catch (e) {
-      alert(e.message);
+      handleError(e);
     }
   });
 

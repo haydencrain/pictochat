@@ -5,6 +5,7 @@ import UnauthenticatedUser from '../../../models/UnauthenticatedUser';
 import StoresContext from '../../../contexts/StoresContext';
 import { observer } from 'mobx-react';
 import useForm from 'react-hook-form';
+import { handleError } from '../../../utils/ErrorHelpers';
 import './LoginForm.less';
 
 interface LoginFormProps {
@@ -32,7 +33,6 @@ function LoginForm(props: LoginFormProps) {
   const { handleSubmit, register } = useForm<LoginFormData>();
 
   const onSubmit = handleSubmit(async ({ username, password }) => {
-    console.log(username, password);
     try {
       const user: UnauthenticatedUser = {
         username: username,
@@ -42,7 +42,7 @@ function LoginForm(props: LoginFormProps) {
       await authStore.authAndLoadCurrentUser(user);
       props.onLogin && props.onLogin();
     } catch (error) {
-      alert(error);
+      handleError(error);
     }
   });
 
