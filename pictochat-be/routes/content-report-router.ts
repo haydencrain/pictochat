@@ -4,9 +4,13 @@ import { strategies } from '../middleware/passport-middleware';
 import { ContentReportService } from '../services/content-report-service';
 import { requireAdminMiddleware } from '../middleware/require-admin-middleware';
 
-export const contentReportRouter = express.Router();
 /**
- * Implements HTTP responses for the endpoint `'/content-report'`
+ * Implements HTTP responses for the endpoint `'/api/content-report'`
+ */
+export const contentReportRouter = express.Router();
+
+/**
+ * GET a list of post content reports
  */
 contentReportRouter.get(
   '/',

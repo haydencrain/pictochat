@@ -6,7 +6,7 @@ import { UnprocessableError } from '../exceptions/unprocessable-error';
  * @param res
  * @param next
  */
-export async function registerUserMiddleware(req, res, next) {
+export async function validateUserAttrsMiddleware(req, res, next) {
   const { username, email, password } = req.body;
   if (!EmailValidator.validate(email)) {
     next(new UnprocessableError('Email is invalid!'));

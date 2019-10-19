@@ -6,33 +6,16 @@ import { UserService } from '../services/user-service';
 import { strategies } from '../middleware/passport-middleware';
 import { deviceIdMiddleware } from '../middleware/device-id-middleware';
 import { User } from '../models/user';
-import { registerUserMiddleware } from '../middleware/register-user-middleware';
+import { validateUserAttrsMiddleware } from '../middleware/validate-user-attrs-middleware';
 import { LoginLogRepo } from '../repositories/login-log-repo';
-
-//// HELPERS ////
-
-function makeJWTPayload(user: User): { auth: boolean; token: string } {
-  const token = jwt.sign({ id: user.userId }, config.JWT_SECRET, {
-    expiresIn: '24h'
-  });
-  return { auth: true, token };
-}
 
 //// ROUTER ////
 
 export const userRouter = express.Router();
 
-// get user by username
-// userRouter.get('/:username', async (req, res, next) => {
-//   try {
-//     const user: User = await UserService.getUserByUsername(req.params.username);
-//     res.json(user.getPublicJSON());
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
-// GET /user
+/** GET users
+ * @queryParam username (optional)
+ */
 userRouter.get('/', async (req, res, next) => {
   try {
     if (req.query.username) {
@@ -49,28 +32,44 @@ userRouter.get('/', async (req, res, next) => {
   }
 });
 
-// GET current user ONLY IF AUTHED
-userRouter.get('/authed', passport.authenticate(strategies.JWT, { session: false }), async (req: any, res, next) => {
-  try {
-    const user: User = await UserService.getUser(req.user.userId);
-    res.json(user.getPublicJSON());
-  } catch (error) {
-    next(error);
+/**
+ * DELETE
+ * Disable a user
+ * @urlParam userId
+ */
+userRouter.delete(
+  '/:userId',
+  passport.authenticate(strategies.JWT, { session: false }),
+  async (req: any, res, next) => {
+    try {
+      await UserService.disableUser(req.params.userId, req.user.userId);
+      res.status(204);
+      res.end();
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
-// POST create user
-userRouter.post('/', registerUserMiddleware, deviceIdMiddleware, async (req: any, res, next) => {
+/**
+ * POST
+ * Create user
+ * @body JSON with format {username, password, email}
+ * @response JSON with format {user, message}
+ */
+userRouter.post('/', validateUserAttrsMiddleware, deviceIdMiddleware, async (req: any, res, next) => {
   passport.authenticate(strategies.REGISTER, (err, user: boolean | User, info) => {
     if (err) return next(err);
+
     if (!user && !!info) {
       return res.status(400).json(info);
     }
+
     if (!!info) return res.json(info);
 
     try {
       req.logIn(user, async err => {
-        let typedUser = user as User;
+        const typedUser = user as User;
         await UserService.updateUser(typedUser.userId, { email: req.body.email });
         let body = makeJWTPayload(typedUser);
         body['message'] = 'User created successfully';
@@ -85,7 +84,28 @@ userRouter.post('/', registerUserMiddleware, deviceIdMiddleware, async (req: any
   })(req, res, next);
 });
 
-// POST auth user
+/**
+ * GET the user associated with the clients current session (e.g. based on client's JWT)
+ *
+ * NOTE: Breaking of RESTful conventions is intentional and prevents user credentials
+ *    from being included in URL.
+ */
+userRouter.get('/authed', passport.authenticate(strategies.JWT, { session: false }), async (req: any, res, next) => {
+  try {
+    const user: User = await UserService.getUser(req.user.userId);
+    res.json(user.getPublicJSON());
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * POST
+ * This handler is used to login clients
+ *
+ * NOTE: Breaking of RESTful conventions is intentional and prevents user credentials
+ *    from being included in URL.
+ */
 userRouter.post('/login', deviceIdMiddleware, (req: any, res, next) => {
   passport.authenticate(strategies.LOGIN, (err, user, info) => {
     if (err) return next(err);
@@ -104,16 +124,11 @@ userRouter.post('/login', deviceIdMiddleware, (req: any, res, next) => {
   })(req, res, next);
 });
 
-userRouter.delete(
-  '/:userId',
-  passport.authenticate(strategies.JWT, { session: false }),
-  async (req: any, res, next) => {
-    try {
-      await UserService.disableUser(req.params.userId, req.user.userId);
-      res.status(204);
-      res.end();
-    } catch (error) {
-      next(error);
-    }
-  }
-);
+//// HELPERS ////
+
+function makeJWTPayload(user: User): { auth: boolean; token: string } {
+  const token = jwt.sign({ id: user.userId }, config.JWT_SECRET, {
+    expiresIn: '24h'
+  });
+  return { auth: true, token };
+}

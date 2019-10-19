@@ -19,6 +19,7 @@ export class ReactionService {
     let reaction: Reaction[] = await ReactionRepo.getReactions(postId, userId);
     return reaction;
   }
+
   /**
    * Returns all reactions made for a post
    * @param postId
@@ -27,6 +28,7 @@ export class ReactionService {
     let reaction: Reaction[] = await ReactionRepo.getReactionsByPost(postId);
     return reaction;
   }
+
   /**
    * Returns all reactions made by a user
    * @param userId
@@ -35,6 +37,7 @@ export class ReactionService {
     let reaction: Reaction[] = await ReactionRepo.getReactionsByUser(userId);
     return reaction;
   }
+
   /**
    * Creates a specific reaction for a post by a user
    * @param reactionName
@@ -49,13 +52,18 @@ export class ReactionService {
         return reaction;
       } catch (error) {
         if (error instanceof UniqueConstraintError) {
-          // Occurs if user already has a reaction of this post
+          // Occurs if user already has a reaction for this post
           throw new UnprocessableError('User already has a reaction for this post');
         }
       }
     });
   }
 
+  /**
+   * Deletes a reaction
+   * @param reactionId
+   * @param requestingUserId User trying to delete the reaction
+   */
   static async removeReaction(reactionId: number, requestingUserId: number): Promise<void> {
     await transaction(async () => {
       const requestingUser = await UserRepo.getUser(requestingUserId);
@@ -63,6 +71,7 @@ export class ReactionService {
       const reaction = await ReactionRepo.getReaction({ reactionId });
       if (reaction === null) throw new NotFoundError();
 
+      // Users can only remove their own reactions
       if (requestingUser.userId !== reaction.userId) throw new ForbiddenError();
 
       await reaction.destroy();

@@ -18,11 +18,11 @@ export class PaginationService {
    * @param paginationOptions
    */
   static getPaginatedResults<T>(collection: T[], paginationOptions: PaginationOptions): PaginatedResults<T> {
-    /** Checks if the number of posts is larger than the maximum number allowed */
+    // Checks if the number of posts is larger than the maximum number allowed
     const end = isNullOrUndefined(paginationOptions.limit)
       ? collection.length
       : paginationOptions.start + paginationOptions.limit;
-    /** Checks if there are enough posts to create an additional page */
+    // Checks if there are enough posts to create an additional page
     const hasNextPage = end < collection.length;
     const results = collection.slice(paginationOptions.start, end);
     const nextStart = hasNextPage ? end : null;
@@ -35,6 +35,7 @@ export class PaginationService {
       nextStart
     };
   }
+
   /**
    * Returns replies to each post currently on the page
    * @param orderedPosts

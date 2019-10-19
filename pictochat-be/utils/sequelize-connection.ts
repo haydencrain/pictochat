@@ -8,10 +8,10 @@ const DB_PORT = config.DB_PORT;
 const DB_USER = config.DB_USER;
 const DB_PASSWORD = config.DB_PASSWORD;
 const DB_NAME = config.DB_NAME;
-const DB_DIALECT = (config.DB_DIALECT as Dialect);
+const DB_DIALECT = config.DB_DIALECT as Dialect;
 
 /**
- * This class maintains a single instanced sequelize connection to the pictochat database
+ * This class maintains a singleton sequelize connection to the pictochat database
  */
 export class SequelizeConnection {
   private static instance: Sequelize = null;

@@ -16,7 +16,6 @@ interface UpdateUserData {
 
 /** Implements User related domain logic */
 export class UserService {
-
   /**
    * @param username
    * @param includeDisabled Whether to return the specified user if disabled
@@ -32,6 +31,7 @@ export class UserService {
   static async getUser(userId: number): Promise<User> {
     return await UserRepo.getUser(userId);
   }
+
   /**
    * Returns an array of all users
    */
@@ -65,6 +65,7 @@ export class UserService {
     user.username = data.username;
     return await user.save();
   }
+
   /**
    * Disables a user
    * @param userId userId of the user to be disabled

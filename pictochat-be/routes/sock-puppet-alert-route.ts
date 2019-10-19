@@ -5,9 +5,14 @@ import { SockPuppetAlertRepo } from '../repositories/sock-puppet-alert-repo';
 import { SockPuppetAlert } from '../models/sock-puppet-alert';
 import { requireAdminMiddleware } from '../middleware/require-admin-middleware';
 
-export const sockPuppetAlertRouter = express.Router();
 /**
- * Implements HTTP responses for the endpoint `'/sock-puppet-alert'`
+ * Implements HTTP responses for the endpoint `'/api/sock-puppet-alert'`
+ */
+export const sockPuppetAlertRouter = express.Router();
+
+/**
+ * GET Alerts for devices that have been used to access a large number of accounts (suspected sock puppets accounts)
+ * @queryParam userLimit The number of accounts/users a device needs to access to be included in the alerts
  */
 sockPuppetAlertRouter.get(
   '/',

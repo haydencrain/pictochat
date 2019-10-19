@@ -26,7 +26,10 @@ export enum ArchiveType {
 // SERVICE
 
 export class DiscussionService {
-
+  /**
+   * Get specified post. Throws an error if not found.
+   * @param postId
+   */
   static async getPost(postId: number): Promise<DiscussionPost> {
     const post = await DiscussionPostRepo.getDiscussionPost(postId);
     if (post === null) {
@@ -37,7 +40,8 @@ export class DiscussionService {
 
   /**
    * Creates and persists a new thread
-   * @param NewThread Object of structure {image, userId}, where userId is the id for the root post's author
+   * @param userId post's author
+   * @param newImage post's content
    * @returns DiscussionThread instance created with the specified newThread data */
   static async createThread(userId: number, newImage: NewImage): Promise<DiscussionThread> {
     return await transaction(async () => {
@@ -56,8 +60,10 @@ export class DiscussionService {
 
   /**
    * Creates and persists a new reply to an existing post
-   * @param NewThread Object of structure {image, userId, parentPostId}, where userId is the id for the root post's author
-   * @returns DiscussionPost instance created with the specified newPost data */
+   * @param userId authors userId
+   * @param parentPostId post being replied to
+   * @param newImage post's content
+   */
   static async createReply(userId: number, parentPostId: number, newImage: NewImage): Promise<DiscussionPost> {
     return await transaction(async () => {
       const image: Image = await ImageService.saveImage(newImage);
@@ -77,6 +83,13 @@ export class DiscussionService {
     });
   }
 
+  /**
+   * Change a post's image
+   *
+   * @param userId user trying to update the psot
+   * @param postId
+   * @param newImage new content for post
+   */
   static async updatePost(userId: number, postId: number, newImage: NewImage): Promise<DiscussionPost> {
     return await transaction(async () => {
       let post: DiscussionPost = await DiscussionService.getPost(postId);
@@ -98,6 +111,8 @@ export class DiscussionService {
 
   /**
    * Marks a post as deleted or hidden
+   * @param postId
+   * @param requestingUserId userId for user who is trying to achive the post
    */
   static async archivePost(postId: number, requestingUserId: number): Promise<ArchiveType> {
     return await transaction(async () => {
@@ -126,6 +141,11 @@ export class DiscussionService {
     });
   }
 
+  /**
+   * Set or unset a posts inappropriate content flag
+   * @param postId
+   * @param flagValue
+   */
   static async setInappropriateFlag(postId: number, flagValue: boolean): Promise<DiscussionPost> {
     return await transaction(async () => {
       const post = await DiscussionService.getPost(postId);
@@ -146,6 +166,12 @@ export class DiscussionService {
     return paginatedSummaries;
   }
 
+  /**
+   * Get a tree like representation of postId and its replies (with postId as the root node)
+   * @param postId
+   * @param sortType The sorting strategy to use amonsts direct replies to the same post
+   * @param paginationOptions
+   */
   static async getReplyTreeUnderPost(
     postId: number,
     sortType?: SortValue,
@@ -159,6 +185,12 @@ export class DiscussionService {
     return await DiscussionService.makeReplyTree(posts, paginationOptions ? paginationOptions.limit : null);
   }
 
+  /**
+   * Get replies for the specified post
+   * @param postId
+   * @param sortType The sorting strategy to use
+   * @param startAfterPostId The lowest postId to include (for pagination)
+   */
   static async getPostReplies(
     postId: number,
     sortType?: SortValue,
@@ -173,6 +205,7 @@ export class DiscussionService {
 
   /**
    * @param posts Array of posts ordered by replyTreePath such that the root is the first post
+   * @param limit If specified only the first `limit` replies in posts will be included
    * @returns Nested tree-like representation of the specified posts array */
   private static async makeReplyTree(posts: DiscussionPost[], limit?: number): Promise<DiscussionTreeNode> {
     // Create reply tree
@@ -201,6 +234,9 @@ export class DiscussionService {
     return nodes[rootPostId];
   }
 
+  /**
+   * Create an array of flat JSON objects for the specified discussions threads
+   */
   static flattenDiscussions(discussions: DiscussionThread[]): DiscussionThread[] {
     return discussions.map(discussion => discussion.toFlatJSON());
   }

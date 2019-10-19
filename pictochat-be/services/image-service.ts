@@ -2,6 +2,10 @@ import { Image } from '../models/image';
 import config from '../utils/config';
 import { ImageRepo } from '../repositories/image-repo';
 
+/**
+ * NOTE: IMAGES is currently used to help us expose an interface to clients
+ *  that would support an user avatar image feature.
+ */
 const IMAGES = {
   DEFAULT_AVATAR: 'https://semantic-ui.com/images/avatar2/large/elyse.png'
 };
@@ -14,11 +18,11 @@ export interface NewImage {
 
 // SERVICE
 
-/**
- * NOTE: This currently just returns mock data
- */
 export class ImageService {
-
+  /**
+   * Resolves the imageId to a URI that clients can use to request the image
+   * @param imageId
+   */
   static getImageURI(imageId: string): string {
     if (IMAGES.hasOwnProperty(imageId)) {
       return IMAGES[imageId];
@@ -26,10 +30,18 @@ export class ImageService {
     return `${config.API_ROOT}/image/${imageId}`;
   }
 
-  static getUserAvatarURI(imageId: string): string {
-    return ImageService.getImageURI(imageId);
+  /**
+   * Get users avatar image
+   * FIXME: Currently returns a mock image.
+   */
+  static getUserAvatarURI(userId: string): string {
+    return ImageService.getImageURI('DEFAULT_AVATAR');
   }
 
+  /**
+   * Persist an image
+   * @param newImage
+   */
   static async saveImage(newImage: NewImage): Promise<Image> {
     let uploadedDate: Date = new Date();
     let image: Image = await ImageRepo.createImage({ ...newImage, ...{ uploadedDate: uploadedDate } });

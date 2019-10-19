@@ -1,6 +1,5 @@
 /**
- * Throws a `NotFoundError` when a search returns without data
- * @class
+ * Throw a `NotFoundError` when a search returns without data
  */
 export class NotFoundError {
   static readonly ERROR_TYPE = 'NOT_FOUND_ERROR';

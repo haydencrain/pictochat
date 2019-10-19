@@ -17,10 +17,10 @@ const imageStager = multer({ dest: config.IMAGE_STAGING_DIR });
 
 //// ROUTER ////
 
-export const postRouter = express.Router();
 /**
- * Implements HTTP responses for the endpoint `'/post'`
+ * Implements HTTP responses for the endpoint `'/api/post'`
  */
+export const postRouter = express.Router();
 
 /**
  * GET discussion tree node for postId
@@ -34,7 +34,7 @@ postRouter.get('/:postId', async (req, res, next) => {
   try {
     const { sort, limit, after } = req.query;
     const paginationOptions = new PaginationOptions(after, limit);
-    let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(
+    const replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(
       req.params.postId,
       sort,
       paginationOptions
@@ -143,14 +143,15 @@ postRouter.patch(
 
 /**
  * DELETE a post
+ * @urlParam postId
  */
 postRouter.delete(
   '/:postId',
   passport.authenticate(strategies.JWT, { session: false }),
   async (req: any, res, next) => {
     try {
-      let requestingUserId: number = req.user.userId;
-      let archiveType: ArchiveType = await DiscussionService.archivePost(req.params.postId, requestingUserId);
+      const requestingUserId: number = req.user.userId;
+      const archiveType: ArchiveType = await DiscussionService.archivePost(req.params.postId, requestingUserId);
 
       if (archiveType === ArchiveType.DELETED) {
         res.status(204);
@@ -158,7 +159,7 @@ postRouter.delete(
       }
 
       // If Post was hidden
-      let post: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(req.params.postId);
+      const post: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(req.params.postId);
       res.json(post.toJSON());
     } catch (error) {
       next(error);
@@ -168,7 +169,7 @@ postRouter.delete(
 
 //// HELPER FUNCTIONS ////
 
-function makeContentReport(post: DiscussionPost): { postId: number, hasInappropriateContentFlag: boolean } {
+function makeContentReport(post: DiscussionPost): { postId: number; hasInappropriateContentFlag: boolean } {
   return { postId: post.postId, hasInappropriateContentFlag: post.hasInappropriateFlag };
 }
 

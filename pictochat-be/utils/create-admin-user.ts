@@ -2,6 +2,9 @@ import { UserService } from '../services/user-service';
 import { SequelizeConnection } from './sequelize-connection';
 import config from './config';
 
+/**
+ * Creates an admin user with static username and password
+ */
 export async function createAdminUser() {
   const sequelize = SequelizeConnection.getInstance();
   await sequelize.transaction(async transaction => {
