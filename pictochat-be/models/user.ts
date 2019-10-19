@@ -36,7 +36,6 @@ export class User extends Model {
     }
     return json;
   }
-
 }
 
 User.init(

@@ -8,6 +8,10 @@ const sequelize = SequelizeConnection.getInstance();
 
 export class LeaderboardRankRepo {
 
+  /**
+   * Get the top n leaderboard ranks
+   * @param n
+   */
   static async getTop(n: number): Promise<any[]> {
     let topUserMetrics = await LeaderboardRankRepo.getRankedAuthorMetrics(n);
     let topUserIds = topUserMetrics.map(userMetricRecord => userMetricRecord.authorId);
@@ -15,6 +19,10 @@ export class LeaderboardRankRepo {
     return LeaderboardRankRepo.mergeUsersAndMetrics(userDetails, topUserMetrics);
   }
 
+  /**
+   * Get the scores for the highest scoring users
+   * @param top the number of users to include
+   */
   private static async getRankedAuthorMetrics(top: number): Promise<any[]> {
     let userMetrics: any[] = await sequelize.query(
       `SELECT "authorId", COUNT(*) AS "postCount"
@@ -31,6 +39,12 @@ export class LeaderboardRankRepo {
     return userMetrics;
   }
 
+  /**
+   * Get LeaderboardRanks for the userIds in topUserMetrics
+   *
+   * @param userDetails A map of User objects keyed by userId
+   * @param topUserMetrics A JSON with format {userId, rank, <metrics...>}
+   */
   private static mergeUsersAndMetrics(
     userDetails: { [userId: string]: User },
     topUserMetrics: { authorId: number, postCount: number }[]
@@ -51,7 +65,11 @@ export class LeaderboardRankRepo {
     return ranks;
   }
 
-  private static async getUserDetails(userIds) {
+  /**
+   * Get a map (keyed by userId) of user objects for the specified userIds
+   * @param userIds
+   */
+  private static async getUserDetails(userIds: number[]) {
     let userDetails = await UserRepo.getUsers(true, userIds);
     let userDetailMap = {};
     for (let user of userDetails) {

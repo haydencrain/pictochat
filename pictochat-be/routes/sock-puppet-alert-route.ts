@@ -6,7 +6,9 @@ import { SockPuppetAlert } from '../models/sock-puppet-alert';
 import { requireAdminMiddleware } from '../middleware/require-admin-middleware';
 
 export const sockPuppetAlertRouter = express.Router();
-
+/**
+ * Implements HTTP responses for the endpoint `'/sock-puppet-alert'`
+ */
 sockPuppetAlertRouter.get(
   '/',
   passport.authenticate(strategies.JWT, { session: false }),

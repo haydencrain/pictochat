@@ -7,7 +7,6 @@ const IMAGES = {
 };
 
 // HELPER INTERFACES
-
 export interface NewImage {
   data: Buffer;
   encoding: string;

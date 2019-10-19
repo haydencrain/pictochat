@@ -1,9 +1,13 @@
 import { User } from "../models/user";
-import { Op } from "sequelize";
+import { Op, WhereOptions } from "sequelize";
 
 export class UserRepo {
 
-  static defaultFilter(includeDisabled: boolean = false) {
+  /**
+   * Default WHERE condition for queries that get users.
+   * @param includeDisabled Whether to include disabled users
+   */
+  static defaultFilter(includeDisabled: boolean = false): WhereOptions {
     let filter = {};
     if (!includeDisabled) {
       filter['isDisabled'] = false;
@@ -11,10 +15,18 @@ export class UserRepo {
     return filter;
   }
 
+  /**
+   * @param username
+   * @param hashedPassword A bcrypt hashed password
+   */
   static async createUser(username: string, hashedPassword: string): Promise<User> {
     return await User.create({ username, password: hashedPassword });
   }
 
+  /**
+   * @param username
+   * @param includeDisabled When true, the specified user will be returned even if disabled.
+   */
   static async getUserByUsername(username: string, includeDisabled: boolean = false): Promise<User> {
     const user = await User.findOne({
       attributes: {
@@ -29,6 +41,7 @@ export class UserRepo {
    * @param userId
    * @param onlyIncludePublicAttrs When true, only fields in User.PUBLIC_ATTRIBUTES will be
    *    included in the returned object.
+   * @param includeDisabled When true, the specified user will be returned even if disabled.
    * @returns a User instance with the specified userId
    */
   static async getUser(
@@ -46,7 +59,9 @@ export class UserRepo {
 
   /**
    * @param onlyIncludePublicAttrs When true, only fields in User.PUBLIC_ATTRIBUTES will be
-   *    included in the returned object. */
+   *    included in the returned object.
+   * @param userIds if provided, limits the results to users with the specifeid userIds
+   */
   static async getUsers(onlyIncludePublicAttrs: boolean = true, userIds?: number[]): Promise<User[]> {
     let queryParams = {
       where: UserRepo.defaultFilter()

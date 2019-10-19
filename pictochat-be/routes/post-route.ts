@@ -18,9 +18,17 @@ const imageStager = multer({ dest: config.IMAGE_STAGING_DIR });
 //// ROUTER ////
 
 export const postRouter = express.Router();
+/**
+ * Implements HTTP responses for the endpoint `'/post'`
+ */
 
 /**
- * Get reply tree under post
+ * GET discussion tree node for postId
+ * @urlParam postId
+ *
+ * @queryParam sort The sorting strategy to use for replies. Must be a value defined in SortTypes (used for pagination)
+ * @queryParam limit Maximum number of replies to include (used for pagination)
+ * @queryParam after The lowest postId to include in the post's replies (used for pagination)
  */
 postRouter.get('/:postId', async (req, res, next) => {
   try {
@@ -37,7 +45,11 @@ postRouter.get('/:postId', async (req, res, next) => {
   }
 });
 
-// POST Flag a post for inappropriate content
+/**
+ * POST
+ * Flag a post for inappropriate content
+ * @urlParam postId
+ */
 postRouter.post(
   '/:postId/content-report',
   passport.authenticate(strategies.JWT, { session: false }),
@@ -51,6 +63,10 @@ postRouter.post(
   }
 );
 
+/**
+ * DELETE flag on post for inappropriate content
+ * @urlParam postId
+ */
 postRouter.delete('/:postId/content-report', async (req, res, next) => {
   try {
     const post: DiscussionPost = await DiscussionService.setInappropriateFlag(parseInt(req.params.postId), false);
@@ -60,6 +76,10 @@ postRouter.delete('/:postId/content-report', async (req, res, next) => {
   }
 });
 
+/**
+ * GET Flag on a post for inappropriate content
+ * @urlParam postId
+ */
 postRouter.get('/:postId/content-report', async (req, res, next) => {
   try {
     const post: DiscussionPost = await DiscussionService.getPost(parseInt(req.params.postId));
@@ -70,6 +90,12 @@ postRouter.get('/:postId/content-report', async (req, res, next) => {
   }
 });
 
+/**
+ * POST a post by a logged in user
+ * @body Multi-Part Form with the following fields:
+ *    parentPostId: (optional) The post that this posts is directly replying too
+ *    image: A File containing the post's image
+ */
 postRouter.post(
   '/',
   passport.authenticate(strategies.JWT, { session: false }),
@@ -87,18 +113,25 @@ postRouter.post(
   }
 );
 
+/**
+ * PATCH
+ * Update a post's content
+ *
+ * @urlParam postId
+ * @body A Multi-Part Form with the following fields
+ *      image: A File containing the new image for the specified postId
+ */
 postRouter.patch(
   '/:postId',
   passport.authenticate(strategies.JWT, { session: false }),
   imageStager.single('image'),
   async (req: any, res, next) => {
     try {
-      let newImageSpec = await makeNewImageSpec(req.file);
-      let post: DiscussionPost = await DiscussionService.updatePost(req.user.userId, req.body.postId, newImageSpec);
+      const newImageSpec = await makeNewImageSpec(req.file);
+      const post: DiscussionPost = await DiscussionService.updatePost(req.user.userId, req.params.postId, newImageSpec);
       // Return full tree under updated post so that clients only have to deal with one
       // data structure for all methods.
-      let postTree = await DiscussionService.getReplyTreeUnderPost(post.postId);
-      res.status(200);
+      const postTree = await DiscussionService.getReplyTreeUnderPost(post.postId);
       res.json(postTree.toJSON());
     } catch (error) {
       next(error);
@@ -108,6 +141,9 @@ postRouter.patch(
   }
 );
 
+/**
+ * DELETE a post
+ */
 postRouter.delete(
   '/:postId',
   passport.authenticate(strategies.JWT, { session: false }),
@@ -123,7 +159,6 @@ postRouter.delete(
 
       // If Post was hidden
       let post: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(req.params.postId);
-      res.status(200);
       res.json(post.toJSON());
     } catch (error) {
       next(error);
@@ -133,10 +168,14 @@ postRouter.delete(
 
 //// HELPER FUNCTIONS ////
 
-function makeContentReport(post) {
-  return { postId: post.postId, hasInappropriateContentFlag: post.hasInappropriateContentFlag };
+function makeContentReport(post: DiscussionPost): { postId: number, hasInappropriateContentFlag: boolean } {
+  return { postId: post.postId, hasInappropriateContentFlag: post.hasInappropriateFlag };
 }
 
+/**
+ * Extracts the correct encoding and content from the specified image
+ * @param file A multer File object for the image
+ */
 async function makeNewImageSpec(file): Promise<{ data: Buffer; encoding: string }> {
   let data = await readFile(file.path);
   let encoding = MIMETYPE_TO_ENCODING[file.mimetype];
@@ -146,37 +185,33 @@ async function makeNewImageSpec(file): Promise<{ data: Buffer; encoding: string 
   return { data, encoding };
 }
 
-// function assertIsPostAuthor(body: { userId: string }, user: User) {
-//   if (parseInt(body.userId) !== user.userId) {
-//     throw new ForbiddenError("Post's userId and/or supplied JWT token is incorrect or are for different users");
-//   }
-// }
-
+/**
+ * Creates a reply to a post
+ * @param req
+ * @param res
+ * @param next
+ */
 async function handleNewReplyPOST(req, res, next) {
   try {
-    // assertIsPostAuthor(req.body, req.user);
     const newImageSpec = await makeNewImageSpec(req.file);
     const post = await DiscussionService.createReply(req.user.userId, req.body.parentPostId, newImageSpec);
-    // let post = await DiscussionService.createReply(req.body.userId, req.body.parentPostId, newImageSpec);
-    // Setting Location and using status 201 to match RESTful conventions for POST responses
-    // res.set('Location', `${config.API_ROOT}/post/${post.postId}`);
     res.status(201);
     res.json(post.toJSON());
   } finally {
     await unlink(req.file.path);
-    // await deleteFile(req.file.path);
   }
 }
 
+/**
+ * Establishes a post as the parent of the reply thread
+ * @param req
+ * @param res
+ * @param next
+ */
 async function handleNewThreadPOST(req, res, next) {
   try {
-    // assertIsPostAuthor(req.body, req.user);
     const newImageSpec = await makeNewImageSpec(req.file);
-    // let newThreadSpec = { image: newImageSpec, userId: req.body.userId };
     const thread = await DiscussionService.createThread(req.user.userId, newImageSpec);
-    // let thread = await DiscussionService.createThread(req.body.userId, newImageSpec);
-    // Setting Location and using status 201 to match RESTful conventions for POST responses
-    // res.set('Location', `${config.API_ROOT}/post/${thread.rootPost.postId}`);
     res.status(201);
     res.json(thread.toFlatJSON());
   } finally {

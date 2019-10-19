@@ -1,3 +1,7 @@
+/**
+ * Allow requests on the same IP address to a different port
+ * @param allowedRequestOrigin
+ */
 export function makeCORSMiddleware(allowedRequestOrigin: string) {
   return (req, res, next) => {
     res.header('Access-Control-Allow-Origin', allowedRequestOrigin);

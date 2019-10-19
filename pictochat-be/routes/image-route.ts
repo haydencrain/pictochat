@@ -4,6 +4,9 @@ import { ImageService } from '../services/image-service';
 import { ENCODING_CONTENT_TYPES } from '../utils/encoding-content-types';
 
 export const imageRouter = Router();
+/**
+ * Implements HTTP responses for the endpoint `'/image/:imageId'`
+ */
 imageRouter.get('/:imageId', async (req, res, next) => {
   try {
     let image: Image = await ImageService.getImage(req.params.imageId);

@@ -20,6 +20,11 @@ export class ReactionRepo {
     throw new Error('Either params.reactionId or both params.userId and params.postId must be specified');
   }
 
+  /**
+   * GET reactions based on `postId` and `userId`
+   * @param postId
+   * @param userId
+   */
   static async getReactions(postId: number, userId: number): Promise<Reaction[]> {
     return Reaction.findAll({
       attributes: {
@@ -29,6 +34,10 @@ export class ReactionRepo {
     });
   }
 
+  /**
+   * Get reactions based on `discussionId`
+   * @param discussionId
+   */
   static async getReactionsByDiscussion(discussionId: number): Promise<Reaction[]> {
     const discussionJoin = {
       model: DiscussionPost,
@@ -42,6 +51,10 @@ export class ReactionRepo {
     });
   }
 
+  /**
+   * Get reactions based on `postId`
+   * @param postId
+   */
   static async getReactionsByPost(postId: number): Promise<Reaction[]> {
     return Reaction.findAll({
       attributes: {
@@ -51,6 +64,10 @@ export class ReactionRepo {
     });
   }
 
+  /**
+   * Get reactions based on `userId`
+   * @param userId
+   */
   static async getReactionsByUser(userId: number): Promise<Reaction[]> {
     return Reaction.findAll({
       attributes: {
@@ -60,17 +77,12 @@ export class ReactionRepo {
     });
   }
 
+  /**
+   * @param reactionName Name of the reactions type
+   * @param postId Post being reacted too
+   * @param userId User who made the reaction
+   */
   static async createReaction(reactionName: string, postId: number, userId: number): Promise<Reaction> {
     return await Reaction.create({ reactionName, postId, userId });
-  }
-
-  static async removeReaction(reactionName: string, postId: number, userId: number) {
-    return Reaction.destroy({
-      where: {
-        reactionName,
-        postId,
-        userId
-      }
-    });
   }
 }

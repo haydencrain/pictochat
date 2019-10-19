@@ -5,7 +5,9 @@ import { ContentReportService } from '../services/content-report-service';
 import { requireAdminMiddleware } from '../middleware/require-admin-middleware';
 
 export const contentReportRouter = express.Router();
-
+/**
+ * Implements HTTP responses for the endpoint `'/content-report'`
+ */
 contentReportRouter.get(
   '/',
   passport.authenticate(strategies.JWT, { session: false }),

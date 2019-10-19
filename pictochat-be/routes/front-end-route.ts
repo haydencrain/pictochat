@@ -2,6 +2,7 @@ import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
 
 /**
+ * Router for serving static front-end files
  * @param webContentDir Directory containing the files that should be served
  */
 export function makeFrontEndRouter(webContentDir: string) {

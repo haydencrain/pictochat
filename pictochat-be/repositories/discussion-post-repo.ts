@@ -1,5 +1,5 @@
 import { DiscussionPost } from '../models/discussion-post';
-import { FindOptions, Op, CountOptions, OrderItem } from 'sequelize';
+import { FindOptions, Op, CountOptions, OrderItem, WhereOptions } from 'sequelize';
 import { SortValue, SortTypes } from '../utils/sort-types';
 import { User } from '../models/user';
 
@@ -26,6 +26,10 @@ export class DiscussionPostRepo {
     return await DiscussionPost.findAll(options);
   }
 
+  /**
+   * Get the root post for each discussion
+   * @param sortType the sorting strategy to use
+   */
   static async getRootPosts(sortType: SortValue): Promise<DiscussionPost[]> {
     const rootPosts = await DiscussionPostRepo.findAll({
       where: DiscussionPostRepo.isRootPostFilter(),
@@ -43,12 +47,16 @@ export class DiscussionPostRepo {
     });
   }
 
+  /**
+   * @param postId
+   */
   static async getDiscussionPost(postId: number): Promise<DiscussionPost> {
     const options = { where: { postId } };
     return await DiscussionPostRepo.findOne(options);
   }
 
   /**
+   * Get the root post for the specified discussion/thread specified discussionId
    * @param discussionId
    */
   static async getDiscussionRoot(discussionId: string): Promise<DiscussionPost> {
@@ -60,7 +68,11 @@ export class DiscussionPostRepo {
 
   /**
    * Get all replies (and replies of replies) to the specified postId, ordered
-   * such that parent posts always come before their replies (aka pre-order traversal order). */
+   * such that parent posts always come before their replies (i.e. the pre-order traversal visit order).
+   * @param rootPost the root of the sub-tree
+   * @param sortType the sorting strategy to use; determines the relative order of the direct
+   *    replies to each post.
+   */
   static async getPathOrderedSubTreeUnder(
     rootPost: DiscussionPost,
     sortType: SortValue = ''
@@ -114,6 +126,9 @@ export class DiscussionPostRepo {
     return await DiscussionPost.findOne(options);
   }
 
+  /**
+   * Wrapper for Model.count that ensures default filters are applied
+   */
   static async count(options?: CountOptions) {
     options['where'] = { ...(options['where'] || {}), ...DiscussionPostRepo.defaultFilter() };
     return await DiscussionPost.count(options);
@@ -132,13 +147,13 @@ export class DiscussionPostRepo {
   /* FILTERS */
 
   /**
-   * @returns Sequelize where clause condition for getting rootPosts */
+   * @returns Sequelize WHERE clause condition for getting rootPosts */
   static isRootPostFilter(): { [fieldName: string]: any } {
     return { isRootPost: true };
   }
 
   /** @returns Default WHERE condition applied to all queries */
-  static defaultFilter() {
+  static defaultFilter(): WhereOptions {
     return { isDeleted: false };
   }
 }

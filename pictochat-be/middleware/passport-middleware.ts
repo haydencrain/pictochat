@@ -18,6 +18,10 @@ export function initialisePassport() {
   return passport.initialize();
 }
 
+/**
+ * Creates a passport strategy for registration
+ * @function
+ */
 const registerStrategy = new passportLocal.Strategy(
   {
     usernameField: 'username',
@@ -38,6 +42,10 @@ const registerStrategy = new passportLocal.Strategy(
   }
 );
 
+/**
+ * Creates a passport strategy for login
+ * @function
+ */
 const loginStrategy = new passportLocal.Strategy(
   {
     usernameField: 'username',

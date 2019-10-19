@@ -7,6 +7,8 @@ import { DiscussionPostRepo } from '../repositories/discussion-post-repo';
 const sequelize: Sequelize = SequelizeConnection.getInstance();
 
 export class DiscussionPost extends Model {
+  /**
+   * Attributes exposed outside of this class */
   static readonly PUBLIC_ATTRIBUTES = [
     'postId',
     'discussionId',
@@ -40,23 +42,38 @@ export class DiscussionPost extends Model {
   // Attributes for associations
   author?: User;
 
+  /**
+   * Sets a flag that tells clients to consider the content of this post hidden
+   */
   hide() {
     this.isHidden = true;
   }
 
+  /**
+   * Delete this post
+   */
   setDeleted() {
     this.isDeleted = true;
   }
 
+  /**
+   * Flags a post as having inappropraite content (e.g. text, content not appropirate for general audience)
+   */
   setInappropriateFlag(value: boolean) {
     this.hasInappropriateFlag = value;
   }
 
+  /**
+   * Checks whether the content of this post can be edited
+   */
   async isUpdatable(): Promise<boolean> {
     let replyCount: number = await this.getDirectReplyCount();
     return replyCount === 0 && this.reactionsCount === 0;
   }
 
+  /**
+   * Checks whether this post can be deleted
+   */
   async isDeleteable(): Promise<boolean> {
     let replyCount: number = await this.getDirectReplyCount();
     return replyCount === 0;
@@ -65,21 +82,20 @@ export class DiscussionPost extends Model {
   /**
    * Number of replies made to this post or to replies of this post and so on
    * (number of nodes under this node in the reply tree).
-   *
-   * NOTE: This isn't a virtual column because its expensive to compute and best not
-   *   included in every toJSON call. */
+   */
   async getDeepReplyCount(): Promise<number> {
     return await DiscussionPostRepo.count({
       where: { replyTreePath: { [Op.like]: this.getReplyPathPrefix() + '/%' } }
     });
   }
 
+  /** Get the number of direct replies */
   async getDirectReplyCount(): Promise<number> {
     return await DiscussionPostRepo.count({ where: { parentPostId: this.postId } });
   }
 
   /**
-   * @returns A prefix for the replyTreePath values of all descendants of the current node. */
+   * Get a prefix for the replyTreePath values of all descendants of the current node. */
   getReplyPathPrefix(): string {
     const replyTreePath = this.replyTreePath;
     return `${replyTreePath || ''}${this.postId}`;

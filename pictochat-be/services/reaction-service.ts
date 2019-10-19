@@ -8,21 +8,39 @@ import { UserRepo } from '../repositories/user-repo';
 import { NotFoundError } from '../exceptions/not-found-error';
 import { ForbiddenError } from '../exceptions/forbidden-error';
 
+/** Implements reaction related CRUD */
 export class ReactionService {
+  /**
+   * Returns all reactions made by a user for a post
+   * @param postId
+   * @param userId
+   */
   static async getReactions(postId: number, userId: number): Promise<Reaction[]> {
     let reaction: Reaction[] = await ReactionRepo.getReactions(postId, userId);
     return reaction;
   }
+  /**
+   * Returns all reactions made for a post
+   * @param postId
+   */
   static async getReactionsByPost(postId: number): Promise<Reaction[]> {
     let reaction: Reaction[] = await ReactionRepo.getReactionsByPost(postId);
     return reaction;
   }
-
+  /**
+   * Returns all reactions made by a user
+   * @param userId
+   */
   static async getReactionsByUser(userId: number): Promise<Reaction[]> {
     let reaction: Reaction[] = await ReactionRepo.getReactionsByUser(userId);
     return reaction;
   }
-
+  /**
+   * Creates a specific reaction for a post by a user
+   * @param reactionName
+   * @param postId
+   * @param userId
+   */
   static async createReaction(reactionName: string, postId: number, userId: number): Promise<Reaction> {
     return await transaction(async () => {
       try {
@@ -31,6 +49,7 @@ export class ReactionService {
         return reaction;
       } catch (error) {
         if (error instanceof UniqueConstraintError) {
+          // Occurs if user already has a reaction of this post
           throw new UnprocessableError('User already has a reaction for this post');
         }
       }

@@ -8,6 +8,7 @@ import { leaderboardRankRouter } from './leaderboard-rank-route';
 import { sockPuppetAlertRouter } from './sock-puppet-alert-route';
 import { contentReportRouter } from './content-report-router';
 
+/** Route endpoints in use */
 export const apiRouter = express.Router();
 apiRouter.use('/user', userRouter);
 apiRouter.use('/reaction', reactionRouter);

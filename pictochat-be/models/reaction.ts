@@ -21,7 +21,6 @@ export class Reaction extends Model {
     }
     return json;
   }
-
 }
 
 Reaction.init(
@@ -36,10 +35,12 @@ Reaction.init(
     modelName: 'reaction',
     tableName: 'reactions',
     freezeTableName: true,
-    indexes: [{
-      unique: true,
-      fields: ['postId', 'userId']
-    }]
+    indexes: [
+      {
+        unique: true,
+        fields: ['postId', 'userId']
+      }
+    ]
   }
 );
 
