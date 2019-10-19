@@ -1,15 +1,22 @@
 import express from 'express';
-import path from 'path';
+import expressStaticGzip from 'express-static-gzip';
+
 /**
- * Implements HTTP responses for the endpoint `'/'`
+ * Router for serving static front-end files
  * @param webContentDir Directory containing the files that should be served
  */
 export function makeFrontEndRouter(webContentDir: string) {
   const router = express.Router();
-  router.use('/', express.static(webContentDir));
-  // Enable client-side routing
-  // router.get('*', (req, res) => {
-  //     res.sendFile(path.join(webContentDir, 'index.html'));
-  // });
+  router.use(
+    '/',
+    expressStaticGzip(webContentDir, {
+      enableBrotli: true,
+      orderPreference: ['br', 'gz'],
+      serveStatic: {
+        maxAge: 234, // will be kept
+        cacheControl: false // will be kept as well
+      }
+    })
+  );
   return router;
 }

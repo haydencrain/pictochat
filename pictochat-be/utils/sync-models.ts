@@ -2,7 +2,6 @@ import { DiscussionPost } from '../models/discussion-post';
 import { User } from '../models/user';
 import { Image } from '../models/image';
 import { Reaction } from '../models/reaction';
-import { ReactionService } from '../services/reaction-service';
 import { LoginLog } from '../models/login-log';
 
 export async function syncModels() {

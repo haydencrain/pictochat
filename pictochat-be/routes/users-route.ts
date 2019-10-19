@@ -6,8 +6,8 @@ import { UserService } from '../services/user-service';
 import { strategies } from '../middleware/passport-middleware';
 import { deviceIdMiddleware } from '../middleware/device-id-middleware';
 import { User } from '../models/user';
-import { LoginLog } from '../models/login-log';
 import { registerUserMiddleware } from '../middleware/register-user-middleware';
+import { LoginLogRepo } from '../repositories/login-log-repo';
 
 //// HELPERS ////
 
@@ -18,19 +18,19 @@ function makeJWTPayload(user: User): { auth: boolean; token: string } {
   return { auth: true, token };
 }
 
-async function logUserAccess(deviceId: string, user: User): Promise<void> {
-  // TODO: Move this into dedicated service
-  const loginLogRecord = {
-    userId: user.userId,
-    loginTimestamp: new Date(),
-    deviceId: deviceId
-  };
-  await LoginLog.create(loginLogRecord);
-}
-
 //// ROUTER ////
 
 export const userRouter = express.Router();
+
+// get user by username
+// userRouter.get('/:username', async (req, res, next) => {
+//   try {
+//     const user: User = await UserService.getUserByUsername(req.params.username);
+//     res.json(user.getPublicJSON());
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 // GET /user
 userRouter.get('/', async (req, res, next) => {
@@ -38,11 +38,11 @@ userRouter.get('/', async (req, res, next) => {
     if (req.query.username) {
       // get user by username
       const user = await UserService.getUserByUsername(req.query.username);
-      return res.json(user.toJSON());
+      res.json(user.toJSON());
     } else {
       // get all users
       let users = await UserService.getUsers();
-      return res.json(users.map(user => user.getPublicJSON()));
+      res.json(users.map(user => user.getPublicJSON()));
     }
   } catch (error) {
     next(error);
@@ -50,9 +50,10 @@ userRouter.get('/', async (req, res, next) => {
 });
 
 // GET current user ONLY IF AUTHED
-userRouter.get('/authed', passport.authenticate(strategies.JWT, { session: false }), (req, res, next) => {
+userRouter.get('/authed', passport.authenticate(strategies.JWT, { session: false }), async (req: any, res, next) => {
   try {
-    res.status(200).json((req.user as User).getPublicJSON());
+    const user: User = await UserService.getUser(req.user.userId);
+    res.json(user.getPublicJSON());
   } catch (error) {
     next(error);
   }
@@ -74,9 +75,9 @@ userRouter.post('/', registerUserMiddleware, deviceIdMiddleware, async (req: any
         let body = makeJWTPayload(typedUser);
         body['message'] = 'User created successfully';
         body['user'] = typedUser.getPublicJSON();
-        res.status(200).json(body);
+        res.json(body);
 
-        logUserAccess(req.deviceId, typedUser);
+        LoginLogRepo.logUserAccess(typedUser, req.deviceId);
       });
     } catch (error) {
       next(error);
@@ -93,8 +94,9 @@ userRouter.post('/login', deviceIdMiddleware, (req: any, res, next) => {
       req.logIn(user, async err => {
         let body = makeJWTPayload(user as User);
         body['message'] = 'User logged in successfully';
-        res.status(200).json(body);
-        logUserAccess(req.deviceId, user);
+        res.json(body);
+
+        LoginLogRepo.logUserAccess(user, req.deviceId);
       });
     } catch (error) {
       next(error);
@@ -109,7 +111,7 @@ userRouter.delete(
     try {
       await UserService.disableUser(req.params.userId, req.user.userId);
       res.status(204);
-      res.send(null);
+      res.end();
     } catch (error) {
       next(error);
     }

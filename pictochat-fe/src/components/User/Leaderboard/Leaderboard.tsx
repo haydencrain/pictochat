@@ -7,9 +7,6 @@ import UserService from '../../../services/UserService';
 import './Leaderboard.less';
 
 interface LeaderboardProps {
-  /**
-   * The list of ranks to display
-   */
   ranks: LeaderboardRank[];
 }
 
@@ -20,26 +17,38 @@ interface LeaderboardProps {
 export function Leaderboard(props: LeaderboardProps) {
   const { ranks } = props;
 
-  const userInfo = ranks.map(rank => (
-    <Segment className="user-row" key={`user_${rank.user.username}`}>
-      <div className="user-avatar">
-        <Image src={rank.user.userAvatarURI} size="tiny" circular />
-      </div>
-      <div className="user-info">
-        <div id="info-username" className="row">
-          <Link to={UserService.getUserUrl(rank.user.username)} className="link inherit">
-            <h3>{rank.user.username}</h3>
-          </Link>
-        </div>
-        <div className="row">{<h5>Posts: {rank.postCount}</h5>}</div>
-      </div>
-    </Segment>
-  ));
+  /* RENDERING HELPERS */
+  const getContent = () => {
+    if (ranks.length == 0) {
+      // show placeholder
+      return <p>No users to show</p>;
+    }
 
+    const userInfo = ranks.map(rank => (
+      <Segment className="user-row" key={`user_${rank.user.username}`}>
+        <div className="user-avatar">
+          <Image src={rank.user.userAvatarURI} size="tiny" circular />
+        </div>
+        <div className="user-info">
+          <div id="info-username" className="row">
+            <Link to={UserService.getUserUrl(rank.user.username)} className="link inherit">
+              <h3>{rank.user.username}</h3>
+            </Link>
+          </div>
+          <div className="row"><h5>Posts: {rank.postCount}</h5></div>
+        </div>
+      </Segment>
+    ));
+
+    return userInfo;
+
+  };
+
+  /* MAIN RENDERING */
   return (
     <section id="leaderboard-section">
       <h1>Leaderboard</h1>
-      <Segment.Group raised>{userInfo}</Segment.Group>
+      <Segment.Group raised>{getContent()}</Segment.Group>
     </section>
   );
 }

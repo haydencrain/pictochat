@@ -8,6 +8,15 @@ export class DiscussionTreeNode extends DiscussionPost {
   commentCount?: number; // Only populated for the root node
   hasMore: boolean;
 
+  // Factory
+  static async makeInstance(post: DiscussionPost): Promise<DiscussionTreeNode> {
+    let commentCount: number = null;
+    if (post.isRootPost) {
+      commentCount = await post.getDeepReplyCount();
+    }
+    return new DiscussionTreeNode(post, commentCount);
+  }
+
   /**
    * For internal use only!
    */
@@ -40,14 +49,5 @@ export class DiscussionTreeNode extends DiscussionPost {
       baseJSON['commentCount'] = this.commentCount;
     }
     return baseJSON;
-  }
-
-  // Factory
-  static async makeInstance(post: DiscussionPost): Promise<DiscussionTreeNode> {
-    let commentCount: number = null;
-    if (post.isRootPost) {
-      commentCount = await post.getDeepReplyCount();
-    }
-    return new DiscussionTreeNode(post, commentCount);
   }
 }

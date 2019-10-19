@@ -1,10 +1,12 @@
 import { Reaction } from '../models/reaction';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { UniqueConstraintError } from 'sequelize';
 import { UnprocessableError } from '../exceptions/unprocessable-error';
-import { DiscussionPost } from '../models/discussion-post';
-
-const sequelize = SequelizeConnectionService.getInstance();
+import { DiscussionPostRepo } from '../repositories/discussion-post-repo';
+import { ReactionRepo } from '../repositories/reaction-repo';
+import { transaction } from '../utils/transaction';
+import { UserRepo } from '../repositories/user-repo';
+import { NotFoundError } from '../exceptions/not-found-error';
+import { ForbiddenError } from '../exceptions/forbidden-error';
 
 /** Implements reaction related CRUD */
 export class ReactionService {
@@ -14,7 +16,7 @@ export class ReactionService {
    * @param userId
    */
   static async getReactions(postId: number, userId: number): Promise<Reaction[]> {
-    let reaction: Reaction[] = await Reaction.getReactions(postId, userId);
+    let reaction: Reaction[] = await ReactionRepo.getReactions(postId, userId);
     return reaction;
   }
   /**
@@ -22,7 +24,7 @@ export class ReactionService {
    * @param postId
    */
   static async getReactionsByPost(postId: number): Promise<Reaction[]> {
-    let reaction: Reaction[] = await Reaction.getReactionsByPost(postId);
+    let reaction: Reaction[] = await ReactionRepo.getReactionsByPost(postId);
     return reaction;
   }
   /**
@@ -30,7 +32,7 @@ export class ReactionService {
    * @param userId
    */
   static async getReactionsByUser(userId: number): Promise<Reaction[]> {
-    let reaction: Reaction[] = await Reaction.getReactionsByUser(userId);
+    let reaction: Reaction[] = await ReactionRepo.getReactionsByUser(userId);
     return reaction;
   }
   /**
@@ -40,32 +42,31 @@ export class ReactionService {
    * @param userId
    */
   static async createReaction(reactionName: string, postId: number, userId: number): Promise<Reaction> {
-    return await sequelize.transaction(async transaction => {
+    return await transaction(async () => {
       try {
-        /** Increments the number of reactions made on that post */
-        await DiscussionPost.incrementReactionsCount(postId);
-        return await Reaction.createReaction(reactionName, postId, userId);
-        /** Checks that the user's reaction is unique for said post  */
+        const reaction: Reaction = await ReactionRepo.createReaction(reactionName, postId, userId);
+        await DiscussionPostRepo.incrementReactionsCount(postId);
+        return reaction;
       } catch (error) {
         if (error instanceof UniqueConstraintError) {
-          throw new UnprocessableError('User already has a reaction of the type for this post');
+          // Occurs if user already has a reaction of this post
+          throw new UnprocessableError('User already has a reaction for this post');
         }
       }
     });
   }
 
-  //Don't know what to do here -Rach
+  static async removeReaction(reactionId: number, requestingUserId: number): Promise<void> {
+    await transaction(async () => {
+      const requestingUser = await UserRepo.getUser(requestingUserId);
 
-  /**
-   * TODO: Use this instead of inlining in router - Jordan
-   */
-  static async removeReaction(reactionName: string, postId: number, userId: number) {
-    // const numberRemoved = await Reaction.removeReaction(reactionName, postId, userId);
-    // await DiscussionPost.decrementReactionsCount(postId);
-    // return numberRemoved;
+      const reaction = await ReactionRepo.getReaction({ reactionId });
+      if (reaction === null) throw new NotFoundError();
+
+      if (requestingUser.userId !== reaction.userId) throw new ForbiddenError();
+
+      await reaction.destroy();
+      await DiscussionPostRepo.decrementReactionsCount(reaction.postId);
+    });
   }
-
-  // static async removeReaction(reactionName: string, postId: number, userId: number) {
-  //   return await Reaction.removeReaction(reactionName, postId, userId);
-  // }
 }

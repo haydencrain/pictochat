@@ -2,10 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import { strategies } from '../middleware/passport-middleware';
 import { ContentReportService } from '../services/content-report-service';
-import { UserService } from '../services/user-service';
-import { User } from '../models/user';
-import { ContentReport } from '../models/content-report';
-import { ForbiddenError } from '../exceptions/forbidden-error';
+import { requireAdminMiddleware } from '../middleware/require-admin-middleware';
 
 export const contentReportRouter = express.Router();
 /**
@@ -14,17 +11,12 @@ export const contentReportRouter = express.Router();
 contentReportRouter.get(
   '/',
   passport.authenticate(strategies.JWT, { session: false }),
+  requireAdminMiddleware,
   async (req: any, res: any, next) => {
     try {
-      // Only admins can view content reports
-      const requestingUser: User = await UserService.getUser(req.user.userId);
-      if (!requestingUser.hasAdminRole) {
-        throw new ForbiddenError();
-      }
-
-      const reports = await ContentReportService.getContentReports();
-      const reportsJson = reports.map(report => report.toJSON());
-      res.json(reportsJson);
+      const reportedPosts = await ContentReportService.getReportedPosts();
+      const reportedPostsJson = reportedPosts.map(post => post.toJSON());
+      res.json(reportedPostsJson);
     } catch (error) {
       next(error);
     }

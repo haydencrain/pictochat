@@ -1,13 +1,13 @@
 import { Sequelize, Model, DataTypes, WhereOptions } from 'sequelize';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
+import { SequelizeConnection } from '../utils/sequelize-connection';
 import { ImageService } from '../services/image-service';
-import { NotFoundError } from '../exceptions/not-found-error';
 
-const sequelize: Sequelize = SequelizeConnectionService.getInstance();
+const sequelize: Sequelize = SequelizeConnection.getInstance();
 
 export class User extends Model {
   static readonly PUBLIC_ATTRIBUTES = ['userId', 'email', 'username', 'userAvatarURI', 'hasAdminRole'];
-  static readonly PUBLIC_TABLE_COLUMNS = ['userId', 'email', 'username', 'hasAdminRole']; // Everything from PUBLIC_ATTRIBUTES excluding virtual columns
+  // Everything from PUBLIC_ATTRIBUTES excluding virtual columns
+  static readonly PUBLIC_TABLE_COLUMNS = ['userId', 'email', 'username', 'hasAdminRole'];
 
   userId!: number;
   username!: string;
@@ -33,86 +33,8 @@ export class User extends Model {
     let json = {};
     for (let attr of User.PUBLIC_ATTRIBUTES) {
       json[attr] = this.get(attr);
-      // json[attr] = this.getDataValue(attr as any);
     }
     return json;
-  }
-  /**
-   * Checks if the user is disabled
-   * @param includeDisabled
-   */
-  static defaultFilter(includeDisabled: boolean = false) {
-    let filter = {};
-    if (!includeDisabled) {
-      filter['isDisabled'] = false;
-    }
-    return filter;
-  }
-
-  /**
-   * CREATE user
-   * @param username
-   * @param hashedPassword
-   */
-  static async createUser(username: string, hashedPassword: string): Promise<User> {
-    return await User.create({ username, password: hashedPassword });
-  }
-  /**
-   * GET user by `username` and filter the search based on `includeDisabled`
-   * @param username
-   * @param includeDisabled
-   */
-  static async getUserByUsername(username: string, includeDisabled: boolean = false): Promise<User> {
-    const user = await User.findOne({
-      attributes: {
-        include: User.PUBLIC_ATTRIBUTES
-      },
-      where: { username, ...User.defaultFilter(includeDisabled) }
-    });
-    // if (user === null || user === undefined) {
-    //   throw new NotFoundError();
-    // }
-    return user;
-  }
-
-  /**
-   * GET user based on `userId` and filter the search based on `onlyIncludePublicAttrs`
-   * and `includeDisabled`
-   * @param userId
-   * @param onlyIncludePublicAttrs When true, only fields in User.PUBLIC_ATTRIBUTES will be
-   *    included in the returned object.
-   * @returns a User instance with the specified userId
-   */
-  static async getUser(
-    userId: number,
-    onlyIncludePublicAttrs: boolean = true,
-    includeDisabled: boolean = false
-  ): Promise<User> {
-    let queryParams = { where: { userId, ...User.defaultFilter(includeDisabled) } };
-    if (onlyIncludePublicAttrs) {
-      queryParams['attributes'] = { include: User.PUBLIC_ATTRIBUTES };
-    }
-    const user = await User.findOne(queryParams);
-    // if (user === null || user === undefined) {
-    //   throw new NotFoundError();
-    // }
-    return user;
-  }
-
-  /**
-   * GET users based on `onlyIncludePublicAttrs` and `filter`
-   * @param onlyIncludePublicAttrs When true, only fields in User.PUBLIC_ATTRIBUTES will be
-   *    included in the returned object. */
-  static async getUsers(onlyIncludePublicAttrs: boolean = true, filter?: WhereOptions): Promise<User[]> {
-    let queryParams = { order: ['userId'], where: User.defaultFilter() };
-    if (onlyIncludePublicAttrs) {
-      queryParams['attributes'] = { include: User.PUBLIC_ATTRIBUTES };
-    }
-    const users = User.findAll(queryParams);
-    // if (users === null || users === undefined) {
-    //   throw new NotFoundError();
-    // }
-    return users;
   }
 }
 
@@ -142,7 +64,9 @@ User.init(
     modelName: 'user',
     tableName: 'users',
     freezeTableName: true,
-    // paranoid: true,
-    indexes: [{ fields: ['userId'], using: 'BTREE' }, { fields: ['username'], using: 'BTREE' }]
+    indexes: [
+      { fields: ['userId', 'isDisabled', 'hasAdminRole'], using: 'BTREE' },
+      { fields: ['username'], using: 'BTREE' }
+    ]
   }
 );

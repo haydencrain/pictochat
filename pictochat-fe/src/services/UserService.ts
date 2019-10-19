@@ -15,9 +15,7 @@ class UserService {
   }
 
   static async getUser(username: string): Promise<IUser> {
-    const query = {
-      username
-    };
+    const query = { username };
     return await ApiService.get('/user', query);
   }
 

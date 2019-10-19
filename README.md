@@ -23,14 +23,16 @@ The application is split up into two main areas:
 ```
 src
   │   index.tsx     # React App entry point
+  │   config.ts     # Provides config variables (mostly from env)
   └───components    # React components / View Logic
-  └───hooks         # Custom React Hooks
+  └───context       # React Contexts (namely Store Context)
+  └───hooks         # React Hooks
   └───images        # Images used in the app
   └───models        # TypeScript Models and Interfaces
   └───pages         # React components that are mapped to routes
   └───services      # Services for Api Requests
+  └───stores        # Mobx Stores (application state)
   └───styles        # global styles and constants
-  └───store         # (IN PROGRESS) Mobx stores
   └───utils         # Helper functions and methods
 ```
 
