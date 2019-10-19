@@ -57,8 +57,10 @@ src
   │   app.ts        # App entry point and setup
   └───middleware    # Middleware methods and functions
   └───models        # ORM/db Models and classes
+  └───repositories  # Collection oriented data-access logic
   └───routes        # HTTP RESTful endpoints
   └───services      # Business logic
+  └───exceptions    # Custom exception classes
   └───utls          # Helper functions and methods
 ```
 
@@ -76,7 +78,7 @@ src
   - **Purpose:**
     - Encapsulates the details for the database, implements data structures for our domain/business data.
     - In special cases, can implement functions/methods which perform domain/business logic for the service layer (e.g. if some operations are much faster when performed with raw SQL queries).
-  - **What’s in it:** ORM Models (i.e. Sequelize models), and custom classes which implement database views
+  - **What’s in it:** ORM Models (i.e. Sequelize models), repositories, and custom classes which implement database views
 
 ## Environment Setup
 
