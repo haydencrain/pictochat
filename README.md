@@ -195,6 +195,6 @@ As this project is almost purely JavaScript, many of the best practices chosen t
 
 ## Contributors
 
-- Jordan Finch
+- Jordan Finch (Student Number: 99144077)
 - Hayden Crain
 - Rachel Coster
