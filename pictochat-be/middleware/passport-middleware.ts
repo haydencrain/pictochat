@@ -5,6 +5,12 @@ import { UserService } from '../services/user-service';
 import config from '../utils/config';
 import { transaction } from '../utils/transaction';
 
+/**
+ * NOTE: Much of the code in this module is adapted from:
+ *    Niedringhaus, P. 2018, 'Implementing JSON Web Tokens & Passport.js in a JavaScript Application with React',
+ *        viewed 19 Oct 2019, <https://itnext.io/implementing-json-web-tokens-passport-js-in-a-javascript-application-with-react-b86b1f313436>.
+ */
+
 export const strategies = {
   LOGIN: 'login',
   REGISTER: 'register',

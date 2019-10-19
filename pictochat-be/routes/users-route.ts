@@ -58,6 +58,11 @@ userRouter.delete(
  * @response JSON with format {user, message}
  */
 userRouter.post('/', validateUserAttrsMiddleware, deviceIdMiddleware, async (req: any, res, next) => {
+  /*
+   * NOTE: Much of the code in this function is adapted from:
+   *    Niedringhaus, P. 2018, 'Implementing JSON Web Tokens & Passport.js in a JavaScript Application with React',
+   *        viewed 19 Oct 2019, <https://itnext.io/implementing-json-web-tokens-passport-js-in-a-javascript-application-with-react-b86b1f313436>.
+   */
   passport.authenticate(strategies.REGISTER, (err, user: boolean | User, info) => {
     if (err) return next(err);
 
@@ -107,6 +112,11 @@ userRouter.get('/authed', passport.authenticate(strategies.JWT, { session: false
  *    from being included in URL.
  */
 userRouter.post('/login', deviceIdMiddleware, (req: any, res, next) => {
+  /*
+   * NOTE: Much of the code in this function is adapted from:
+   *    Niedringhaus, P. 2018, 'Implementing JSON Web Tokens & Passport.js in a JavaScript Application with React',
+   *        viewed 19 Oct 2019, <https://itnext.io/implementing-json-web-tokens-passport-js-in-a-javascript-application-with-react-b86b1f313436>.
+   */
   passport.authenticate(strategies.LOGIN, (err, user, info) => {
     if (err) return next(err);
     if (!!info) return res.json(info);
