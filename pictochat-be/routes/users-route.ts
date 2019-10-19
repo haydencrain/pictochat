@@ -21,7 +21,7 @@ userRouter.get('/', async (req, res, next) => {
     if (req.query.username) {
       // get user by username
       const user = await UserService.getUserByUsername(req.query.username);
-      res.json(user.toJSON());
+      res.json(user.getPublicJSON());
     } else {
       // get all users
       let users = await UserService.getUsers();
