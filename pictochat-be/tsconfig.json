@@ -3,6 +3,6 @@
   "compilerOptions": {
     "outDir": "../build/pictochat-be",
     "rootDir": "../pictochat-be",
-    "types": []
+    "types": ["Jest"]
   }
 }

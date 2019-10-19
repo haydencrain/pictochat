@@ -116,6 +116,11 @@ _Note that containers will need to be rebuilt after any change which alters the 
 2. One pictochat_pictochat-db container is running, the postgres database will exposed on <docker machine ip>:5432,
    The container provides a default user with username: postgres and password: postgres
 
+## Running tests
+
+To get the Jest unit tests running use the following command:
+`$ npm test`
+
 ## Design Principles
 
 There are many ways to write web applications. However, it is important to create a unified approach in order to enhance readability and reusability. We have compiled a list of 'best practices' that we wish to follow and enforce within our project.
