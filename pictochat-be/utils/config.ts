@@ -17,7 +17,7 @@ const config = {
   // Password of admin user
   ADMIN_PASSWORD: process.env.PICTOCHAT_ADMIN_PASSWORD || 'admin',
   // Whether to create an admin user on start up
-  CREATE_ADMIN_USER: process.env.PICTOCHAT_CREATE_ADMIN_USER || true,
+  CREATE_ADMIN_USER: process.env.PICTOCHAT_CREATE_ADMIN_USER || false,
   /* Directory containing front-end files to be served
      Default path is relative to the compiled app.js file's location in the build directory */
   WEB_CONTENT_DIR: process.env.PICTOCHAT_FRONTEND_DIR || path.join(__dirname, '../../pictochat-fe'),
