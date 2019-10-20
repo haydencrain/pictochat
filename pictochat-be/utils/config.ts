@@ -33,7 +33,8 @@ const config = {
   // Database name or schema name (depending on the dialect)
   DB_NAME: process.env.PICTOCHAT_DB_NAME || 'pictochat',
   // Database dialect (see https://sequelize.org/master/manual/dialects.html)
-  DB_DIALECT: process.env.PICTOCHAT_DB_DIALECT || 'postgres'
+  DB_DIALECT: process.env.PICTOCHAT_DB_DIALECT || 'postgres',
+  DB_URL: process.env.DATABASE_URL !== undefined ? process.env.DATABASE_URL : undefined
 };
 
 // type casting so IDE's know what properties config has
