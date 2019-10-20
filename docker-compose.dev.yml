@@ -3,9 +3,9 @@ version: "3"
 services:
   web-app:
     build:
-      dockerfile: ./build-scripts/web-app.Dockerfile
+      dockerfile: ./web-app.Dockerfile
       context: .
-    command: sh -c "npm install && npm run start-dev-remote"
+    command: sh -c "npm run start-dev-remote"
     env_file:
       - ./.env.dev
     ports:

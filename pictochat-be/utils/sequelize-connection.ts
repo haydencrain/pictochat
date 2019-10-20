@@ -23,7 +23,7 @@ export class SequelizeConnection {
     password?: string;
     databaseName?: string;
     dialect?: Dialect;
-    url: string;
+    url?: string;
   }): Sequelize {
     const defaultParams = {
       host: DB_HOST,
@@ -42,9 +42,10 @@ export class SequelizeConnection {
       // Setting the CLS makes transactions automatically apply to all queries within
       // a sequelize.transaction(...) callback
       const namespace = createNamespace('default');
+
       Sequelize.useCLS(namespace);
 
-      if (params.url === undefined) {
+      if (params.url === undefined || params.url === null) {
         const { databaseName, user, password, dialect, host, port } = params;
         SequelizeConnection.instance = new Sequelize(databaseName, user, password, {
           dialect: dialect,
