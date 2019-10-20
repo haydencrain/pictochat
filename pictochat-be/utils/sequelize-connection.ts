@@ -16,7 +16,7 @@ const DB_DIALECT = config.DB_DIALECT as Dialect;
 export class SequelizeConnection {
   private static instance: Sequelize = null;
 
-  static getInstance(params: {
+  static getInstance(params?: {
     host?: string;
     port?: number;
     user?: string;
