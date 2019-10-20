@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import ThreadListContainer from '../../components/ThreadListContainer';
+import ThreadListContainer from '../../components/Post/ThreadListContainer';
 import './HomePage.less';
 
-interface HomePage {}
-
-function HomePage(props: HomePage) {
+/**
+ * A React component that renders the Page layout for the home page
+ * @component
+ */
+function HomePage(props: {}) {
   return (
     <section id="home-page">
       <ThreadListContainer

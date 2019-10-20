@@ -1,23 +1,21 @@
 import * as cookies from 'js-cookie';
 import ApiService from './ApiService';
-import { IUser } from '../models/User';
+import { IUser } from '../models/store/User';
 import UnauthenticatedUser from '../models/UnauthenticatedUser';
+import LoginResult from '../models/LoginResult';
 
-interface LoginResult {
-  auth: boolean;
-  token: string;
-  message: string;
-}
-
+/**
+ * Implements HTTP Requests for the `'/user'` API endpoint
+ * @class
+ * @static
+ */
 class UserService {
   static getUserUrl(username: string): string {
     return `/user/${username}`;
   }
 
   static async getUser(username: string): Promise<IUser> {
-    const query = {
-      username
-    };
+    const query = { username };
     return await ApiService.get('/user', query);
   }
 
@@ -41,7 +39,7 @@ class UserService {
 
   static async authUser(user: UnauthenticatedUser): Promise<string> {
     const data = {
-      username: user.email,
+      username: user.username,
       password: user.password
     };
     const res: LoginResult = await ApiService.post('/user/login', data);

@@ -1,53 +1,51 @@
 import { observable, action, ObservableMap, runInAction, flow } from 'mobx';
 import { computedFn } from 'mobx-utils';
-import { Reaction, IReaction } from '../models/Reaction';
+import { Reaction, IReaction } from '../models/store/Reaction';
 import ObservableIntMap from '../utils/ObserableIntMap';
 import ReactionService from '../services/ReactionService';
+import KeyException from '../models/exceptions/KeyException';
 
-// export class PostReactions {
-//   @observable hasCurrentUser: boolean;
-//   @observable currentUserReaction: Reaction;
-//   // Has format {[reactionName]: count}
-//   @observable reactionCountMap: ObservableMap<any, number> = observable.map(undefined, {
-//     name: 'reactionCountMap'
-//   });
-// }
-
-export class KeyException {
-  static readonly ERROR_TYPE = 'KEY_ERROR';
-  errorType: string;
-  message: string;
-  constructor(message?: string) {
-    this.message = message;
-    this.errorType = KeyException.ERROR_TYPE;
-  }
+interface IReactionStore {
+  /**
+   * Set to true if the store is currently fetching reactions
+   */
+  isLoading: boolean;
+  /**
+   * A 2D map of reactions, indexed by both the post and user
+   */
+  postUserReactionsMap: ObservableIntMap<ObservableIntMap<Reaction>>;
 }
 
-export class ReactionStore {
+export class ReactionStore implements IReactionStore {
   @observable isLoading: boolean;
-  // {post: {reactionId: Reaction}}
-  // @observable postReactionsMap: ObservableMap<any, ObservableMap<any, Reaction>> = observable.map(undefined);
-
-  // @observable reactionMap: ObservableIntMap<Reaction> = new ObservableIntMap(observable.map(undefined));
-
-  // {post: {user: Reaction}}
   @observable
   postUserReactionsMap: ObservableIntMap<ObservableIntMap<Reaction>> = new ObservableIntMap(observable.map(undefined));
 
+  /**
+   * Loads a new set of reactions for the specified post
+   * @function
+   * @param postId - The post id to load the reactions for
+   */
   @action.bound
   async fetchPostReactions(postId: number): Promise<void> {
     let reactionJson: IReaction[] = await ReactionService.getReactionsPost(postId);
     runInAction(() => {
       let reactions = reactionJson.map(react => new Reaction(react));
-      reactions.forEach((react) => this.putReact(react));
+      reactions.forEach(react => this.putReact(react));
     });
   }
 
+  /**
+   * Updates a reaction
+   * @function
+   * @param postId The id of the post that the reaction is currently on
+   * @param userId The id of the user who created the reaction
+   * @param reactionName The name of the reaction to update to
+   */
   @action.bound
   async updateReaction(postId: number, userId: number, reactionName: string) {
     if (!this.hasReacted(postId, userId)) {
       let reactionJson = await ReactionService.addReaction(reactionName, postId, userId);
-      // console.log('NEW Reaction JSON: ', reactionJson);
       let reaction = new Reaction(reactionJson);
       this.putReact(reaction);
       return;
@@ -88,17 +86,14 @@ export class ReactionStore {
     this.isLoading = true;
     try {
       let reactsJson = await ReactionService.getDiscussionReactions(discussionId);
-      // console.log('reactsJson: ', reactsJson);
       runInAction(() => {
         for (let reactJson of reactsJson) {
           let react = new Reaction(reactJson);
-          // console.log('BEFORE PUT: ', JSON.stringify(this.postUserReactionsMap));
           this.putReact(react);
-          // console.log('AFTER PUT: ', JSON.stringify(this.postUserReactionsMap));
         }
       });
     } finally {
-      runInAction(() => this.isLoading = false);
+      runInAction(() => (this.isLoading = false));
     }
   }
 
@@ -151,7 +146,11 @@ export class ReactionStore {
     return nameCounts;
   });
 
-  // get an array of Reaction objects for specified post
+  /**
+   * Get an array of Reaction objects for specified post
+   * @function
+   * @param postId The id of the post to get the reactions for
+   */
   postReactions = computedFn(function(postId: number) {
     if (!this.postUserReactionsMap.has(postId)) {
       return [];

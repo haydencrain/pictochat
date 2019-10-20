@@ -23,14 +23,16 @@ The application is split up into two main areas:
 ```
 src
   │   index.tsx     # React App entry point
+  │   config.ts     # Provides config variables (mostly from env)
   └───components    # React components / View Logic
-  └───hooks         # Custom React Hooks
+  └───context       # React Contexts (namely Store Context)
+  └───hooks         # React Hooks
   └───images        # Images used in the app
   └───models        # TypeScript Models and Interfaces
   └───pages         # React components that are mapped to routes
   └───services      # Services for Api Requests
+  └───stores        # Mobx Stores (application state)
   └───styles        # global styles and constants
-  └───store         # (IN PROGRESS) Mobx stores
   └───utils         # Helper functions and methods
 ```
 
@@ -55,8 +57,10 @@ src
   │   app.ts        # App entry point and setup
   └───middleware    # Middleware methods and functions
   └───models        # ORM/db Models and classes
+  └───repositories  # Collection oriented data-access logic
   └───routes        # HTTP RESTful endpoints
   └───services      # Business logic
+  └───exceptions    # Custom exception classes
   └───utls          # Helper functions and methods
 ```
 
@@ -74,7 +78,7 @@ src
   - **Purpose:**
     - Encapsulates the details for the database, implements data structures for our domain/business data.
     - In special cases, can implement functions/methods which perform domain/business logic for the service layer (e.g. if some operations are much faster when performed with raw SQL queries).
-  - **What’s in it:** ORM Models (i.e. Sequelize models), and custom classes which implement database views
+  - **What’s in it:** ORM Models (i.e. Sequelize models), repositories, and custom classes which implement database views
 
 ## Environment Setup
 
@@ -189,9 +193,10 @@ As this project is almost purely JavaScript, many of the best practices chosen t
 1. Use `// TODO:` to annotate solutions to problems, and `// FIXME:` to annotate parts of the code that need to be fixed.
 1. Don't use multiple blank lines to pad your code.
 1. Use semicolons after all statements, in order to avoid the use of [Automatic Code Insertion](https://tc39.es/ecma262/#sec-automatic-semicolon-insertion).
+1. JSDoc Whenever possible!
 
 ## Contributors
 
-- Jordan Finch
-- Hayden Crain
-- Rachel Coster
+- Jordan Finch (Student Number: 99144077)
+- Hayden Crain (Student Number: 98105873)
+- Rachel Coster (Student Number: 13242159)

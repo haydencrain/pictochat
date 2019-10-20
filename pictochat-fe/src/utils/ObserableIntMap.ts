@@ -1,9 +1,21 @@
 import { ObservableMap } from 'mobx';
 
-export default class ObservableIntMap<V = any> {
-  private map: ObservableMap<number, V>;
+interface IObservableIntMap<T> {
+  has(key: any): boolean;
+  set(key: any, value: T): this;
+  delete(key: any): boolean;
+  get(key: any): T | undefined;
+  clear(): void;
+  replace(values: any): void;
+  keys(): IterableIterator<number>;
+  values(): IterableIterator<T>;
+  entries(): any;
+}
 
-  constructor(map: ObservableMap<number, V>) {
+export default class ObservableIntMap<T = any> implements IObservableIntMap<T> {
+  private map: ObservableMap<number, T>;
+
+  constructor(map: ObservableMap<number, T>) {
     this.map = map;
   }
 
@@ -11,7 +23,7 @@ export default class ObservableIntMap<V = any> {
     return this.map.has(parseInt(key));
   }
 
-  set(key: any, value: V): this {
+  set(key: any, value: T): this {
     this.map.set(parseInt(key), value);
     return this;
   }
@@ -20,7 +32,7 @@ export default class ObservableIntMap<V = any> {
     return this.map.delete(parseInt(key));
   }
 
-  get(key: any): V | undefined {
+  get(key: any): T | undefined {
     return this.map.get(parseInt(key));
   }
 
@@ -36,7 +48,7 @@ export default class ObservableIntMap<V = any> {
     return this.map.keys();
   }
 
-  values(): IterableIterator<V> {
+  values(): IterableIterator<T> {
     return this.map.values();
   }
 

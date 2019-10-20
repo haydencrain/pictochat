@@ -3,7 +3,15 @@ import { Image } from '../models/image';
 import { ImageService } from '../services/image-service';
 import { ENCODING_CONTENT_TYPES } from '../utils/encoding-content-types';
 
+/**
+ * Implements HTTP responses for the endpoint `'/api/image`
+ */
 export const imageRouter = Router();
+
+/**
+ * GET an image
+ * @urlParam imageId
+ */
 imageRouter.get('/:imageId', async (req, res, next) => {
   try {
     let image: Image = await ImageService.getImage(req.params.imageId);

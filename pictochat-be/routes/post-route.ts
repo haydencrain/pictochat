@@ -1,5 +1,4 @@
-import util from 'util';
-import fs from 'fs';
+import { unlink, readFile } from 'fs-extra';
 import express from 'express';
 import multer from 'multer';
 import passport from 'passport';
@@ -8,31 +7,34 @@ import { strategies } from '../middleware/passport-middleware';
 import { DiscussionService, ArchiveType } from '../services/discussion-service';
 import { MIMETYPE_TO_ENCODING } from '../utils/encoding-content-types';
 import { DiscussionTreeNode } from '../models/discussion-tree-node';
-import { User } from '../models/user';
-import { ForbiddenError } from '../exceptions/forbidden-error';
 import { DiscussionPost } from '../models/discussion-post';
 import { NotFoundError } from '../exceptions/not-found-error';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
 import { PaginationOptions } from '../utils/pagination-types';
 import { UnprocessableError } from '../exceptions/unprocessable-error';
-
-const AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR';
 
 // This will temporarily store images in a local staging directory on the API server
 const imageStager = multer({ dest: config.IMAGE_STAGING_DIR });
 
 //// ROUTER ////
 
+/**
+ * Implements HTTP responses for the endpoint `'/api/post'`
+ */
 export const postRouter = express.Router();
 
 /**
- * Get reply tree under post
+ * GET discussion tree node for postId
+ * @urlParam postId
+ *
+ * @queryParam sort The sorting strategy to use for replies. Must be a value defined in SortTypes (used for pagination)
+ * @queryParam limit Maximum number of replies to include (used for pagination)
+ * @queryParam after The lowest postId to include in the post's replies (used for pagination)
  */
 postRouter.get('/:postId', async (req, res, next) => {
   try {
     const { sort, limit, after } = req.query;
     const paginationOptions = new PaginationOptions(after, limit);
-    let replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(
+    const replyTree: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(
       req.params.postId,
       sort,
       paginationOptions
@@ -43,13 +45,17 @@ postRouter.get('/:postId', async (req, res, next) => {
   }
 });
 
-// POST Flag a post for inappropriate content
+/**
+ * POST
+ * Flag a post for inappropriate content
+ * @urlParam postId
+ */
 postRouter.post(
   '/:postId/content-report',
   passport.authenticate(strategies.JWT, { session: false }),
   async (req, res, next) => {
     try {
-      const post: DiscussionPost = await setPostInappropraiteContentFlag(parseInt(req.params.postId), true);
+      const post: DiscussionPost = await DiscussionService.setInappropriateFlag(parseInt(req.params.postId), true);
       res.json(makeContentReport(post));
     } catch (error) {
       next(error);
@@ -57,18 +63,25 @@ postRouter.post(
   }
 );
 
+/**
+ * DELETE flag on post for inappropriate content
+ * @urlParam postId
+ */
 postRouter.delete('/:postId/content-report', async (req, res, next) => {
   try {
-    const post: DiscussionPost = await setPostInappropraiteContentFlag(parseInt(req.params.postId), false);
+    const post: DiscussionPost = await DiscussionService.setInappropriateFlag(parseInt(req.params.postId), false);
     res.json(makeContentReport(post));
   } catch (error) {
     next(error);
   }
 });
 
+/**
+ * GET Flag on a post for inappropriate content
+ * @urlParam postId
+ */
 postRouter.get('/:postId/content-report', async (req, res, next) => {
   try {
-    console.log(req.params);
     const post: DiscussionPost = await DiscussionService.getPost(parseInt(req.params.postId));
     if (!post.hasInappropriateFlag) throw new NotFoundError();
     res.json(makeContentReport(post));
@@ -77,6 +90,12 @@ postRouter.get('/:postId/content-report', async (req, res, next) => {
   }
 });
 
+/**
+ * POST a post by a logged in user
+ * @body Multi-Part Form with the following fields:
+ *    parentPostId: (optional) The post that this posts is directly replying too
+ *    image: A File containing the post's image
+ */
 postRouter.post(
   '/',
   passport.authenticate(strategies.JWT, { session: false }),
@@ -94,49 +113,53 @@ postRouter.post(
   }
 );
 
+/**
+ * PATCH
+ * Update a post's content
+ *
+ * @urlParam postId
+ * @body A Multi-Part Form with the following fields
+ *      image: A File containing the new image for the specified postId
+ */
 postRouter.patch(
   '/:postId',
   passport.authenticate(strategies.JWT, { session: false }),
   imageStager.single('image'),
   async (req: any, res, next) => {
     try {
-      let newImageSpec = await makeNewImageSpec(req.file);
-      let postUpdateSpec = {
-        image: newImageSpec,
-        postId: req.body.postId,
-        userId: req.user.userId
-      };
-      let post: DiscussionPost = await DiscussionService.updatePost(postUpdateSpec);
+      const newImageSpec = await makeNewImageSpec(req.file);
+      const post: DiscussionPost = await DiscussionService.updatePost(req.user.userId, req.params.postId, newImageSpec);
       // Return full tree under updated post so that clients only have to deal with one
       // data structure for all methods.
-      let postTree = await DiscussionService.getReplyTreeUnderPost(post.postId);
-      res.status(200);
+      const postTree = await DiscussionService.getReplyTreeUnderPost(post.postId);
       res.json(postTree.toJSON());
     } catch (error) {
       next(error);
     } finally {
-      deleteFile(req.file.path);
+      unlink(req.file.path);
     }
   }
 );
 
+/**
+ * DELETE a post
+ * @urlParam postId
+ */
 postRouter.delete(
   '/:postId',
   passport.authenticate(strategies.JWT, { session: false }),
   async (req: any, res, next) => {
     try {
-      let requestingUserId: number = req.user.userId;
-      let archiveType: ArchiveType = await DiscussionService.archivePost(req.params.postId, requestingUserId);
+      const requestingUserId: number = req.user.userId;
+      const archiveType: ArchiveType = await DiscussionService.archivePost(req.params.postId, requestingUserId);
 
       if (archiveType === ArchiveType.DELETED) {
-        res.status(204); // Successful, no content
-        res.send(null);
-        return;
+        res.status(204);
+        return res.end();
       }
 
       // If Post was hidden
-      let post: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(req.params.postId);
-      res.status(200);
+      const post: DiscussionTreeNode = await DiscussionService.getReplyTreeUnderPost(req.params.postId);
       res.json(post.toJSON());
     } catch (error) {
       next(error);
@@ -146,25 +169,14 @@ postRouter.delete(
 
 //// HELPER FUNCTIONS ////
 
-// TODO: Move into module in project utils folder (or maybe see if a promise-based library for fs already exists?)
-const readFile = util.promisify(fs.readFile);
-const deleteFile = util.promisify(fs.unlink);
-
-// TODO: Put in a a service (not sure which one)
-async function setPostInappropraiteContentFlag(postId: number, flagValue: boolean): Promise<DiscussionPost> {
-  const sequelize = SequelizeConnectionService.getInstance();
-  return await sequelize.transaction(async transaction => {
-    const post = await DiscussionService.getPost(postId);
-    post.setInappropriateContentFlag(flagValue);
-    await post.save();
-    return post;
-  });
+function makeContentReport(post: DiscussionPost): { postId: number; hasInappropriateContentFlag: boolean } {
+  return { postId: post.postId, hasInappropriateContentFlag: post.hasInappropriateFlag };
 }
 
-function makeContentReport(post) {
-  return { postId: post.postId, hasInappropriateContentFlag: post.hasInappropriateContentFlag };
-}
-
+/**
+ * Extracts the correct encoding and content from the specified image
+ * @param file A multer File object for the image
+ */
 async function makeNewImageSpec(file): Promise<{ data: Buffer; encoding: string }> {
   let data = await readFile(file.path);
   let encoding = MIMETYPE_TO_ENCODING[file.mimetype];
@@ -174,42 +186,36 @@ async function makeNewImageSpec(file): Promise<{ data: Buffer; encoding: string 
   return { data, encoding };
 }
 
-function assertIsPostAuthor(body: { userId: string }, user: User) {
-  if (parseInt(body.userId) !== user.userId) {
-    throw new ForbiddenError("Post's userId and/or supplied JWT token is incorrect or are for different users");
-  }
-}
-
+/**
+ * Creates a reply to a post
+ * @param req
+ * @param res
+ * @param next
+ */
 async function handleNewReplyPOST(req, res, next) {
   try {
-    assertIsPostAuthor(req.body, req.user);
-    let newImageSpec = await makeNewImageSpec(req.file);
-    let newReplySpec = {
-      image: newImageSpec,
-      parentPostId: req.body.parentPostId,
-      userId: req.body.userId
-    };
-    let post = await DiscussionService.createReply(newReplySpec);
-    // Setting Location and using status 201 to match RESTful conventions for POST responses
-    res.set('Location', `${config.API_ROOT}/post/${post.postId}`);
+    const newImageSpec = await makeNewImageSpec(req.file);
+    const post = await DiscussionService.createReply(req.user.userId, req.body.parentPostId, newImageSpec);
     res.status(201);
     res.json(post.toJSON());
   } finally {
-    await deleteFile(req.file.path);
+    await unlink(req.file.path);
   }
 }
 
+/**
+ * Establishes a post as the parent of the reply thread
+ * @param req
+ * @param res
+ * @param next
+ */
 async function handleNewThreadPOST(req, res, next) {
   try {
-    assertIsPostAuthor(req.body, req.user);
-    let newImageSpec = await makeNewImageSpec(req.file);
-    let newThreadSpec = { image: newImageSpec, userId: req.body.userId };
-    let thread = await DiscussionService.createThread(newThreadSpec);
-    // Setting Location and using status 201 to match RESTful conventions for POST responses
-    res.set('Location', `${config.API_ROOT}/post/${thread.rootPost.postId}`);
+    const newImageSpec = await makeNewImageSpec(req.file);
+    const thread = await DiscussionService.createThread(req.user.userId, newImageSpec);
     res.status(201);
     res.json(thread.toFlatJSON());
   } finally {
-    await deleteFile(req.file.path);
+    await unlink(req.file.path);
   }
 }

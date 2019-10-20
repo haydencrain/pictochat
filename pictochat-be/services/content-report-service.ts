@@ -1,12 +1,15 @@
 import { DiscussionPost } from '../models/discussion-post';
-import { ContentReport } from '../models/content-report';
+import { User } from '../models/user';
+import { DiscussionPostRepo } from '../repositories/discussion-post-repo';
+// import { ContentReport } from '../models/content-report';
 
+/** Gets content reports for admin user */
 export class ContentReportService {
-  static async getContentReports(): Promise<DiscussionPost[]> {
-    const reportedPosts = await DiscussionPost.getDiscussionPosts({
-      where: { hasInappropriateFlag: true, isHidden: false }
-    });
-    // return reportedPosts.map(post => new ContentReport(post));
+  /**
+    * Returns an array of posts that have been reported
+    */
+  static async getReportedPosts(): Promise<DiscussionPost[]> {
+    const reportedPosts = await DiscussionPostRepo.getFlaggedPosts();
     return reportedPosts;
   }
 }

@@ -1,28 +1,27 @@
 import express from 'express';
 import passport from 'passport';
 import { strategies } from '../middleware/passport-middleware';
-import { User } from '../models/user';
-import { ForbiddenError } from '../exceptions/forbidden-error';
+import { SockPuppetAlertRepo } from '../repositories/sock-puppet-alert-repo';
 import { SockPuppetAlert } from '../models/sock-puppet-alert';
+import { requireAdminMiddleware } from '../middleware/require-admin-middleware';
 
+/**
+ * Implements HTTP responses for the endpoint `'/api/sock-puppet-alert'`
+ */
 export const sockPuppetAlertRouter = express.Router();
 
+/**
+ * GET Alerts for devices that have been used to access a large number of accounts (suspected sock puppets accounts)
+ * @queryParam userLimit The number of accounts/users a device needs to access to be included in the alerts
+ */
 sockPuppetAlertRouter.get(
   '/',
   passport.authenticate(strategies.JWT, { session: false }),
+  requireAdminMiddleware,
   async (req: any, res, next) => {
     try {
-      const userId = req.user.userId;
-      const requestingUser = await User.findOne({ where: { userId } });
-
-      if (!requestingUser.hasAdminRole) {
-        throw new ForbiddenError();
-      }
-
-      const alerts = await SockPuppetAlert.getSockPuppetAlerts(req.query.userLimit);
+      const alerts: SockPuppetAlert[] = await SockPuppetAlertRepo.getSockPuppetAlerts(req.query.userLimit);
       const alertsJson = alerts.map(alert => alert.toJSON());
-      console.log('alertsJson: ', JSON.stringify(alertsJson));
-
       res.send(alertsJson);
     } catch (error) {
       next(error);

@@ -1,40 +1,31 @@
 import { useState, useCallback } from 'react';
 import { readFile } from '../utils/FileHelpers';
 
-export function useImageDropzone(params: {
-  onUpload?: (image: File) => void;
-}): {
-  errorMessage: string;
-  onDropAccepted: (rejectedFiles: File[]) => void;
-  onDropRejected: (acceptedFiles: File[]) => void;
-  onDragOver: (event: React.DragEvent<HTMLElement>) => void;
-} {
-  const { onUpload } = params;
-  const [errorMessage, setErrorMessage] = useState<string>();
-  const onDropAccepted = useCallback((acceptedFiles: File[]) => {
-    !!onUpload && params.onUpload(acceptedFiles[0]);
-  }, []);
-  const onDropRejected = useCallback((rejectedFiles: File[]) => {
-    setErrorMessage('File is not an accepted image type!');
-  }, []);
-  const onDragOver = useCallback((event: React.DragEvent<HTMLElement>) => {
-    setErrorMessage('');
-  }, []);
-
-  return {
-    errorMessage,
-    onDropAccepted,
-    onDropRejected,
-    onDragOver
-  };
-}
-
+/**
+ * A React Hook that provides functionality for asynchronously creating the base64 string of an image File
+ * @function
+ * @param params - callback functions to use
+ */
 export function useImage(params: {
   onSetImageDone?: () => void;
 }): {
+  /**
+   * The current image being used (can be null if no image is being processed)
+   */
   image: File;
+  /**
+   * The base64 string of the image (can be null if still being processed)
+   */
   base64: string;
+  /**
+   * A function which sets a new image to be processed
+   * @function
+   * @param img - The new image to process
+   */
   addNewImage: (img: File) => void;
+  /**
+   * Clears the currently processed image
+   */
   clearImage: () => void;
 } {
   const { onSetImageDone } = params;

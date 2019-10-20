@@ -1,50 +1,58 @@
 import * as React from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
-import { Observer } from 'mobx-react';
-import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
-import NavHistoryContext from '../../contexts/NavHistoryContext';
-import ThreadListContainer from '../../components/ThreadListContainer';
 import { computed } from 'mobx';
-import PostMainContainer from '../../components/PostMainContainer';
+import { Observer } from 'mobx-react';
+import { RouteComponentProps, withRouter } from 'react-router';
+import StoresContext, { IStoresContext } from '../../contexts/StoresContext';
+import ThreadListContainer from '../../components/Post/ThreadListContainer';
+import PostMainContainer from '../../components/Post/PostMainContainer';
 import './DiscussionPage.less';
 
 interface DiscussionPageMatchParams {
+  /**
+   * The id of the discussion, from the url route params
+   */
   id: string;
 }
 
 interface DiscussionPageProps extends RouteComponentProps<DiscussionPageMatchParams> {}
 
+/**
+ * A React component that fetches the currently selected discussion (by access the url's route parameters) and rendering
+ * Page layout for the discussion
+ * @component
+ * @param { DiscussionPageProps } props - The props of the component
+ */
 function DiscussionPage(props: DiscussionPageProps) {
   const stores: IStoresContext = React.useContext(StoresContext);
-  const activeId = computed((): string => stores.discussion.activeDiscussionRootId);
+  const activeId = computed((): string => stores.activeDiscussion.postId);
 
   React.useEffect(() => {
-    const discussionStore = stores.discussion;
-    discussionStore
-      .setActiveDiscussion(props.match.params.id)
-      .then(async () => {
-        const discussionId = discussionStore.activeDiscussionRoot.discussionId;
-        stores.reaction.loadThreadReactions(discussionId);
-      });
-  }, [props.match.params.id]);
+    const activeDiscussionStore = stores.activeDiscussion;
+    (async () => {
+      await activeDiscussionStore.setDiscussion(props.match.params.id);
+      const discussionId = activeDiscussionStore.discussion.discussionId;
+      stores.reaction.loadThreadReactions(discussionId);
+    })();
+  }, [
+    /* The component should refetch new data every time the id route parameter changes */
+    props.match.params.id
+  ]);
 
   return (
-    <NavHistoryContext.Provider value={props.history}>
-      <section id="discussion-page">
-        <Observer>{() => <PostMainContainer id={activeId.get()} />}</Observer>
-        <Observer>
-          {() => (
-            <ThreadListContainer
-              id={activeId.get()}
-              showReplies
-              sectionHeader="Replies"
-              noPostsMessage="No replies have been added yet! Be the first to add a reply!"
-              addPostButtonMessage="Add Reply"
-            />
-          )}
-        </Observer>
-      </section>
-    </NavHistoryContext.Provider>
+    <section id="discussion-page">
+      <Observer>{() => <PostMainContainer id={activeId.get()} />}</Observer>
+      <Observer>
+        {() => (
+          <ThreadListContainer
+            id={activeId.get()}
+            showReplies
+            sectionHeader="Replies"
+            noPostsMessage="No replies have been added yet! Be the first to add a reply!"
+            addPostButtonMessage="Add Reply"
+          />
+        )}
+      </Observer>
+    </section>
   );
 }
 

@@ -1,10 +1,14 @@
 import * as React from 'react';
-import RegisterForm from '../../components/RegisterForm';
-import './RegisterPage.less';
 import { RouteComponentProps } from 'react-router';
+import RegisterForm from '../../components/User/RegisterForm';
+import './RegisterPage.less';
 
 interface RegisterPageProps extends RouteComponentProps<any> {}
 
+/**
+ * A React component that renders the Registration Page, which includes the register form.
+ * @param props - The props of the component (includes RouteComponentProps in order to access the route history)
+ */
 export default function RegisterPage(props: RegisterPageProps) {
   const handleCancelClick = React.useCallback(() => {
     props.history.goBack();

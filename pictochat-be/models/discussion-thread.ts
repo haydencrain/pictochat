@@ -1,9 +1,8 @@
-import { Sequelize, QueryTypes } from 'sequelize';
-import { SequelizeConnectionService } from '../services/sequelize-connection-service';
+import { Sequelize } from 'sequelize';
+import { SequelizeConnection } from '../utils/sequelize-connection';
 import { DiscussionPost } from './discussion-post';
-import { SortTypes, SortValue } from '../utils/sort-types';
 
-const sequelize: Sequelize = SequelizeConnectionService.getInstance();
+const sequelize: Sequelize = SequelizeConnection.getInstance();
 
 /**
  * Summary of posts with in one discussion thread
@@ -13,13 +12,11 @@ export class DiscussionThread {
   rootPost: DiscussionPost;
   replyCount: number;
 
-  constructor(data: { discussionId: string; rootPost: DiscussionPost; replyCount: number }) {
-    this.discussionId = data.discussionId;
-    this.rootPost = data.rootPost;
-    this.replyCount = data.replyCount;
+  constructor(discussionId: string, rootPost: DiscussionPost, replyCount: number) {
+    this.discussionId = discussionId;
+    this.rootPost = rootPost;
+    this.replyCount = replyCount;
   }
-
-  // INSTANCE METHODS
 
   /**
    * @returns A flat type-less object representation of this DiscussionThread */
@@ -33,58 +30,7 @@ export class DiscussionThread {
     return threadFlat;
   }
 
-  // STATIC/COLLECTION METHODS
-
-  /**
-   * @param discussionId
-   * @returns A DiscussionThread instance for the specified discussionId */
-  static async getDiscussionThread(discussionId: string): Promise<DiscussionThread> {
-    let rootPost: DiscussionPost = await DiscussionPost.getDiscussionRoot(discussionId);
-    return new DiscussionThread({ rootPost, discussionId, replyCount: await rootPost.getDeepReplyCount() });
-  }
-
-  /**
-   * @returns A DiscussionThread instance for all discussion threads */
-  static async getDiscussionThreads(sortType: SortValue): Promise<DiscussionThread[]> {
-    // Using application side join rather than one raw SQL query to avoid
-    // cascading changes to this method when columns are added to the DiscussionPost model/table.
-    let rootPosts = await DiscussionPost.getDiscussionRootPosts(sortType);
-    let replyCounts: { [discussionId: number]: number } = await DiscussionThread.getReplyCountsForAllThreads();
-    let threads: DiscussionThread[] = [];
-    for (let rootPost of rootPosts) {
-      let discussionId = rootPost.discussionId;
-      let thread = new DiscussionThread({
-        discussionId: discussionId,
-        rootPost,
-        replyCount: replyCounts[discussionId]
-      });
-      threads.push(thread);
-    }
-
-    // we can sort by comment count now, as we have finally computed to reply counts
-    if (sortType === SortTypes.COMMENTS) {
-      threads = DiscussionThread.sortByCommentCount(threads);
-    }
-
-    return threads;
-  }
-
-  private static async getReplyCountsForAllThreads(): Promise<{ [discussionId: number]: number }> {
-    let records: { discussionId: number; replyCount: number }[] = await sequelize.query(
-      `SELECT "discussionId", COUNT(*) - 1 as "replyCount"
-       FROM discussion_posts
-       WHERE "isDeleted" = FALSE
-       GROUP BY "discussionId"`,
-      { raw: true, type: QueryTypes.SELECT }
-    );
-    let threadReplyCountMap = {};
-    for (let record of records) {
-      threadReplyCountMap[record.discussionId] = record.replyCount;
-    }
-    return threadReplyCountMap;
-  }
-
-  private static sortByCommentCount(threads: DiscussionThread[]): DiscussionThread[] {
+  static sortByCommentCount(threads: DiscussionThread[]): DiscussionThread[] {
     return threads.sort((d1, d2) => d2.replyCount - d1.replyCount);
   }
 }
