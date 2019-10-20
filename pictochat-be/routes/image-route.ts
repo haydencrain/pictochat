@@ -17,7 +17,7 @@ imageRouter.get('/:imageId', async (req, res, next) => {
     let image: Image = await ImageService.getImage(req.params.imageId);
 
     // Images are idempotent so tell client to cache for a long time (7 days)
-    res.set('Cache-Control', 'max-age=1209600, no-transform');
+    res.set('Cache-Control', 'max-age=1209600, no-transform, immutable');
 
     res.type(ENCODING_CONTENT_TYPES[image.encoding]);
     res.send(image.data);
