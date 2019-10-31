@@ -14,6 +14,7 @@ export interface ImageUploadModalProps {
    * Provide a class name to the root element of this component
    */
   className?: string;
+  triggerClassName?: string;
   /**
    * Determines whether the modal's trigger should either be a modal, or a link
    */
@@ -84,16 +85,18 @@ function ImageUploadModal(props: ImageUploadModalProps) {
 
   const renderModalTrigger = () => {
     const content = props.triggerContent || 'Add Post';
+    const triggerClassName = props.triggerClassName || '';
+    const className = classnames('image-upload-modal-trigger', triggerClassName);
     switch (props.triggerType) {
       case 'button':
         return (
-          <Button primary onClick={handleOpen}>
+          <Button primary className={className} onClick={handleOpen}>
             {content}
           </Button>
         );
       case 'link':
         return (
-          <button className="link" onClick={handleOpen}>
+          <button className={classnames("link", className)} onClick={handleOpen}>
             {content}
           </button>
         );
@@ -109,7 +112,7 @@ function ImageUploadModal(props: ImageUploadModalProps) {
 
       <Modal.Actions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button primary onClick={handleSubmit}>
+        <Button className={'submit'} primary onClick={handleSubmit}>
           Submit
         </Button>
       </Modal.Actions>

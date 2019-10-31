@@ -56,6 +56,7 @@ export default function ThreadListMenu(props: ThreadListMenuProps) {
               triggerType="button"
               triggerContent={props.createButtonMessage}
               parentPostId={props.parentId}
+              triggerClassName={'add-reply-trigger'}
             />
           </Menu.Item>
         </Menu.Menu>

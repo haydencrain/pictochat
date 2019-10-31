@@ -44,7 +44,7 @@ function PostItem(props: PostItemProps) {
   const imageSrc = computed(() => (post.isHidden ? deletedPlaceholderImg : post.imageSrc));
 
   return (
-    <section className={classnames('thread-post', getPostTypeName(postType))}>
+    <section className={classnames('thread-post', getPostTypeName(postType))} data-postId={post.postId} data-testId="post-item">
       <div className="post-sidebar">
         <Link to={UserService.getUserUrl(post.author.username)}>
           <Image src={post.author.userAvatarURI} avatar size="mini" />
@@ -59,7 +59,7 @@ function PostItem(props: PostItemProps) {
         </div>
         <div className="post-body">
           <ShowImageModal
-            trigger={<Observer>{() => <Image src={imageSrc.get()} />}</Observer>}
+            trigger={<Observer>{() => <Image src={imageSrc.get()} className="post-image"/>}</Observer>}
             imageSrc={imageSrc.get()}
           />
         </div>

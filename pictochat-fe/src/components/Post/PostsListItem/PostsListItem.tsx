@@ -39,7 +39,7 @@ function PostsListItem(props: PostListItemProps) {
   };
 
   return (
-    <Segment className="post-and-replies">
+    <Segment className="post-and-replies" data-postId={props.post.postId}>
       <PostItem post={props.post} postType={props.postType} />
       {props.showReplies && renderPostReplies()}
     </Segment>

@@ -52,7 +52,7 @@ function PostsList(props: PostListsProps) {
     if (!props.isLoading && props.posts.length === 0 && !props.shouldLoadMore) {
       return (
         <Segment>
-          <p>{props.noPostsMessage || 'Nothing to display'}</p>
+          <p className="no-posts-message">{props.noPostsMessage || 'Nothing to display'}</p>
         </Segment>
       );
     }

@@ -28,7 +28,7 @@ function DeletePostButton(props: DeletePostButtonProps) {
   };
 
   return (
-    <button className="link" onClick={handleClick}>
+    <button className="link delete-post" onClick={handleClick}>
       delete
     </button>
   );

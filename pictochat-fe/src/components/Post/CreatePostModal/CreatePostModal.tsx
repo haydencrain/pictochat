@@ -19,6 +19,7 @@ interface CreatePostModalProps {
    * The message the trigger should display
    */
   triggerContent?: any;
+  triggerClassName?: string;
 }
 
 /**
@@ -62,6 +63,7 @@ function CreatePostModal(props: CreatePostModalProps) {
       triggerContent={props.triggerContent}
       onSubmit={handleSubmit}
       shouldOpen={shouldOpen}
+      triggerClassName={props.triggerClassName}
     />
   );
 }
