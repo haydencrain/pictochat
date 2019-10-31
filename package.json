@@ -9,6 +9,7 @@
     "build-backend-prod": "tsc",
     "build-frontend-prod": "webpack --config ./pictochat-fe/webpack.prod.js",
     "start-dev": "concurrently \"npm run start-frontend-dev\" \"npm run start-backend-dev\"",
+    "start-dev-docker": "docker-compose -f docker-compose.dev.yml up",
     "start-dev-remote": "concurrently \"npm run start-frontend-dev-remote\" \"npm run start-backend-dev\"",
     "start-backend-dev": "concurrently \"tsc --watch\" \"nodemon -L --watch ./build/pictochat-be ./build/pictochat-be/app.js\"",
     "start-frontend-dev": "webpack-dev-server --config ./pictochat-fe/webpack.dev.js",

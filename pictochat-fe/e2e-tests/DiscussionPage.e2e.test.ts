@@ -1,5 +1,3 @@
-import path from 'path';
-import fetch from 'node-fetch';
 import puppeteer, { Browser, Page, ElementHandle } from 'puppeteer';
 import { wait } from 'pptr-testing-library';
 import config from '../src/config';
@@ -8,7 +6,7 @@ import { REPLY_PLACEHOLDER_TEXT } from '../src/pages/DiscussionPage/DiscussionPa
 import '@testing-library/jest-dom/extend-expect';
 import 'pptr-testing-library/extend';
 import { openPage, resetBackend, loginWithStaticCookies, waitAndGet } from '../test-utils/E2EUtils';
-import { TEST_IMAGE_PATH, NO_REPLY_POST_ID, ONE_REPLY_TEST_ROOT_POST_ID, ONE_REPLY_TEST_REPLY_POST_ID, ONE_REACTION_POST_ID, NO_REPLIES_OR_REACTIONS_TEST_POST_ID } from './constants';
+import { TEST_IMAGE_PATH, NO_REPLY_POST_ID, ONE_REPLY_TEST_ROOT_POST_ID, ONE_REPLY_TEST_REPLY_POST_ID, NO_REPLIES_OR_REACTIONS_TEST_POST_ID } from './constants';
 
 //// CONSTANTS ////
 const DISCUSSION_PAGE_URL_ROOT = `${config.urls.FRONTEND_URL_ROOT}discussion/`
@@ -28,7 +26,7 @@ async function getPostImage(page: Page, postId: string): Promise<ElementHandle<E
   return (await post.$$('.post-image'))[0];
 }
 
-async function getPostImageSrc(page, postId) {
+async function getPostImageSrc(page: Page, postId: string): Promise<string> {
   const image = await getPostImage(page, postId);
   return image.evaluate(node => node.getAttribute('src'));
 }
@@ -110,7 +108,6 @@ async function simulateReplyToPost(page: Page, postId: string) {
 async function simulateDeletePost(page: Page, postId: string) {
   const post = await getPostItem(page, postId);
   // extracting first match as child posts will also instances of this button
-  // const deletePostBtn = await ( waitAndGet(() => post.$$('.delete-post')) )[0];
   const deleteElms = await waitAndGet(() => post.getAllByText('delete'));
   const deletePostBtn = deleteElms[0];
   await deletePostBtn.click();
@@ -119,7 +116,7 @@ async function simulateDeletePost(page: Page, postId: string) {
 /// TESTS ///
 
 beforeEach(async () => {
-  // 10 minutes
+  // 2 minutes
   jest.setTimeout(60000 * 2);
 browser = await puppeteer.launch({ headless: false, slowMo: 200 });
   await resetBackend();
@@ -180,9 +177,8 @@ describe('Edit/delete posts feature', () => {
 
       await wait(async () => {
         const updatedSrc = getPostImageSrc(page, postId);
-        console.log(`[postId: ${postId}] updatedSrc: ${await updatedSrc}`);
         return expect(updatedSrc).resolves.not.toEqual(initialSrc);
-      }, {timeout: 50});
+      });
     }
   );
 
