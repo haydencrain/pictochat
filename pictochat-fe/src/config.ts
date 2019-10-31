@@ -8,5 +8,8 @@ export default {
   },
   sockPuppets: {
     USER_LIMIT: 2
+  },
+  cookieNames: {
+    JWT: 'pictochatJWT'
   }
 };
