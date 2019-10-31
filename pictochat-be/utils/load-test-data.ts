@@ -5,6 +5,7 @@ import { Image } from '../models/image';
 import { syncModels } from './sync-models';
 import { User } from '../models/user';
 import { LoginLog } from '../models/login-log';
+import { Reaction } from '../models/reaction';
 
 /**
  * Promise-returning wrapper for fs.readFile
@@ -67,14 +68,14 @@ export async function loadTestData() {
 
   console.log('Creating test instances for DiscussionPosts');
   let samplePosts = [
-    {
+    { //1
       discussionId: '1',
       isRootPost: true,
       imageId: 'asdsdfsdfd1-20190101T010101000',
       authorId: 1,
       postedDate: new Date()
     },
-    {
+    { //2
       discussionId: '1',
       parentPostId: 1,
       isRootPost: false,
@@ -83,7 +84,7 @@ export async function loadTestData() {
       postedDate: new Date(),
       replyTreePath: '1/'
     },
-    {
+    { //3
       discussionId: '1',
       parentPostId: 2,
       isRootPost: false,
@@ -93,7 +94,7 @@ export async function loadTestData() {
       replyTreePath: '1/2/',
       hasInappropriateFlag: true
     },
-    {
+    { //4
       discussionId: '1',
       parentPostId: 3,
       isRootPost: false,
@@ -102,7 +103,7 @@ export async function loadTestData() {
       postedDate: new Date(),
       replyTreePath: '1/2/3/'
     },
-    {
+    { //5
       discussionId: '1',
       parentPostId: 3,
       isRootPost: false,
@@ -112,7 +113,7 @@ export async function loadTestData() {
       replyTreePath: '1/2/3/',
       hasInappropriateFlag: true
     },
-    {
+    { //6
       discussionId: 1,
       parentPostId: 3,
       isRootPost: false,
@@ -121,7 +122,7 @@ export async function loadTestData() {
       postedDate: new Date(),
       replyTreePath: '1/2/3/'
     },
-    {
+    { //7
       discussionId: 1,
       parentPostId: 2,
       isRootPost: false,
@@ -131,7 +132,7 @@ export async function loadTestData() {
       replyTreePath: '1/2/',
       hasInappropriateFlag: true
     },
-    {
+    { //8
       discussionId: 1,
       parentPostId: 2,
       isRootPost: false,
@@ -140,7 +141,7 @@ export async function loadTestData() {
       postedDate: new Date(),
       replyTreePath: '1/2/'
     },
-    {
+    { //9
       discussionId: 1,
       parentPostId: 1,
       isRootPost: false,
@@ -149,7 +150,7 @@ export async function loadTestData() {
       postedDate: new Date(),
       replyTreePath: '1/'
     },
-    {
+    { //10
       discussionId: 1,
       parentPostId: 1,
       isRootPost: false,
@@ -158,7 +159,7 @@ export async function loadTestData() {
       postedDate: new Date(),
       replyTreePath: '1/'
     },
-    {
+    { //11
       discussionId: 1,
       parentPostId: 1,
       isRootPost: false,
@@ -167,7 +168,7 @@ export async function loadTestData() {
       postedDate: new Date(),
       replyTreePath: '1/'
     },
-    {
+    { //12
       discussionId: 1,
       parentPostId: 1,
       isRootPost: false,
@@ -176,7 +177,7 @@ export async function loadTestData() {
       postedDate: new Date(),
       replyTreePath: '1/'
     },
-    {
+    { //13
       discussionId: 2,
       isRootPost: true,
       imageId: 'asdsdfsdfd0-20190101T010101000',
@@ -184,15 +185,31 @@ export async function loadTestData() {
       postedDate: new Date(),
       hasInappropriateFlag: true
     },
-    {
+    { //14
       discussionId: 3,
       isRootPost: true,
       imageId: 'asdsdfsdfd0-20190101T010101000',
       authorId: 2,
       postedDate: new Date()
     },
-    {
+    { //15
       discussionId: 4,
+      isRootPost: true,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 1,
+      postedDate: new Date()
+    },
+    { //16
+      parentPostId: 13,
+      discussionId: 2,
+      isRootPost: false,
+      imageId: 'asdsdfsdfd0-20190101T010101000',
+      authorId: 1,
+      postedDate: new Date(),
+      replyTreePath: '13/'
+    },
+    { //17
+      discussionId: 5,
       isRootPost: true,
       imageId: 'asdsdfsdfd0-20190101T010101000',
       authorId: 1,
@@ -202,6 +219,10 @@ export async function loadTestData() {
   for (let postData of samplePosts) {
     await DiscussionPost.create(postData);
   }
+
+  await Reaction.bulkCreate([
+    { postId: 15, userId: 1, reactionName: 'laugh' }
+  ]);
 
   await LoginLog.bulkCreate([
     { userId: 1, deviceId: 'device1', loginTimestamp: new Date() },
