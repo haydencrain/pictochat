@@ -39,6 +39,8 @@ interface PostListsProps {
    * @function
    */
   onLoadMore?: () => void;
+
+  htmlId?: string;
 }
 
 /**
@@ -81,11 +83,13 @@ function PostsList(props: PostListsProps) {
     );
 
   return (
-    <Segment.Group className="post-list" raised={props.raised}>
-      {renderPosts()}
-      {renderLoadMore()}
-      {renderLoading()}
-    </Segment.Group>
+    <div id={props.htmlId}>
+      <Segment.Group className="post-list" raised={props.raised}>
+        {renderPosts()}
+        {renderLoadMore()}
+        {renderLoading()}
+      </Segment.Group>
+    </div>
   );
 }
 

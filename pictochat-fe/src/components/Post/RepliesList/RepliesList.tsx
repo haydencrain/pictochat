@@ -23,6 +23,8 @@ interface RepliesListProps {
    * Set to true if the segment containing the posts list should be raised
    */
   raised: boolean;
+
+  htmlId?: string;
 }
 
 /**
@@ -67,6 +69,7 @@ function RepliesList(props: RepliesListProps) {
       showReplies={showReplies}
       shouldLoadMore={hasMore.get()}
       onLoadMore={handleLoadMore}
+      htmlId={props.htmlId}
     />
   );
 }

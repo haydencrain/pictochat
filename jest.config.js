@@ -1,4 +1,3 @@
 module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
+  projects: ['pictochat-be', 'pictochat-fe']
 };

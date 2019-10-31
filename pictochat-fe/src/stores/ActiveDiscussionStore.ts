@@ -90,6 +90,8 @@ export default class ActiveDiscussionStore implements IActiveDiscussionStore {
         this.postId = postId;
         this.discussion.replace(post);
       });
+    } catch (error) {
+      throw error;
     } finally {
       runInAction(() => {
         this.isLoadingRoot = false;
@@ -104,7 +106,7 @@ export default class ActiveDiscussionStore implements IActiveDiscussionStore {
    * @param postId - The id of the post to fetch the replies from
    */
   @action.bound
-  async getNewReplies(postId: string) {
+  private async getNewReplies(postId: string) {
     this.isLoadingReplies = true;
     this.postsMap.clear();
     try {

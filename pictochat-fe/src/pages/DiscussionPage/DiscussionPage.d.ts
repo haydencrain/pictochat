@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import './DiscussionPage.less';
+export declare const REPLY_PLACEHOLDER_TEXT = "No replies have been added yet! Be the first to add a reply!";
 interface DiscussionPageMatchParams {
     /**
      * The id of the discussion, from the url route params

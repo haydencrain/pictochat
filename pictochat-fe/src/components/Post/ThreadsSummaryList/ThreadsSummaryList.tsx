@@ -18,6 +18,8 @@ interface ThreadsSummaryListProps {
    * Set to true if the segment containing the posts list should be raised
    */
   raised: boolean;
+
+  htmlId?: string;
 }
 
 /**
@@ -49,6 +51,7 @@ function ThreadsSummaryList(props: ThreadsSummaryListProps) {
       showReplies={props.showReplies}
       shouldLoadMore={shouldLoadMore.get()}
       onLoadMore={handleLoadMore}
+      htmlId={props.htmlId}
     />
   );
 }

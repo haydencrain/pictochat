@@ -7,6 +7,8 @@ import ThreadListContainer from '../../components/Post/ThreadListContainer';
 import PostMainContainer from '../../components/Post/PostMainContainer';
 import './DiscussionPage.less';
 
+export const REPLY_PLACEHOLDER_TEXT = 'No replies have been added yet! Be the first to add a reply!';
+
 interface DiscussionPageMatchParams {
   /**
    * The id of the discussion, from the url route params
@@ -41,17 +43,20 @@ function DiscussionPage(props: DiscussionPageProps) {
   return (
     <section id="discussion-page">
       <Observer>{() => <PostMainContainer id={activeId.get()} />}</Observer>
-      <Observer>
-        {() => (
-          <ThreadListContainer
-            id={activeId.get()}
-            showReplies
-            sectionHeader="Replies"
-            noPostsMessage="No replies have been added yet! Be the first to add a reply!"
-            addPostButtonMessage="Add Reply"
-          />
-        )}
-      </Observer>
+      <div id="main-threads-list-container">
+        <Observer>
+          {() => (
+            <ThreadListContainer
+              id={activeId.get()}
+              showReplies
+              sectionHeader="Replies"
+              noPostsMessage={REPLY_PLACEHOLDER_TEXT}
+              addPostButtonMessage="Add Reply"
+              htmlId="main-replies-list-container"
+            />
+          )}
+        </Observer>
+      </div>
     </section>
   );
 }

@@ -1,5 +1,5 @@
 import { PostAuthor, IPostAuthor } from './PostAuthor';
-import { observable, action, IObservableArray } from 'mobx';
+import { observable, action, IObservableArray, toJS } from 'mobx';
 
 export interface IDiscussionPost {
   /**
@@ -144,6 +144,14 @@ export class DiscussionPost implements IDiscussionPost {
   @action.bound
   clear() {
     this.replace(new DiscussionPost());
+  }
+
+  /**
+   * Returns a plain JS object representation of the post
+   * @function
+   */
+  toJSON(): any {
+    return toJS(this);
   }
 
   /**

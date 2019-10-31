@@ -29,6 +29,8 @@ interface ThreadListContainerProps {
    * Set true if the replies of each reply should be displayed (aka display the reply tree)
    */
   showReplies?: boolean;
+
+  htmlId?: string;
 }
 
 /**
@@ -58,7 +60,8 @@ function ThreadListContainer(props: ThreadListContainerProps) {
   const postListProps = {
     noPostsMessage: props.noPostsMessage,
     showReplies: props.showReplies,
-    raised: true
+    raised: true,
+    htmlId: props.htmlId
   };
 
   let postList = isThreadsSummary ? (
